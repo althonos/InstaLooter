@@ -302,25 +302,30 @@ class InstaLooter(object):
 
 def main(args=sys.argv):
     # parse arguments
-    parser = argparse.ArgumentParser(description='InstaLooter')
-    parser.add_argument('username', help='Instagram username')
-    parser.add_argument('directory', help='Where to save the images')
-    parser.add_argument('-n', '--num-to-download',
-                        help='Number of posts to download', type=int)
-    parser.add_argument('-m', '--add_metadata',
-                        help=("Add metadata (caption/date) from Instagram "
-                              "post into downloaded images' exif tags "
-                              "(requires GExiv2 python module)"),
+    parser = argparse.ArgumentParser(
+        description='%(prog)s: Another API-less Instagram pictures and videos downloader.',
+        usage='%(prog)s [options] username directory',
+    )
+    parser.add_argument('username', help='the instagram account to download posts from')
+    parser.add_argument('directory', help='the directory to download files into')
+    parser.add_argument('--version', action='version', version="%(prog)s ("+__version__+")")
+    parser.add_argument('-n', type=int, metavar='NUM',
+                        help=("number of new posts to download "
+                              "(if not specified all posts are downloaded)")),
+    parser.add_argument('-m', '--add-metadata',
+                        help=("add date and caption metadata to downloaded pictures "
+                              "(requires PIL/Pillow and piexif)"),
                         action='store_true', dest='use_metadata')
-    parser.add_argument('-v', '--get_videos',
-                        help="Download videos",
+    parser.add_argument('-v', '--get-videos',
+                        help="also download videos",
                         action='store_true', dest='get_videos')
-    parser.add_argument('-j', '--jobs',
-                        help="Number of concurrent threads to use",
+    parser.add_argument('-j', '--jobs', metavar='JOBS',
+                        help=("the number of parallel threads to use to download files "
+                              "[default: 16]"),
                         action='store', dest='jobs',
                         type=int, default=16)
     parser.add_argument('-q', '--quiet',
-                        help="Do not display any output",
+                        help="do not produce any output",
                         action='store_true')
 
     args = parser.parse_args()
