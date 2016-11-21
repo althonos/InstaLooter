@@ -152,6 +152,8 @@ class InstaLooter(object):
     def __del__(self):
         for worker in self._workers:
             worker.kill()
+        if hasattr(self, '_pbar'):
+            self._pbar.finish()
 
     def _setup_workers(self):
         self._shared_map = {}
@@ -181,12 +183,16 @@ class InstaLooter(object):
                 script = soup.find('body').find('script', {'type':'text/javascript'})
                 data = json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
 
-                media_count = data['entry_data']['ProfilePage'][0]['user']['media']['count']
+                if self.num_to_download == float('inf'):
+                    media_count = data['entry_data']['ProfilePage'][0]['user']['media']['count']
+                else:
+                    media_count = self.num_to_download
+
                 if pbar:
                     if not 'max_id' in url:
                         self._pbar = progressbar.ProgressBar(
                             min_value=1,
-                            max_value=media_count//12 + (2 if media_count%12 else 1),
+                            max_value=media_count//12 + 1,
                             initial_value=1,
                             widgets=[
                                 "Loading pages|",
@@ -199,7 +205,8 @@ class InstaLooter(object):
                         )
                         self._pbar.start()
                     else:
-                        self._pbar.update(self._pbar.value+1)
+                        if self._pbar.value < self._pbar.max_value:
+                            self._pbar.update(self._pbar.value+1)
 
                 yield data
 
@@ -207,7 +214,7 @@ class InstaLooter(object):
                     max_id = data['entry_data']['ProfilePage'][0]['user']['media']['nodes'][-1]['id']
                     url = '/{}/?max_id={}'.format(self.name, max_id)
                 except IndexError:
-                    self._pbar.finish()
+                    #self._pbar.finish()
                     break
 
     def medias(self, pbar=True):
@@ -229,7 +236,7 @@ class InstaLooter(object):
 
         if pbar:
             self._pbar = progressbar.ProgressBar(
-                min_value=1,
+                min_value=0,
                 max_value=photos_queued,
                 initial_value=self.dl_count,
                 widgets=[
@@ -262,7 +269,7 @@ class InstaLooter(object):
 
         if pbar:
             self._pbar = progressbar.ProgressBar(
-                min_value=1,
+                min_value=0,
                 max_value=videos_queued,
                 initial_value=self.dl_count,
                 widgets=[
@@ -299,7 +306,7 @@ class InstaLooter(object):
 
         if pbar:
             self._pbar = progressbar.ProgressBar(
-                min_value=1,
+                min_value=0,
                 max_value=medias_queued,
                 initial_value=self.dl_count,
                 widgets=[
@@ -320,7 +327,7 @@ class InstaLooter(object):
             if pbar:
                 self._pbar.update(self.dl_count)
 
-        self._pbar.finish()
+        #self._pbar.finish()
 
 
 def main(args=sys.argv):
