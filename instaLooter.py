@@ -81,7 +81,6 @@ class InstaDownloader(threading.Thread):
 
             img.save(path, exif=piexif.dump(exif_dict))
 
-
     def _download_photo(self, media):
 
         photo_url = media.get('display_src')
@@ -114,7 +113,6 @@ class InstaDownloader(threading.Thread):
 
         # save full-resolution photo
         self._dl(video_url, video_name)
-
 
     @staticmethod
     def _dl(source, dest):
@@ -309,7 +307,7 @@ def main(args=sys.argv):
     parser.add_argument('username', help='the instagram account to download posts from')
     parser.add_argument('directory', help='the directory to download files into')
     parser.add_argument('--version', action='version', version="%(prog)s ("+__version__+")")
-    parser.add_argument('-n', type=int, metavar='NUM',
+    parser.add_argument('-n', type=int, metavar='NUM', dest='num_to_download',
                         help=("number of new posts to download "
                               "(if not specified all posts are downloaded)")),
     parser.add_argument('-m', '--add-metadata',

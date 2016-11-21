@@ -36,7 +36,7 @@ setup(
     description="Another API-less Instagram pictures and videos downloader.",
     long_description=open('README.rst').read(),
 
-    run_requires=format_for_setup('requirements.txt'),
+    install_requires = format_for_setup('requirements.txt'),
     extras_require = { extra:format_for_setup('requirements-{}.txt'.format(extra))
                         for extra in ['metadata'] },
 
