@@ -49,9 +49,6 @@ class InstaDownloader(threading.Thread):
 
     def _add_metadata(self, path, metadata):
         """
-        Tag downloaded photos with metadata from associated Instagram post.
-
-        If GExiv2 is not installed, do nothing.
         """
 
         if PIL is not None:
@@ -70,7 +67,7 @@ class InstaDownloader(threading.Thread):
 
             exif_dict['Exif'] = {
                 piexif.ExifIFD.DateTimeOriginal: datetime.datetime.fromtimestamp(metadata['date']).isoformat(),
-                #piexif.ExifIFD.UserComment: metadata.get('caption', ''),
+                piexif.ExifIFD.UserComment: metadata.get('caption', '').encode('utf-8'),
             }
 
             img.save(path, exif=piexif.dump(exif_dict))
@@ -91,10 +88,6 @@ class InstaDownloader(threading.Thread):
 
     def _download_video(self, media):
         """
-        Given source code for loaded Instagram page:
-        - discover all video wrapper links
-        - activate all links to load video url
-        - extract and download video url
         """
 
         url = "https://www.instagram.com/p/{}/".format(media['code'])
@@ -113,9 +106,6 @@ class InstaDownloader(threading.Thread):
         # save full-resolution photo
         self._dl(video_url, video_name)
 
-        # put info from Instagram post into image metadata
-        # if self.use_metadata:
-        #     self._add_metadata(video_name, data["entry_data"]["PostPage"][0]["media"])
 
     @staticmethod
     def _dl(source, dest):
@@ -164,6 +154,8 @@ class InstaLooter(object):
             self._pbar.finish()
 
     def _init_workers(self):
+        """Initialize a pool of workers to download files
+        """
         self._shared_map = {}
         self._workers = []
         self._medias_queue = six.moves.queue.Queue()
@@ -172,7 +164,20 @@ class InstaLooter(object):
             worker.start()
             self._workers.append(worker)
 
-    def pages(self, pbar=False):
+    def pages(self, with_pbar=False):
+        """An iterator over the shared data of the instagram profile
+
+        Create a connection to www.instagram.com and use successive
+        GET requests to load all pages of a profile.
+        Each page contains 12 media nodes, as well as metadata associated
+        to the account.
+
+        Arguments:
+            -
+
+        Yields:
+            dict: an dictionnary containing
+        """
 
         url = "/{}/".format(self.name)
         with closing(six.moves.http_client.HTTPSConnection("www.instagram.com")) as con:
@@ -191,7 +196,7 @@ class InstaLooter(object):
                 else:
                     media_count = self.num_to_download
 
-                if pbar:
+                if with_pbar:
                     if not 'max_id' in url: # First page: init pbar
                         self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
                     else: # Other pages: update pbar
@@ -209,26 +214,28 @@ class InstaLooter(object):
                 except IndexError:
                     break
 
-    def medias(self, pbar=False):
-        for page in self.pages(pbar=pbar):
+    def medias(self, with_pbar=False):
+        """
+        """
+        for page in self.pages(with_pbar=with_pbar):
             for media in page['entry_data']['ProfilePage'][0]['user']['media']['nodes']:
                 yield media
 
-    def download_photos(self, pbar=False):
-        self.download(pbar=pbar, condition=lambda media: not media['is_video'])
+    def download_photos(self, with_pbar=False):
+        self.download(with_pbar=with_pbar, condition=lambda media: not media['is_video'])
 
-    def download_videos(self, pbar=False):
-        self.download(pbar=pbar, condition=lambda media: media['is_video'])
+    def download_videos(self, with_pbar=False):
+        self.download(with_pbar=with_pbar, condition=lambda media: media['is_video'])
 
-    def download(self, pbar=False, condition=None):
+    def download(self, with_pbar=False, condition=None):
         self._init_workers()
         if condition is None:
             condition = lambda media: (not media['is_video'] or self.get_videos)
-        medias_queued = self._fill_media_queue(pbar=pbar, condition=condition)
-        if pbar:
+        medias_queued = self._fill_media_queue(with_pbar=with_pbar, condition=condition)
+        if with_pbar:
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
         self._poison_workers()
-        self._join_workers(pbar=pbar)
+        self._join_workers(with_pbar=with_pbar)
 
     @classmethod
     def _get_shared_data(cls, res):
@@ -236,9 +243,9 @@ class InstaLooter(object):
         script = soup.find('body').find('script', {'type':'text/javascript'})
         return json.loads(cls._RX_SHARED_DATA.match(script.text).group(1))
 
-    def _fill_media_queue(self, pbar, condition):
+    def _fill_media_queue(self, with_pbar, condition):
         medias_queued = 0
-        for media in self.medias(pbar=pbar):
+        for media in self.medias(with_pbar=with_pbar):
             if condition(media):
                 media_url = media.get('display_src')
                 media_basename = os.path.basename(media_url.split('?')[0])
@@ -249,9 +256,9 @@ class InstaLooter(object):
                 break
         return medias_queued
 
-    def _join_workers(self, pbar=False):
+    def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):
-            if pbar:
+            if with_pbar:
                 self._pbar.update(self.dl_count)
         self._pbar.update(self.dl_count)
 
@@ -302,7 +309,7 @@ def main(args=sys.argv):
     parser.add_argument('-j', '--jobs',
                         help="Number of concurrent threads to use",
                         action='store', dest='jobs',
-                        type=int, default=64)
+                        type=int, default=16)
     parser.add_argument('-q', '--quiet',
                         help="Do not display any output",
                         action='store_true')
@@ -317,7 +324,7 @@ def main(args=sys.argv):
                          jobs=args.jobs)
 
     try:
-        looter.download(pbar=not args.quiet)
+        looter.download(with_pbar=not args.quiet)
     except KeyboardInterrupt:
         looter.__del__()
 
