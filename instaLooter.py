@@ -21,7 +21,11 @@ try:
 except ImportError:
     PIL = None
 
-
+try:
+    import lxml
+    PARSER = 'lxml'
+except ImportError:
+    PARSER = 'html'
 
 class InstaDownloader(threading.Thread):
 
@@ -239,7 +243,7 @@ class InstaLooter(object):
 
     @classmethod
     def _get_shared_data(cls, res):
-        soup = BeautifulSoup(res.read().decode('utf-8'), 'lxml')
+        soup = BeautifulSoup(res.read().decode('utf-8'), PARSER)
         script = soup.find('body').find('script', {'type':'text/javascript'})
         return json.loads(cls._RX_SHARED_DATA.match(script.text).group(1))
 
