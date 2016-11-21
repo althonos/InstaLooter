@@ -1,4 +1,9 @@
 # coding: utf-8
+
+__author__ = "althonos"
+__author_email__ = "martin.larralde@ens-cachan.fr"
+__version__ = "0.1.0"
+
 import argparse
 import copy
 import datetime
