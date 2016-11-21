@@ -1,21 +1,25 @@
 # coding: utf-8
 import argparse
+import copy
+import datetime
 import gzip
 import json
-import threading
 import os
 import progressbar
 import re
 import six
 import sys
+import threading
+import time
 
 from contextlib import closing
 from bs4 import BeautifulSoup
 
 try:
-    from gi.repository import GExiv2
+    import PIL.Image
+    import piexif
 except ImportError:
-    GExiv2 = None
+    PIL = None
 
 
 
@@ -49,24 +53,28 @@ class InstaDownloader(threading.Thread):
 
         If GExiv2 is not installed, do nothing.
         """
-        if GExiv2 is not None:
-            if metadata.get('caption') or metadata.get('date_time'):
-                # todo: improve error handling
-                try:
-                    exif = GExiv2.Metadata(path)
-                    if metadata.get('caption'):
-                        try:
-                            exif.set_comment(metadata.get('caption'))
-                        except BaseException as be:
-                            print("{} when setting comment on {}".format(type(be).__name__, path))
-                    if metadata.get('date_time'):
-                        try:
-                            exif.set_date_time(metadata.get('date_time'))
-                        except BaseException as be:
-                            print("{} when setting datetime on {}".format(type(be).__name__, path))
-                    exif.save_file()
-                except BaseException as be:
-                    pass
+
+        if PIL is not None:
+
+            img = PIL.Image.open(path)
+
+            exif_dict = {"0th":{}, "Exif":{}, "GPS":{}, "1st":{}, "thumbnail":None}
+
+            exif_dict['0th'] = {
+                piexif.ImageIFD.Artist: "Image creator, {}".format(self.owner.metadata['full_name']),
+            }
+
+            exif_dict['1st'] = {
+                piexif.ImageIFD.Artist: "Image creator, {}".format(self.owner.metadata['full_name']),
+            }
+
+            exif_dict['Exif'] = {
+                piexif.ExifIFD.DateTimeOriginal: datetime.datetime.fromtimestamp(metadata['date']).isoformat(),
+                #piexif.ExifIFD.UserComment: metadata.get('caption', ''),
+            }
+
+            img.save(path, exif=piexif.dump(exif_dict))
+
 
     def _download_photo(self, media):
 
@@ -75,9 +83,7 @@ class InstaDownloader(threading.Thread):
         photo_name = os.path.join(self.directory, photo_basename)
 
         # save full-resolution photo
-        with closing(six.moves.urllib.request.urlopen(photo_url)) as photo_con:
-            with open(photo_name, 'wb') as img_file:
-                img_file.write(photo_con.read())
+        self._dl(photo_url, photo_name)
 
         # put info from Instagram post into image metadata
         if self.use_metadata:
@@ -95,24 +101,27 @@ class InstaDownloader(threading.Thread):
         req = six.moves.urllib.request.Request(url, headers=self.owner._headers)
         con = six.moves.urllib.request.urlopen(req)
 
-        if con.headers['Content-Encoding'] == 'gzip':
+        if con.headers.get('Content-Encoding', '') == 'gzip':
             con = gzip.GzipFile(fileobj=con)
 
-        soup = BeautifulSoup(con.read().decode('utf-8'), 'lxml')
-        script = soup.find('body').find('script', {'type':'text/javascript'})
-        data = json.loads(self.owner._RX_SHARED_DATA.match(script.text).group(1))
+        data = self.owner._get_shared_data(con)
 
         video_url = data["entry_data"]["PostPage"][0]["media"]["video_url"]
         video_basename = os.path.basename(video_url.split('?')[0])
         video_name = os.path.join(self.directory, video_basename)
 
-        with closing(six.moves.urllib.request.urlopen(video_url)) as video_con:
-            with open(video_name, 'wb') as video_file:
-                video_file.write(video_con.read())
+        # save full-resolution photo
+        self._dl(video_url, video_name)
 
         # put info from Instagram post into image metadata
-        if self.use_metadata:
-            self._add_metadata(video_name, data["entry_data"]["PostPage"][0]["media"])
+        # if self.use_metadata:
+        #     self._add_metadata(video_name, data["entry_data"]["PostPage"][0]["media"])
+
+    @staticmethod
+    def _dl(source, dest):
+        with closing(six.moves.urllib.request.urlopen(source)) as source_con:
+            with open(dest, 'wb') as dest_file:
+                dest_file.write(source_con.read())
 
     def kill(self):
         self._killed = True
@@ -141,13 +150,12 @@ class InstaLooter(object):
         self._headers =  {
             'User-Agent':"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
             'Accept': 'text/html',
-            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Encoding': 'gzip' if six.PY3 else 'identity',
             'Connection': 'keep-alive',
             'Host':'www.instagram.com',
             'DNT': '1',
             'Upgrade-Insecure-Requests': '1',
         }
-        self._setup_workers()
 
     def __del__(self):
         for worker in self._workers:
@@ -155,7 +163,7 @@ class InstaLooter(object):
         if hasattr(self, '_pbar'):
             self._pbar.finish()
 
-    def _setup_workers(self):
+    def _init_workers(self):
         self._shared_map = {}
         self._workers = []
         self._medias_queue = six.moves.queue.Queue()
@@ -164,24 +172,19 @@ class InstaLooter(object):
             worker.start()
             self._workers.append(worker)
 
-    def pages(self, pbar=True):
+    def pages(self, pbar=False):
 
         url = "/{}/".format(self.name)
         with closing(six.moves.http_client.HTTPSConnection("www.instagram.com")) as con:
             while True:
-
                 con.request("GET", url, headers=self._headers)
                 res = con.getresponse()
-
-                self._cookies = res.headers['Set-Cookie']
+                self._cookies = res.getheader('Set-Cookie')
                 self._headers['Cookie'] = self._cookies
 
-                if res.headers['Content-Encoding'] == 'gzip':
+                if res.getheader('Content-Encoding', '') == 'gzip':
                     res = gzip.GzipFile(fileobj=res)
-
-                soup = BeautifulSoup(res.read().decode('utf-8'), 'lxml')
-                script = soup.find('body').find('script', {'type':'text/javascript'})
-                data = json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
+                data = self._get_shared_data(res)
 
                 if self.num_to_download == float('inf'):
                     media_count = data['entry_data']['ProfilePage'][0]['user']['media']['count']
@@ -189,24 +192,14 @@ class InstaLooter(object):
                     media_count = self.num_to_download
 
                 if pbar:
-                    if not 'max_id' in url:
-                        self._pbar = progressbar.ProgressBar(
-                            min_value=1,
-                            max_value=media_count//12 + 1,
-                            initial_value=1,
-                            widgets=[
-                                "Loading pages|",
-                                progressbar.Percentage(),
-                                '(', progressbar.SimpleProgress(), ')',
-                                progressbar.Bar(),
-                                progressbar.Timer(), ' ',
-                                '|', progressbar.ETA(),
-                            ]
-                        )
-                        self._pbar.start()
-                    else:
+                    if not 'max_id' in url: # First page: init pbar
+                        self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
+                    else: # Other pages: update pbar
                         if self._pbar.value < self._pbar.max_value:
                             self._pbar.update(self._pbar.value+1)
+
+                if not 'max_id' in url:
+                    self._parse_metadata(data)
 
                 yield data
 
@@ -214,88 +207,39 @@ class InstaLooter(object):
                     max_id = data['entry_data']['ProfilePage'][0]['user']['media']['nodes'][-1]['id']
                     url = '/{}/?max_id={}'.format(self.name, max_id)
                 except IndexError:
-                    #self._pbar.finish()
                     break
 
-    def medias(self, pbar=True):
+    def medias(self, pbar=False):
         for page in self.pages(pbar=pbar):
             for media in page['entry_data']['ProfilePage'][0]['user']['media']['nodes']:
                 yield media
 
-    def download_photos(self, pbar=True):
-        photos_queued = 0
-        for media in self.medias(pbar=pbar):
-            if not media['is_video']:
-                phot_url = media.get('display_src')
-                photo_basename = os.path.basename(photo_url.split('?')[0])
-                if not os.path.exists(os.path.join(self.directory, photo_basename)):
-                    self._medias_queue.put(media)
-                    photo_queued += 1
-            if photos_queued >= self.num_to_download:
-                break
+    def download_photos(self, pbar=False):
+        self.download(pbar=pbar, condition=lambda media: not media['is_video'])
 
+    def download_videos(self, pbar=False):
+        self.download(pbar=pbar, condition=lambda media: media['is_video'])
+
+    def download(self, pbar=False, condition=None):
+        self._init_workers()
+        if condition is None:
+            condition = lambda media: (not media['is_video'] or self.get_videos)
+        medias_queued = self._fill_media_queue(pbar=pbar, condition=condition)
         if pbar:
-            self._pbar = progressbar.ProgressBar(
-                min_value=0,
-                max_value=photos_queued,
-                initial_value=self.dl_count,
-                widgets=[
-                    "Downloading  |",
-                    progressbar.Percentage(),
-                    '(', progressbar.SimpleProgress(), ')',
-                    progressbar.Bar(),
-                    progressbar.Timer(), ' ',
-                    '|', progressbar.ETA(),
-                ]
-            )
-            self._pbar.start()
+            self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
+        self._poison_workers()
+        self._join_workers(pbar=pbar)
 
-        for worker in self._workers:
-            self._medias_queue.put(None)
+    @classmethod
+    def _get_shared_data(cls, res):
+        soup = BeautifulSoup(res.read().decode('utf-8'), 'lxml')
+        script = soup.find('body').find('script', {'type':'text/javascript'})
+        return json.loads(cls._RX_SHARED_DATA.match(script.text).group(1))
 
-        while any(w.is_alive() for w in self._workers):
-            if pbar:
-                self._pbar.update(self.dl_count)
-
-    def download_videos(self, pbar=True):
-        videos_queued = 0
-        for media in self.medias(pbar=pbar):
-            if media['is_video']:
-                self._medias_queue.put(media)
-                videos_queued += 1
-
-                if videos_queued >= self.num_to_download:
-                    break
-
-        if pbar:
-            self._pbar = progressbar.ProgressBar(
-                min_value=0,
-                max_value=videos_queued,
-                initial_value=self.dl_count,
-                widgets=[
-                    "Downloading  |",
-                    progressbar.Percentage(),
-                    '(', progressbar.SimpleProgress(), ')',
-                    progressbar.Bar(),
-                    progressbar.Timer(), ' ',
-                    '|', progressbar.ETA(),
-                ]
-            )
-            self._pbar.start()
-
-
-
-        for worker in self._workers:
-            self._medias_queue.put(None)
-
-        while any(w.is_alive() for w in self._workers):
-            if pbar:
-                self._pbar.update(self.dl_count)
-
-    def download(self, pbar=True):
+    def _fill_media_queue(self, pbar, condition):
         medias_queued = 0
         for media in self.medias(pbar=pbar):
-            if not media['is_video'] or self.get_videos:
+            if condition(media):
                 media_url = media.get('display_src')
                 media_basename = os.path.basename(media_url.split('?')[0])
                 if not os.path.exists(os.path.join(self.directory, media_basename)):
@@ -303,31 +247,41 @@ class InstaLooter(object):
                     medias_queued += 1
             if medias_queued >= self.num_to_download:
                 break
+        return medias_queued
 
-        if pbar:
-            self._pbar = progressbar.ProgressBar(
-                min_value=0,
-                max_value=medias_queued,
-                initial_value=self.dl_count,
-                widgets=[
-                    "Downloading  |",
-                    progressbar.Percentage(),
-                    '(', progressbar.SimpleProgress(), ')',
-                    progressbar.Bar(),
-                    progressbar.Timer(), ' ',
-                    '|', progressbar.ETA(),
-                ]
-            )
-            self._pbar.start()
-
-        for worker in self._workers:
-            self._medias_queue.put(None)
-
+    def _join_workers(self, pbar=False):
         while any(w.is_alive() for w in self._workers):
             if pbar:
                 self._pbar.update(self.dl_count)
+        self._pbar.update(self.dl_count)
 
-        #self._pbar.finish()
+    def _init_pbar(self, ini_val, max_val, label):
+        self._pbar = progressbar.ProgressBar(
+            min_value=0,
+            max_value=max_val,
+            initial_value=ini_val,
+            widgets=[
+                label,
+                progressbar.Percentage(),
+                '(', progressbar.SimpleProgress(), ')',
+                progressbar.Bar(),
+                progressbar.Timer(), ' ',
+                '|', progressbar.ETA(),
+            ]
+        )
+        self._pbar.start()
+
+    def _poison_workers(self):
+        for worker in self._workers:
+            self._medias_queue.put(None)
+
+    def _parse_metadata(self, data):
+        user = data["entry_data"]["ProfilePage"][0]["user"]
+        for k,v in six.iteritems(user):
+            self.metadata[k] = copy.copy(v)
+        self.metadata['follows'] = self.metadata['follows']['count']
+        self.metadata['followed_by'] = self.metadata['followed_by']['count']
+        del self.metadata['media']['nodes']
 
 
 def main(args=sys.argv):
