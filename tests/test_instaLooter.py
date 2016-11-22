@@ -3,6 +3,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import warnings
 
 sys.path.insert(0,
     os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -53,3 +54,10 @@ def load_tests(loader, tests, pattern):
     TestInstaLooterDownload.register_tests()
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterDownload))
     return suite
+
+
+def setUpModule():
+   warnings.simplefilter('ignore')
+
+def tearDownModule():
+   warnings.simplefilter(warnings.defaultaction)
