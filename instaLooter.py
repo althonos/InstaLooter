@@ -11,6 +11,7 @@ import gzip
 import json
 import os
 import progressbar
+import random
 import re
 import requests
 import six
@@ -133,6 +134,10 @@ class InstaLooter(object):
     _RX_CSRFTOKEN = re.compile(r'csrftoken=([^;]*);')
     _RX_CSRFTOKEN_JSON = re.compile(rb'"csrf_token": "([a-zA-Z0-9]*)"')
 
+    URL_HOME = "https://www.instagram.com/"
+    URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
+    URL_LOGOUT ="https://www.instagram.com/accounts/logout/"
+
     def __init__(self, name, directory, num_to_download=None, log_level='info', use_metadata=True, get_videos=True, jobs=16):
         self.name = name
         self.directory = directory
@@ -143,30 +148,78 @@ class InstaLooter(object):
 
 
         self.session = requests.Session()
+        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
+        self.csrftoken = None
+
         self.dl_count = 0
         self.metadata = {}
 
         self._workers = []
 
+
         self.session.headers.update({
-            'User-Agent':"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            'User-Agent': self.user_agent,
             'Accept': 'text/html',
-            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Encoding': 'gzip, deflate',
             'Connection': 'keep-alive',
             'Host':'www.instagram.com',
             'DNT': '1',
             'Upgrade-Insecure-Requests': '1',
         })
 
-    #def login(self, login, password):
-
-
     def __del__(self):
-        self.session.close()
+        if hasattr(self, 'session'):
+            self.session.close()
         for worker in self._workers:
             worker.kill()
         if hasattr(self, '_pbar'):
             self._pbar.finish()
+
+    def login(self, username, password):
+        """Log in with provided credentials.
+
+        Code taken from LevPasha/instabot.py
+        """
+        self.session.cookies.update({
+            'sessionid': '',
+            'mid': '',
+            'ig_pr': '1',
+            'ig_vw': '1920',
+            'csrftoken': '',
+            's_network': '',
+            'ds_user_id': ''
+        })
+
+        login_post = {'username': username,
+                      'password': password}
+
+        self.session.headers.update({
+            'Origin': self.URL_HOME,
+            'Referer': self.URL_HOME,
+            'X-Instragram-AJAX': '1',
+            'X-Requested-With': 'XMLHttpRequest',
+        })
+
+        res = self.session.get(self.URL_HOME)
+        self.session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
+        time.sleep(5 * random.random())
+
+        login = self.session.post(self.URL_LOGIN, data = login_post, allow_redirects=True)
+        self.session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
+        self.csrftoken = login.cookies['csrftoken']
+
+        if login.status_code != 200:
+            self.csrftoken = None
+            raise SystemError("Login error: check your connection")
+        else:
+            r = self.session.get(self.URL_HOME)
+            if r.text.find(username) == -1:
+                raise ValueError('Login error: check your login data')
+
+    def logout(self):
+        logout_post = {'csrfmiddlewaretoken': self.csrftoken}
+        logout = self.session.post(self.URL_LOGOUT, data=logout_post)
+        self.csrftoken = None
 
     def _init_workers(self):
         """Initialize a pool of workers to download files
@@ -248,11 +301,10 @@ class InstaLooter(object):
         self._poison_workers()
         self._join_workers(with_pbar=with_pbar)
 
-    @classmethod
-    def _get_shared_data(cls, res):
+    def _get_shared_data(self, res):
         soup = BeautifulSoup(res.text, PARSER)
         script = soup.find('body').find('script', {'type':'text/javascript'})
-        return json.loads(cls._RX_SHARED_DATA.match(script.text).group(1))
+        return json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
 
     def _fill_media_queue(self, with_pbar, condition):
         medias_queued = 0
@@ -300,6 +352,9 @@ class InstaLooter(object):
         self.metadata['follows'] = self.metadata['follows']['count']
         self.metadata['followed_by'] = self.metadata['followed_by']['count']
         del self.metadata['media']['nodes']
+
+    def is_logged_in(self):
+        return self.csrftoken is not None
 
 
 def main(args=sys.argv):
