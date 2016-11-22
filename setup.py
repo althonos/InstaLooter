@@ -3,9 +3,6 @@
 
 from setuptools import setup, find_packages
 
-import behave_testsuite
-
-
 def format_for_setup(requirement_file):
     """Build a list of requirements out of requirements.txt files.
     """
