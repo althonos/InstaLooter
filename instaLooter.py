@@ -12,6 +12,7 @@ import json
 import os
 import progressbar
 import re
+import requests
 import six
 import sys
 import threading
@@ -40,6 +41,10 @@ class InstaDownloader(threading.Thread):
         self.directory = owner.directory
         self.use_metadata = owner.use_metadata
         self.owner = owner
+
+        self.session = requests.Session()
+        self.session.cookies = self.owner.session.cookies
+        self.session.headers = self.owner.session.headers
 
         self._killed = False
 
@@ -99,13 +104,8 @@ class InstaDownloader(threading.Thread):
         """
 
         url = "https://www.instagram.com/p/{}/".format(media['code'])
-        req = six.moves.urllib.request.Request(url, headers=self.owner._headers)
-        con = six.moves.urllib.request.urlopen(req)
-
-        if con.headers.get('Content-Encoding', '') == 'gzip':
-            con = gzip.GzipFile(fileobj=con)
-
-        data = self.owner._get_shared_data(con)
+        res = self.session.get(url)
+        data = self.owner._get_shared_data(res)
 
         video_url = data["entry_data"]["PostPage"][0]["media"]["video_url"]
         video_basename = os.path.basename(video_url.split('?')[0])
@@ -114,11 +114,12 @@ class InstaDownloader(threading.Thread):
         # save full-resolution photo
         self._dl(video_url, video_name)
 
-    @staticmethod
-    def _dl(source, dest):
-        with closing(six.moves.urllib.request.urlopen(source)) as source_con:
-            with open(dest, 'wb') as dest_file:
-                dest_file.write(source_con.read())
+    def _dl(self, source, dest):
+        r = self.session.get(source, stream=True)
+        with open(dest, 'wb') as dest_file:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk: # filter out keep-alive new chunks
+                    dest_file.write(chunk)
 
     def kill(self):
         self._killed = True
@@ -129,6 +130,8 @@ class InstaDownloader(threading.Thread):
 class InstaLooter(object):
 
     _RX_SHARED_DATA = re.compile(r'window._sharedData = ({[^\n]*});')
+    _RX_CSRFTOKEN = re.compile(r'csrftoken=([^;]*);')
+    _RX_CSRFTOKEN_JSON = re.compile(rb'"csrf_token": "([a-zA-Z0-9]*)"')
 
     def __init__(self, name, directory, num_to_download=None, log_level='info', use_metadata=True, get_videos=True, jobs=16):
         self.name = name
@@ -138,23 +141,28 @@ class InstaLooter(object):
         self.num_to_download=num_to_download or float("inf")
         self.jobs = jobs
 
-        self.dl_count = 0
 
+        self.session = requests.Session()
+        self.dl_count = 0
         self.metadata = {}
 
-        self._cookies = None
-        self._pbar = None
-        self._headers =  {
+        self._workers = []
+
+        self.session.headers.update({
             'User-Agent':"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
             'Accept': 'text/html',
-            'Accept-Encoding': 'gzip' if six.PY3 else 'identity',
+            'Accept-Encoding': 'gzip, deflate, br',
             'Connection': 'keep-alive',
             'Host':'www.instagram.com',
             'DNT': '1',
             'Upgrade-Insecure-Requests': '1',
-        }
+        })
+
+    #def login(self, login, password):
+
 
     def __del__(self):
+        self.session.close()
         for worker in self._workers:
             worker.kill()
         if hasattr(self, '_pbar'):
@@ -186,40 +194,36 @@ class InstaLooter(object):
             dict: an dictionnary containing
         """
 
-        url = "/{}/".format(self.name)
-        with closing(six.moves.http_client.HTTPSConnection("www.instagram.com")) as con:
-            while True:
-                con.request("GET", url, headers=self._headers)
-                res = con.getresponse()
-                self._cookies = res.getheader('Set-Cookie')
-                self._headers['Cookie'] = self._cookies
 
-                if res.getheader('Content-Encoding', '') == 'gzip':
-                    res = gzip.GzipFile(fileobj=res)
-                data = self._get_shared_data(res)
+        url = "https://www.instagram.com/{}/".format(self.name)
+        #with closing(six.moves.http_client.HTTPSConnection("www.instagram.com")) as con:
+        while True:
 
-                if self.num_to_download == float('inf'):
-                    media_count = data['entry_data']['ProfilePage'][0]['user']['media']['count']
-                else:
-                    media_count = self.num_to_download
+            res = self.session.get(url)
+            data = self._get_shared_data(res)
 
-                if with_pbar:
-                    if not 'max_id' in url: # First page: init pbar
-                        self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
-                    else: # Other pages: update pbar
-                        if self._pbar.value < self._pbar.max_value:
-                            self._pbar.update(self._pbar.value+1)
+            if self.num_to_download == float('inf'):
+                media_count = data['entry_data']['ProfilePage'][0]['user']['media']['count']
+            else:
+                media_count = self.num_to_download
 
-                if not 'max_id' in url:
-                    self._parse_metadata(data)
+            if with_pbar:
+                if not 'max_id' in url: # First page: init pbar
+                    self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
+                else: # Other pages: update pbar
+                    if self._pbar.value < self._pbar.max_value:
+                        self._pbar.update(self._pbar.value+1)
 
-                yield data
+            if not 'max_id' in url:
+                self._parse_metadata(data)
 
-                try:
-                    max_id = data['entry_data']['ProfilePage'][0]['user']['media']['nodes'][-1]['id']
-                    url = '/{}/?max_id={}'.format(self.name, max_id)
-                except IndexError:
-                    break
+            yield data
+
+            try:
+                max_id = data['entry_data']['ProfilePage'][0]['user']['media']['nodes'][-1]['id']
+                url = 'https://www.instagram.com/{}/?max_id={}'.format(self.name, max_id)
+            except IndexError:
+                break
 
     def medias(self, with_pbar=False):
         """
@@ -246,7 +250,7 @@ class InstaLooter(object):
 
     @classmethod
     def _get_shared_data(cls, res):
-        soup = BeautifulSoup(res.read().decode('utf-8'), PARSER)
+        soup = BeautifulSoup(res.text, PARSER)
         script = soup.find('body').find('script', {'type':'text/javascript'})
         return json.loads(cls._RX_SHARED_DATA.match(script.text).group(1))
 
