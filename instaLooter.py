@@ -32,7 +32,7 @@ try:
     import lxml
     PARSER = 'lxml'
 except ImportError:
-    PARSER = 'html'
+    PARSER = 'html.parser'
 
 class InstaDownloader(threading.Thread):
 
