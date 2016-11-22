@@ -1,0 +1,63 @@
+language: python
+
+python:
+- '2.6'
+- '2.7'
+- '3.2'
+- '3.3'
+- '3.4'
+- '3.5'
+- pypy
+- pypy3
+
+# matrix:
+#   allow_failures:
+#   - python: '2.6'
+#   - python: 'pypy'
+#   - python: 'pypy3'
+
+# before_install:
+# - export DOC=$(python -c "import sys; x = float(sys.version[0:3]) > 3.4 if sys.version[0]=='3'
+#   else float(sys.version[0:3])>2.6; sys.exit(x)")
+
+install:
+- pip install .
+
+script:
+  - python -m unittest discover -v
+# - coverage run --source=pronto -m unittest discover -v
+# - coverage combine
+# - coverage xml --include "pronto/*"
+
+# after_success:
+# - python-codacy-coverage -r "coverage.xml"
+
+# before_deploy:
+# - python setup.py sdist --formats zip,gztar bdist_wheel
+
+deploy:
+  - provider: pypi
+    user: althonos
+    password:
+      secure: tOxmKL2WfIajsSao4rVau9xLehIqfpKOm9SCwUlGREJas/D+yFYcltdamVa/kpc2PgHcmQBJxkZzEEDsAiZunm/435qWR2T01B2zB00JdtfWvnoCWEEzg/SEsy/0yS6m666P3vbdSvtfHByaavzPf5RE3ooBwsbKt3OKgS3fs91zFZwJZU6zATpBC6pzwhbt6PZeYzmZnk2AkRl8O2abPh8iHz1DGxJ3baY3ObG289W5Dp9a3sr9PVkXvLCMe04JeORTlPt43hnAy6PpnN8FSgKKLdTiMeqRcctZdH8Y90EIW8nWWoqaokNVLepxDDtf3ouy57DNyZu1FNZDlsQd7aYyUrydy7UIrMa33L7ai0hRcvKQI1ymRbO3W4opOPDcORulvYGUNLeVU886lvuLavlJ+otZClRBPV3EuO0k2eslAvwiTF8DBjB9HPuF3ZtkBgnDH7ubU1hoMi6MQvbjVThI0J7uyTVNmnS8r9/Yv02TsTl+IBHzhE3Sb8z2ZNF/Ip5UU5rbcmmvA/euShL2A+Eb0hhe/Fen3fVROl/cwcGIbkEXTurzc5xfyoLs76VOxr+HvYqA4DzxvDwhhvQSk0PTymO5T5WRj4PYbmkHeevVCsH8unva27u1CeKhVYIrWyvXwDhIK11mLzWKT2SAEVypil8YUcQpROR8vJP2yA4=
+    distributions: sdist bdist_wheel
+    on:
+      python: '3.5'
+      tags: true
+      repo: althonos/InstaLooter
+#  - provider: releases
+#    user: althonos
+#    password:
+#      secure: oI67iZW2mgiSSVsYKFpI/3u7st1ps22g1qfAKo5VsBTpZ6vSS65j3RwNB1EFCDv4nOD3PMz4xMbycGDgZUuNsVjVN6VhJPFRDSWDrvnv2n5+9MIt8ic8zAiYpS+VLC4cuIMxZvdaGsPWVgk99VXSY0o210bx3knES9zHa86G2MIVC6ajM8UaxBPbtYZkTnqO+d7GgDMbYAswxY/Nn0a3dJnDaXyDzgmpV28viNZMvii1sSGWpZXu+5+YV1Xg5Bv/RE5py2hm9DzdccEhZcG77MhBc+hNsxpYmWn+1hJQBb4iQEN1yg03AzhH8W4LnFPCo/d5lKbLzfFzQda60D0DrbWsXBZ668/dHJg60Td37IEEnpncpol0AVJH/24dYJYtmZa2MU17K8eOXrh7yzGwpGuYc9Okmg55Co04/rryxUoQiMvwAV/YmjCHO26EAgIV8RNPk/GMKKDld4uYafIk5KdUydr7X8IORJNKqh6+ECplZCJ3UjWuVNYDXU9ZxWLeKsjaaAE43L0Deg3yYKASC9zyLORP1plJfTo9c+sU0ljfx6vpuzM13ETmUtRBiSQHXx2IXRvN6r6V3HP8+hLSJo3VL5PaH0MRDWAff/PqK88o9fEKC5thKN9S4eVU0osv1XaSbheqdvPaFiIS9mvw9/rH419mVrwWBPeRneCOxWQ=
+#    files: dist/*
+#    file_glob: true
+#    skip_cleanup: true
+#    on:
+#      python: '3.5'
+#      condition: "$TEST_SUITE = doctests"
+#      tags: true
+#      repo: althonos/pronto
+
+notifications:
+  email:
+  - althonosdev@gmail.com

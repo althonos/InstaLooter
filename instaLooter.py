@@ -136,7 +136,7 @@ class InstaLooter(object):
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
     URL_LOGOUT ="https://www.instagram.com/accounts/logout/"
 
-    def __init__(self, name, directory, num_to_download=None, log_level='info', use_metadata=True, get_videos=True, jobs=16):
+    def __init__(self, name, directory, num_to_download=None, use_metadata=False, get_videos=False, jobs=16):
         self.name = name
         self.directory = directory
         self.use_metadata = use_metadata
