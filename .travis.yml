@@ -21,19 +21,16 @@ python:
 #   else float(sys.version[0:3])>2.6; sys.exit(x)")
 
 install:
-- pip install .
+  - pip install codacy-coverage coverage
+  - pip install .
 
 script:
-  - python -m unittest discover -v
-# - coverage run --source=pronto -m unittest discover -v
+  - coverage run --source=instaLooter -m unittest discover -v
 # - coverage combine
-# - coverage xml --include "pronto/*"
+  - coverage xml
 
-# after_success:
-# - python-codacy-coverage -r "coverage.xml"
-
-# before_deploy:
-# - python setup.py sdist --formats zip,gztar bdist_wheel
+after_success:
+  - python-codacy-coverage -r "coverage.xml"
 
 deploy:
   - provider: pypi
