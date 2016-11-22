@@ -45,7 +45,6 @@ class InstaDownloader(threading.Thread):
 
         self.session = requests.Session()
         self.session.cookies = self.owner.session.cookies
-        self.session.headers = self.owner.session.headers
 
         self._killed = False
 
@@ -116,11 +115,12 @@ class InstaDownloader(threading.Thread):
         self._dl(video_url, video_name)
 
     def _dl(self, source, dest):
-        r = self.session.get(source, stream=True)
+        self.session.headers['Accept'] = '*/*'
+        res = self.session.get(source)
         with open(dest, 'wb') as dest_file:
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk: # filter out keep-alive new chunks
-                    dest_file.write(chunk)
+            for block in res.iter_content(1024):
+                if block:
+                    dest_file.write(block)
 
     def kill(self):
         self._killed = True
