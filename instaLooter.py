@@ -131,8 +131,6 @@ class InstaDownloader(threading.Thread):
 class InstaLooter(object):
 
     _RX_SHARED_DATA = re.compile(r'window._sharedData = ({[^\n]*});')
-    _RX_CSRFTOKEN = re.compile(r'csrftoken=([^;]*);')
-    _RX_CSRFTOKEN_JSON = re.compile(rb'"csrf_token": "([a-zA-Z0-9]*)"')
 
     URL_HOME = "https://www.instagram.com/"
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
@@ -169,7 +167,10 @@ class InstaLooter(object):
 
     def __del__(self):
         if hasattr(self, 'session'):
-            self.session.close()
+            try:
+                self.session.close()
+            except ReferenceError:
+                pass
         for worker in self._workers:
             worker.kill()
         if hasattr(self, '_pbar'):
@@ -217,6 +218,10 @@ class InstaLooter(object):
                 raise ValueError('Login error: check your login data')
 
     def logout(self):
+        """Log out from current session
+
+        Code taken from LevPasha/instabot.py
+        """
         logout_post = {'csrfmiddlewaretoken': self.csrftoken}
         logout = self.session.post(self.URL_LOGOUT, data=logout_post)
         self.csrftoken = None
