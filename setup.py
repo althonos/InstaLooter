@@ -21,7 +21,7 @@ def format_for_setup(requirement_file):
 ## SETUPTOOLS VERSION
 setup(
     name='instaLooter',
-    version='0.2.1',
+    version='0.2.2',
 
     packages=find_packages(),
 
