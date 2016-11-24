@@ -326,9 +326,10 @@ class InstaLooter(object):
 
     def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):
-            if with_pbar:
+            if with_pbar and hasattr(self, '_pbar'):
                 self._pbar.update(self.dl_count)
-        self._pbar.update(self.dl_count)
+        if with_pbar and hasattr(self, '_pbar'):
+            self._pbar.update(self.dl_count)
 
     def _init_pbar(self, ini_val, max_val, label):
         self._pbar = progressbar.ProgressBar(
