@@ -11,11 +11,15 @@ python:
 - pypy
 - pypy3
 
-# matrix:
-#   allow_failures:
-#   - python: '2.6'
-#   - python: 'pypy'
-#   - python: 'pypy3'
+matrix:
+  allow_failures:
+  - python: '2.6'
+  - python: '3.2'
+  - python: '3.3'
+  - python: '3.4'
+  - python: 'pypy'
+  - python: 'pypy3'
+
 
 # before_install:
 # - export DOC=$(python -c "import sys; x = float(sys.version[0:3]) > 3.4 if sys.version[0]=='3'
