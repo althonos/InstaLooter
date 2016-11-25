@@ -37,7 +37,7 @@ class TestInstaLooterDownload(unittest.TestCase):
             def _test(self):
                 looter = instaLooter.InstaLooter(username, self.tmpdir, get_videos=True)
                 looter.download()
-                self.assertEqual(os.listdir(self.tmpdir), int(looter.metadata['media']['count']))
+                self.assertEqual(len(os.listdir(self.tmpdir)), int(looter.metadata['media']['count']))
                 self.assertEqual(username, looter.metadata['username'])
 
             setattr(cls, "test_{}".format(username), _test)

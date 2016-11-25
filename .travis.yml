@@ -26,7 +26,7 @@ install:
   - pip install .
 
 script:
-  - coverage run --source=instaLooter -m unittest discover -v
+  - coverage run --source=instaLooter.py -m unittest discover -v
 # - coverage combine
   - coverage xml
 
