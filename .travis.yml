@@ -27,7 +27,7 @@ install:
 
 script:
   - coverage run --source=instaLooter.py -m unittest discover -v
-# - coverage combine
+  - coverage combine
   - coverage xml
 
 after_success:
