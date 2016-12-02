@@ -35,6 +35,7 @@ try:
 except ImportError:
     PARSER = 'html.parser'
 
+
 class InstaDownloader(threading.Thread):
 
     def __init__(self, owner):
@@ -70,7 +71,7 @@ class InstaDownloader(threading.Thread):
 
             img = PIL.Image.open(path)
 
-            exif_dict = {"0th":{}, "Exif":{}, "GPS":{}, "1st":{}, "thumbnail":None}
+            exif_dict = {"0th": {}, "Exif": {}, "GPS": {}, "1st":{}, "thumbnail": None}
 
             exif_dict['0th'] = {
                 piexif.ImageIFD.Artist: "Image creator, {}".format(self.owner.metadata['full_name']),
@@ -127,24 +128,21 @@ class InstaDownloader(threading.Thread):
         self._killed = True
 
 
-
-
 class InstaLooter(object):
 
     _RX_SHARED_DATA = re.compile(r'window._sharedData = ({[^\n]*});')
 
     URL_HOME = "https://www.instagram.com/"
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
-    URL_LOGOUT ="https://www.instagram.com/accounts/logout/"
+    URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
 
     def __init__(self, name, directory, num_to_download=None, use_metadata=False, get_videos=False, jobs=16):
         self.name = name
         self.directory = directory
         self.use_metadata = use_metadata
         self.get_videos = get_videos
-        self.num_to_download=num_to_download or float("inf")
+        self.num_to_download = num_to_download or float("inf")
         self.jobs = jobs
-
 
         self.session = requests.Session()
         self.user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
@@ -155,13 +153,12 @@ class InstaLooter(object):
 
         self._workers = []
 
-
         self.session.headers.update({
             'User-Agent': self.user_agent,
             'Accept': 'text/html',
             'Accept-Encoding': 'gzip, deflate',
             'Connection': 'keep-alive',
-            'Host':'www.instagram.com',
+            'Host': 'www.instagram.com',
             'DNT': '1',
             'Upgrade-Insecure-Requests': '1',
         })
@@ -210,7 +207,7 @@ class InstaLooter(object):
         self.session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
         time.sleep(5 * random.random())
 
-        login = self.session.post(self.URL_LOGIN, data = login_post, allow_redirects=True)
+        login = self.session.post(self.URL_LOGIN, data=login_post, allow_redirects=True)
         self.session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
         self.csrftoken = login.cookies['csrftoken']
 
@@ -271,9 +268,9 @@ class InstaLooter(object):
                 media_count = self.num_to_download
 
             if with_pbar:
-                if not 'max_id' in url: # First page: init pbar
+                if not 'max_id' in url:  # First page: init pbar
                     self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
-                else: # Other pages: update pbar
+                else:  # Other pages: update pbar
                     if self._pbar.value < self._pbar.max_value:
                         self._pbar.update(self._pbar.value+1)
 
@@ -313,7 +310,7 @@ class InstaLooter(object):
 
     def _get_shared_data(self, res):
         soup = BeautifulSoup(res.text, PARSER)
-        script = soup.find('body').find('script', {'type':'text/javascript'})
+        script = soup.find('body').find('script', {'type': 'text/javascript'})
         return json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
 
     def _fill_media_queue(self, with_pbar, condition):
@@ -358,7 +355,7 @@ class InstaLooter(object):
 
     def _parse_metadata(self, data):
         user = data["entry_data"]["ProfilePage"][0]["user"]
-        for k,v in six.iteritems(user):
+        for k, v in six.iteritems(user):
             self.metadata[k] = copy.copy(v)
         self.metadata['follows'] = self.metadata['follows']['count']
         self.metadata['followed_by'] = self.metadata['followed_by']['count']
@@ -410,5 +407,5 @@ def main(args=sys.argv):
     except KeyboardInterrupt:
         looter.__del__()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main(sys.argv)
