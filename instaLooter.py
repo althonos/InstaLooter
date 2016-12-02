@@ -166,6 +166,10 @@ class InstaLooter(object):
             'Upgrade-Insecure-Requests': '1',
         })
 
+        # Create self.directory if it doesn't exist.
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
+
     def __del__(self):
         if hasattr(self, 'session'):
             try:
