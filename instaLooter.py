@@ -1,13 +1,36 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+instaLooter - Another API-less Instagram pictures and videos downloader
+
+Usage:
+    instaLooter <profile> <directory> [options]
+    instaLooter hashtag <hashtag> <directory> [options]
+    instaLooter (--help | --version)
+
+Options:
+    -n NUM, --num-to-dl NUM      Maximum number of new files to download
+    -j JOBS, --jobs JOBS         Number of parallel threads to use to
+                                 download files [default: 16]
+    -v, --get-videos             Get videos as well as photos
+    -m, --add-metadata           Add date and caption metadata to downloaded
+                                 pictures (requires PIL/Pillow and piexif)
+    -q, --quiet                  Do not produce any output
+    -h, --help                   Display this message and quit
+    -c CRED, --credentials CRED  Credentials to login to Instagram with if
+                                 needed (format is login:password)
+    --version                    Show program version and quit
+"""
 
 __author__ = "althonos"
 __author_email__ = "martin.larralde@ens-cachan.fr"
 __version__ = "0.2.3"
 
+import docopt
 import argparse
 import copy
 import datetime
+import docopt
 import gzip
 import json
 import os
@@ -42,7 +65,7 @@ class InstaDownloader(threading.Thread):
         super(InstaDownloader, self).__init__()
         self.medias = owner._medias_queue
         self.directory = owner.directory
-        self.use_metadata = owner.use_metadata
+        self.add_metadata = owner.add_metadata
         self.owner = owner
 
         self.session = requests.Session()
@@ -98,7 +121,7 @@ class InstaDownloader(threading.Thread):
         self._dl(photo_url, photo_name)
 
         # put info from Instagram post into image metadata
-        if self.use_metadata:
+        if self.add_metadata:
             self._add_metadata(photo_name, media)
 
     def _download_video(self, media):
@@ -136,12 +159,25 @@ class InstaLooter(object):
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
     URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
 
-    def __init__(self, name, directory, num_to_download=None, use_metadata=False, get_videos=False, jobs=16):
-        self.name = name
+    def __init__(self, directory, profile=None, hashtag=None, num_to_dl=None, add_metadata=False, get_videos=False, jobs=16):
+
+        if profile is not None:
+            self.target = profile
+            self._page_name = 'ProfilePage'
+            self._section_name = 'user'
+            self.base_url = "https://www.instagram.com/{}/"
+        elif hashtag is not None:
+            self.target = hashtag
+            self._page_name = 'TagPage'
+            self._section_name = 'tag'
+            self.base_url = "https://www.instagram.com/explore/tags/{}/"
+        else:
+            raise ValueError("Either a tag or a profile name is required to create an InstaLooter instance")
+
         self.directory = directory
-        self.use_metadata = use_metadata
+        self.add_metadata = add_metadata
         self.get_videos = get_videos
-        self.num_to_download = num_to_download or float("inf")
+        self.num_to_dl = num_to_dl or float("inf")
         self.jobs = jobs
 
         self.session = requests.Session()
@@ -240,7 +276,7 @@ class InstaLooter(object):
             self._workers.append(worker)
 
     def pages(self, with_pbar=False):
-        """An iterator over the shared data of the instagram profile
+        """An iterator over the shared data of an instagram profile
 
         Create a connection to www.instagram.com and use successive
         GET requests to load all pages of a profile.
@@ -248,48 +284,50 @@ class InstaLooter(object):
         to the account.
 
         Arguments:
-            -
+            - with_pbar (bool, optional): display a progress bar [default: False]
 
         Yields:
             dict: an dictionnary containing
         """
 
 
-        url = "https://www.instagram.com/{}/".format(self.name)
-        #with closing(six.moves.http_client.HTTPSConnection("www.instagram.com")) as con:
+        url = self.base_url.format(self.target)
         while True:
-
             res = self.session.get(url)
             data = self._get_shared_data(res)
 
-            if self.num_to_download == float('inf'):
-                media_count = data['entry_data']['ProfilePage'][0]['user']['media']['count']
+            if self.num_to_dl == float('inf'):
+                media_count = data['entry_data'][self._page_name][0][self._section_name]['media']['count']
             else:
-                media_count = self.num_to_download
+                media_count = self.num_to_dl
 
             if with_pbar:
                 if not 'max_id' in url:  # First page: init pbar
                     self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
                 else:  # Other pages: update pbar
-                    if self._pbar.value < self._pbar.max_value:
-                        self._pbar.update(self._pbar.value+1)
+                    if self._pbar.value  == self._pbar.max_value:
+                        self._pbar.max_value += 1
+                    self._pbar.update(self._pbar.value+1)
 
-            if not 'max_id' in url:
-                self._parse_metadata(data)
+
+
+            if not 'max_id' in url and self._section_name=="user":
+                self._parse_metadata_from_profile_page(data)
 
             yield data
 
-            try:
-                max_id = data['entry_data']['ProfilePage'][0]['user']['media']['nodes'][-1]['id']
-                url = 'https://www.instagram.com/{}/?max_id={}'.format(self.name, max_id)
-            except IndexError:
+            page_info = data['entry_data'][self._page_name][0][self._section_name]['media']['page_info']
+            if not page_info['has_next_page']:
                 break
+            else:
+                url = '{}?max_id={}'.format(self.base_url.format(self.target), page_info["end_cursor"])
+
 
     def medias(self, with_pbar=False):
         """
         """
         for page in self.pages(with_pbar=with_pbar):
-            for media in page['entry_data']['ProfilePage'][0]['user']['media']['nodes']:
+            for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 yield media
 
     def download_photos(self, with_pbar=False):
@@ -322,7 +360,7 @@ class InstaLooter(object):
                 if not os.path.exists(os.path.join(self.directory, media_basename)):
                     self._medias_queue.put(media)
                     medias_queued += 1
-            if medias_queued >= self.num_to_download:
+            if medias_queued >= self.num_to_dl:
                 break
         return medias_queued
 
@@ -353,8 +391,8 @@ class InstaLooter(object):
         for worker in self._workers:
             self._medias_queue.put(None)
 
-    def _parse_metadata(self, data):
-        user = data["entry_data"]["ProfilePage"][0]["user"]
+    def _parse_metadata_from_profile_page(self, data):
+        user = data["entry_data"][self._page_name][0]["user"]
         for k, v in six.iteritems(user):
             self.metadata[k] = copy.copy(v)
         self.metadata['follows'] = self.metadata['follows']['count']
@@ -365,47 +403,25 @@ class InstaLooter(object):
         return self.csrftoken is not None
 
 
-def main(args=sys.argv):
+def main(argv=sys.argv[1:]):
     # parse arguments
-    parser = argparse.ArgumentParser(
-        description='%(prog)s: Another API-less Instagram pictures and videos downloader.',
-        usage='%(prog)s [options] username directory',
-    )
-    parser.add_argument('username', help='the instagram account to download posts from')
-    parser.add_argument('directory', help='the directory to download files into')
-    parser.add_argument('--version', action='version', version="%(prog)s ("+__version__+")")
-    parser.add_argument('-n', type=int, metavar='NUM', dest='num_to_download',
-                        help=("number of new posts to download "
-                              "(if not specified all posts are downloaded)")),
-    parser.add_argument('-m', '--add-metadata',
-                        help=("add date and caption metadata to downloaded pictures "
-                              "(requires PIL/Pillow and piexif)"),
-                        action='store_true', dest='use_metadata')
-    parser.add_argument('-v', '--get-videos',
-                        help="also download videos",
-                        action='store_true', dest='get_videos')
-    parser.add_argument('-j', '--jobs', metavar='JOBS',
-                        help=("the number of parallel threads to use to download files "
-                              "[default: 16]"),
-                        action='store', dest='jobs',
-                        type=int, default=16)
-    parser.add_argument('-q', '--quiet',
-                        help="do not produce any output",
-                        action='store_true')
+    args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
-    args = parser.parse_args()
+    looter = InstaLooter(
+        directory=os.path.expanduser(args['<directory>']),
+        profile=args['<profile>'],hashtag=args['<hashtag>'],
+        num_to_dl=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
+        add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
+        jobs=int(args['--jobs']))
 
-    looter = InstaLooter(name=args.username,
-                         directory=os.path.expanduser(args.directory),
-                         num_to_download=args.num_to_download,
-                         use_metadata=args.use_metadata,
-                         get_videos=args.get_videos,
-                         jobs=args.jobs)
+    if args['--credentials']:
+        login, password = args['--credentials'].split(':')
+        looter.login(login, password)
 
     try:
-        looter.download(with_pbar=not args.quiet)
+        looter.download(with_pbar=not args['--quiet'])
     except KeyboardInterrupt:
         looter.__del__()
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
