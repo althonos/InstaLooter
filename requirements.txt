@@ -2,3 +2,4 @@ six
 beautifulsoup4
 progressbar2
 requests
+docopt
