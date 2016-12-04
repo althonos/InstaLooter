@@ -208,8 +208,9 @@ class InstaLooter(object):
                 self.session.close()
             except ReferenceError:
                 pass
-        for worker in self._workers:
-            worker.kill()
+        if hasattr(self, "_workers"):
+            for worker in self._workers:
+                worker.kill()
         if hasattr(self, '_pbar'):
             self._pbar.finish()
 
