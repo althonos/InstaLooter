@@ -159,7 +159,7 @@ class InstaLooter(object):
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
     URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
 
-    def __init__(self, directory, profile=None, hashtag=None, num_to_dl=None, add_metadata=False, get_videos=False, jobs=16):
+    def __init__(self, directory, profile=None, hashtag=None, add_metadata=False, get_videos=False, jobs=16):
 
         if profile is not None:
             self.target = profile
@@ -177,7 +177,6 @@ class InstaLooter(object):
         self.directory = directory
         self.add_metadata = add_metadata
         self.get_videos = get_videos
-        self.num_to_dl = num_to_dl or float("inf")
         self.jobs = jobs
 
         self.session = requests.Session()
@@ -275,7 +274,7 @@ class InstaLooter(object):
             worker.start()
             self._workers.append(worker)
 
-    def pages(self, with_pbar=False):
+    def pages(self, media_count=None, with_pbar=False):
         """An iterator over the shared data of an instagram profile
 
         Create a connection to www.instagram.com and use successive
@@ -284,22 +283,21 @@ class InstaLooter(object):
         to the account.
 
         Arguments:
+            - media_count (int, optional): how many media to show before
+                stopping [default: None]
             - with_pbar (bool, optional): display a progress bar [default: False]
 
         Yields:
             dict: an dictionnary containing
         """
 
-
         url = self.base_url.format(self.target)
         while True:
             res = self.session.get(url)
             data = self._get_shared_data(res)
 
-            if self.num_to_dl == float('inf'):
+            if media_count is None:
                 media_count = data['entry_data'][self._page_name][0][self._section_name]['media']['count']
-            else:
-                media_count = self.num_to_dl
 
             if with_pbar:
                 if not 'max_id' in url:  # First page: init pbar
@@ -323,24 +321,27 @@ class InstaLooter(object):
                 url = '{}?max_id={}'.format(self.base_url.format(self.target), page_info["end_cursor"])
 
 
-    def medias(self, with_pbar=False):
+    def medias(self, media_count=None, with_pbar=False):
         """
         """
-        for page in self.pages(with_pbar=with_pbar):
+        for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 yield media
 
-    def download_photos(self, with_pbar=False):
-        self.download(with_pbar=with_pbar, condition=lambda media: not media['is_video'])
+    def download_photos(self, media_count=None, with_pbar=False):
+        self.download(media_count=media_count, with_pbar=with_pbar,
+                      condition=lambda media: not media['is_video'])
 
-    def download_videos(self, with_pbar=False):
-        self.download(with_pbar=with_pbar, condition=lambda media: media['is_video'])
+    def download_videos(self, media_count=None, with_pbar=False):
+        self.download(media_count=media_count, with_pbar=with_pbar,
+                      condition=lambda media: media['is_video'])
 
-    def download(self, with_pbar=False, condition=None):
+    def download(self, media_count=None, with_pbar=False, condition=None):
         self._init_workers()
         if condition is None:
             condition = lambda media: (not media['is_video'] or self.get_videos)
-        medias_queued = self._fill_media_queue(with_pbar=with_pbar, condition=condition)
+        medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
+                                               condition=condition)
         if with_pbar:
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
         self._poison_workers()
@@ -351,16 +352,16 @@ class InstaLooter(object):
         script = soup.find('body').find('script', {'type': 'text/javascript'})
         return json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
 
-    def _fill_media_queue(self, with_pbar, condition):
+    def _fill_media_queue(self, media_count=None, with_pbar=False, condition=None):
         medias_queued = 0
-        for media in self.medias(with_pbar=with_pbar):
+        for media in self.medias(media_count=media_count, with_pbar=with_pbar):
             if condition(media):
                 media_url = media.get('display_src')
                 media_basename = os.path.basename(media_url.split('?')[0])
                 if not os.path.exists(os.path.join(self.directory, media_basename)):
                     self._medias_queue.put(media)
                     medias_queued += 1
-            if medias_queued >= self.num_to_dl:
+            if media_count is not None and medias_queued >= media_count:
                 break
         return medias_queued
 
@@ -410,7 +411,6 @@ def main(argv=sys.argv[1:]):
     looter = InstaLooter(
         directory=os.path.expanduser(args['<directory>']),
         profile=args['<profile>'],hashtag=args['<hashtag>'],
-        num_to_dl=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
         add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
         jobs=int(args['--jobs']))
 
@@ -419,7 +419,10 @@ def main(argv=sys.argv[1:]):
         looter.login(login, password)
 
     try:
-        looter.download(with_pbar=not args['--quiet'])
+        looter.download(
+            media_count=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
+            with_pbar=not args['--quiet']
+        )
     except KeyboardInterrupt:
         looter.__del__()
 

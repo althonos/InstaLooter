@@ -32,18 +32,29 @@ class TestInstaLooterDownload(unittest.TestCase):
     @classmethod
     def register_tests(cls):
 
-        for username in cls.MOST_POPULAR:
+        for profile in cls.MOST_POPULAR:
 
             def _test(self):
-                looter = instaLooter.InstaLooter(username, self.tmpdir, get_videos=True)
+                looter = instaLooter.InstaLooter(self.tmpdir, profile=profile, get_videos=True)
                 looter.download()
                 self.assertEqual(len(os.listdir(self.tmpdir)), int(looter.metadata['media']['count']))
-                self.assertEqual(username, looter.metadata['username'])
+                self.assertEqual(profile, looter.metadata['username'])
 
-            setattr(cls, "test_{}".format(username), _test)
+            setattr(cls, "test_{}".format(profile), _test)
 
 
+class TestInstaLooterHashtagDownload(unittest.TestCase):
 
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
+    def test_hashtag_download(self):
+        looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True, num_to_dl=200)
+        looter.download()
+        self.assertEqual(len(os.listdir(self.tmpdir)), 200)
 
 
 
@@ -53,6 +64,7 @@ def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
     TestInstaLooterDownload.register_tests()
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterDownload))
+    suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
     return suite
 
 
