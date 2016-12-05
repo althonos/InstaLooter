@@ -4,8 +4,8 @@
 instaLooter - Another API-less Instagram pictures and videos downloader
 
 Usage:
-    instaLooter <profile> <directory> [options]
-    instaLooter hashtag <hashtag> <directory> [options]
+    instaLooter <profile> [<directory>] [options]
+    instaLooter hashtag <hashtag> [<directory>] [options]
     instaLooter (--help | --version)
 
 Options:
@@ -159,7 +159,7 @@ class InstaLooter(object):
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
     URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
 
-    def __init__(self, directory, profile=None, hashtag=None, add_metadata=False, get_videos=False, jobs=16):
+    def __init__(self, directory=None, profile=None, hashtag=None, add_metadata=False, get_videos=False, jobs=16):
 
         if profile is not None:
             self.target = profile
@@ -172,7 +172,11 @@ class InstaLooter(object):
             self._section_name = 'tag'
             self.base_url = "https://www.instagram.com/explore/tags/{}/"
         else:
-            raise ValueError("Either a tag or a profile name is required to create an InstaLooter instance")
+            self.target = None
+
+        # Create self.directory if it doesn't exist.
+        if directory is not None and not os.path.exists(directory):
+            os.makedirs(directory)
 
         self.directory = directory
         self.add_metadata = add_metadata
@@ -185,7 +189,6 @@ class InstaLooter(object):
 
         self.dl_count = 0
         self.metadata = {}
-
         self._workers = []
 
         self.session.headers.update({
@@ -197,10 +200,6 @@ class InstaLooter(object):
             'DNT': '1',
             'Upgrade-Insecure-Requests': '1',
         })
-
-        # Create self.directory if it doesn't exist.
-        if not os.path.exists(self.directory):
-            os.makedirs(self.directory)
 
     def __del__(self):
         if hasattr(self, 'session'):
@@ -308,10 +307,8 @@ class InstaLooter(object):
                         self._pbar.max_value += 1
                     self._pbar.update(self._pbar.value+1)
 
-
-
             if not 'max_id' in url and self._section_name=="user":
-                self._parse_metadata_from_profile_page(data)
+                self.metadata = self._parse_metadata_from_profile_page(data)
 
             yield data
 
@@ -320,7 +317,6 @@ class InstaLooter(object):
                 break
             else:
                 url = '{}?max_id={}'.format(self.base_url.format(self.target), page_info["end_cursor"])
-
 
     def medias(self, media_count=None, with_pbar=False):
         """
@@ -337,7 +333,19 @@ class InstaLooter(object):
         self.download(media_count=media_count, with_pbar=with_pbar,
                       condition=lambda media: media['is_video'])
 
+    def get_owner_info(self, code):
+        url = "https://www.instagram.com/p/{}/".format(code)
+        res = self.session.get(url)
+        data = self._get_shared_data(res)
+        return data['entry_data']['PostPage'][0]['media']['owner']
+
     def download(self, media_count=None, with_pbar=False, condition=None):
+
+        if self.target is None:
+            raise ValueError("No download target was specified during initialisation !")
+        elif self.directory is None:
+            raise ValueError("No directory was specified during initialisation !")
+
         self._init_workers()
         if condition is None:
             condition = lambda media: (not media['is_video'] or self.get_videos)
@@ -347,6 +355,21 @@ class InstaLooter(object):
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
         self._poison_workers()
         self._join_workers(with_pbar=with_pbar)
+
+    def download_post(self, code):
+        if self.directory is None:
+            raise ValueError("No directory was specified during initialisation !")
+
+        self._init_workers()
+        url = "https://www.instagram.com/p/{}/".format(code)
+        res = self.session.get(url)
+        media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+        self._medias_queue.put(media)
+        self._poison_workers()
+        self._join_workers()
+        if self.add_metadata and not media['is_video']:
+            self._add_metadata(photo_name, media)
+
 
     def _get_shared_data(self, res):
         soup = BeautifulSoup(res.text, PARSER)
@@ -395,11 +418,13 @@ class InstaLooter(object):
 
     def _parse_metadata_from_profile_page(self, data):
         user = data["entry_data"][self._page_name][0]["user"]
+        metadata = {}
         for k, v in six.iteritems(user):
-            self.metadata[k] = copy.copy(v)
-        self.metadata['follows'] = self.metadata['follows']['count']
-        self.metadata['followed_by'] = self.metadata['followed_by']['count']
-        del self.metadata['media']['nodes']
+            metadata[k] = copy.copy(v)
+        metadata['follows'] = self.metadata['follows']['count']
+        metadata['followed_by'] = self.metadata['followed_by']['count']
+        del metadata['media']['nodes']
+        return metadata
 
     def is_logged_in(self):
         return self.csrftoken is not None
@@ -410,7 +435,7 @@ def main(argv=sys.argv[1:]):
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
     looter = InstaLooter(
-        directory=os.path.expanduser(args['<directory>']),
+        directory=os.path.expanduser(args.get('<directory>', os.getcwd())),
         profile=args['<profile>'],hashtag=args['<hashtag>'],
         add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
         jobs=int(args['--jobs']))
