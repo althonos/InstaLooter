@@ -1,24 +1,27 @@
 InstaLooter |Starme|
 ====================
 
-InstaLooter is a downloader that can download any picture or video associated
+*Not all treasure's silver and gold, mate.*
+
+InstaLooter is a program that can download any picture or video associated
 from an Instagram profile. It can be seen as a re-implementation of the now
 deprecated `InstaRaider <https://github.com/akurtovic/InstaRaider>`_ developed by
 `@akurtovic <https://github.com/akurtovic>`_.
-
 
 
 Requirements
 ------------
 
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **requests**      |  HTTP handling             | |PyPI requests|      | |Source requests|      | |License requests|      |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **BeautifulSoup** |  HTML parsing              | |PyPI BeautifulSoup| | |Source BeautifulSoup| | |License BeautifulSoup| |
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **six**           |  Python 2/3 compatibility  | |PyPI six|           | |Source six|           | |License six|           |
+| **docopt**        |  CLI arguments parsing     | |PyPI docopt|        | |Source docopt|        | |License docopt|        |
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **progressbar2**  |  Dynamic output in CLI     | |PyPI progressbar2|  | |Source progressbar2|  | |License progressbar2|  |
++-------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **requests**      |  HTTP handling             | |PyPI requests|      | |Source requests|      | |License requests|      |
++-------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **six**           |  Python 2/3 compatibility  | |PyPI six|           | |Source six|           | |License six|           |
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
 
 Usage
@@ -26,27 +29,37 @@ Usage
 
 InstaLooter comes with its CLI::
 
-    $ instaLooter [options] username directory
+    $ instaLooter <username> <directory> [options]
+    $ instaLooter tag <hashtag> <directory> [options]
     
 Arguments
 ^^^^^^^^^
 - ``username``
     the username of the instagram account to download pictures and videos from.
+- ``hashtag``
+    the hashtag to download pictures and videos from.
 - ``directory``
     the directory to download files into.
 
 Options
 ^^^^^^^
-- ``-n NUM_TO_DOWNLOAD``
-    number of maximum new posts to download (if not specified all posts are downloaded).
+- ``-n NUM, --num-to-dl NUM``
+    number of maximum new posts to download (if not specified all 
+    posts are downloaded).
 - ``-m, --add-metadata``
-    add date and caption metadata to downloaded pictures (requires piexif and Pillow).
+    add date and caption metadata to downloaded pictures (requires
+    piexif and PIL/Pillow)
 - ``-v, --get-videos``
     also download videos.
 - ``-j JOBS, --jobs JOBS``
-    the number of parallel threads to use to download files (defaults to 16). It is 
-    advised to use a value of at least 12 as Instagram profile pages display 12 medias
-    at a time in order to insure parallel download of all files.
+    the number of parallel threads to use to download files. It is 
+    advised to use a value of at least 12 as Instagram profile pages 
+    display 12 medias at a time in order to insure parallel download 
+    of all files. [default: 16]
+- ``-c CRED, --credentials CREAD``
+    the login and password to use to login to Instagram, if needed 
+    (for instance: downloading medias from a private account you 
+    follow). [format: login:password]
 - ``-q, --quiet``
     do not produce any output.
 
@@ -84,8 +97,14 @@ From GitHub
 .. |PyPI progressbar2| image:: https://img.shields.io/pypi/v/progressbar2.svg
    :target: https://pypi.python.org/pypi/progressbar2
     
+.. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg
+   :target: https://pypi.python.org/pypi/docopt/
+
 .. |Source requests| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600   
    :target: https://github.com/kennethreitz/requests
+
+.. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+   :target: https://github.com/docopt/docopt
 
 .. |Source BeautifulSoup| image:: https://img.shields.io/badge/source-Launchpad-orange.svg?maxAge=3600   
    :target: https://launchpad.net/beautifulsoup
@@ -108,3 +127,5 @@ From GitHub
 .. |License progressbar2| image:: https://img.shields.io/pypi/l/progressbar2.svg
    :target: https://opensource.org/licenses/BSD-3-Clause
    
+.. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg
+   :target: https://opensource.org/licenses/MIT   
