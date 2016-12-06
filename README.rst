@@ -85,19 +85,19 @@ From GitHub
 .. |Starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star
    :target: https://github.com/althonos/InstaLooter
 
-.. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg
+.. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/requests
 
-.. |PyPI BeautifulSoup| image:: https://img.shields.io/pypi/v/beautifulsoup4.svg
+.. |PyPI BeautifulSoup| image:: https://img.shields.io/pypi/v/beautifulsoup4.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/beautifulsoup4
 
-.. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg
+.. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/six
 
-.. |PyPI progressbar2| image:: https://img.shields.io/pypi/v/progressbar2.svg
+.. |PyPI progressbar2| image:: https://img.shields.io/pypi/v/progressbar2.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/progressbar2
 
-.. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg
+.. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/docopt/
 
 .. |Source requests| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
@@ -112,20 +112,21 @@ From GitHub
 .. |Source six| image:: https://img.shields.io/badge/source-Bitbucket-blue.svg?maxAge=3600
    :target: https://bitbucket.org/gutworth/six
 
-.. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&width=40
+.. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
    :target: https://github.com/WoLpH/python-progressbar
 
-.. |License requests| image:: https://img.shields.io/pypi/l/requests.svg
+.. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?maxAge=3600
    :target: https://opensource.org/licenses/Apache-2.0
 
-.. |License BeautifulSoup| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg
+.. |License BeautifulSoup| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600
    :target: https://opensource.org/licenses/MIT
 
-.. |License six| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg
+.. |License six| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600
    :target: https://opensource.org/licenses/MIT
 
-.. |License progressbar2| image:: https://img.shields.io/pypi/l/progressbar2.svg
+.. |License progressbar2| image:: https://img.shields.io/pypi/l/progressbar2.svg?maxAge=3600
    :target: https://opensource.org/licenses/BSD-3-Clause
 
-.. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg
+.. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg?maxAge=3600
    :target: https://opensource.org/licenses/MIT
+

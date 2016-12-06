@@ -497,8 +497,8 @@ class InstaLooter(object):
         metadata = {}
         for k, v in six.iteritems(user):
             metadata[k] = copy.copy(v)
-        metadata['follows'] = self.metadata['follows']['count']
-        metadata['followed_by'] = self.metadata['followed_by']['count']
+        metadata['follows'] = metadata['follows']['count']
+        metadata['followed_by'] = metadata['followed_by']['count']
         del metadata['media']['nodes']
         return metadata
 
