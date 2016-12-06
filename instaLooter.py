@@ -52,11 +52,7 @@ try:
 except ImportError:
     PIL = None
 
-try:
-    import lxml
-    PARSER = 'lxml'
-except ImportError:
-    PARSER = 'html.parser'
+PARSER = 'html.parser'
 
 
 class InstaDownloader(threading.Thread):
@@ -152,6 +148,9 @@ class InstaDownloader(threading.Thread):
 
 
 class InstaLooter(object):
+    """A brutal Instagram looter that raids without API tokens.
+    """
+
 
     _RX_SHARED_DATA = re.compile(r'window._sharedData = ({[^\n]*});')
 
@@ -160,17 +159,36 @@ class InstaLooter(object):
     URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
 
     def __init__(self, directory=None, profile=None, hashtag=None, add_metadata=False, get_videos=False, jobs=16):
+        """Create a new looter instance.
+
+        Keyword Arguments:
+            directory (str, optional): where downloaded medias will be stored
+                [default: None]
+            profile (str, optional): a profile to download media from
+                [default: None]
+            hashtag (str, optional): a hashtag to download media from
+                [default: None]
+            add_metadata (bool, optional): Add date and comment metadata to
+                the downloaded pictures [default: False]
+            get_videos (bool, optional): Also get the videos from the given
+                target [default: False]
+            jobs (bool, optional): the number of parallel threads to use to
+                download media (12 or more is advised to have a true parallel
+                download of media files) [default: 16]
+        """
+        if profile is not None and hashtag is not None:
+            raise ValueError("Give only a profile or an hashtag, not both !")
 
         if profile is not None:
             self.target = profile
             self._page_name = 'ProfilePage'
             self._section_name = 'user'
-            self.base_url = "https://www.instagram.com/{}/"
+            self._base_url = "https://www.instagram.com/{}/"
         elif hashtag is not None:
             self.target = hashtag
             self._page_name = 'TagPage'
             self._section_name = 'tag'
-            self.base_url = "https://www.instagram.com/explore/tags/{}/"
+            self._base_url = "https://www.instagram.com/explore/tags/{}/"
         else:
             self.target = None
 
@@ -214,9 +232,13 @@ class InstaLooter(object):
             self._pbar.finish()
 
     def login(self, username, password):
-        """Log in with provided credentials.
+        """Login with provided credentials.
 
-        Code taken from LevPasha/instabot.py
+        Arguments:
+            username (str): the username to log in with
+            password (str): the password to log in with
+
+        (Code taken from LevPasha/instabot.py)
         """
         self.session.cookies.update({
             'sessionid': '',
@@ -257,7 +279,7 @@ class InstaLooter(object):
     def logout(self):
         """Log out from current session
 
-        Code taken from LevPasha/instabot.py
+        (Code taken from LevPasha/instabot.py)
         """
         logout_post = {'csrfmiddlewaretoken': self.csrftoken}
         logout = self.session.post(self.URL_LOGOUT, data=logout_post)
@@ -275,23 +297,23 @@ class InstaLooter(object):
             self._workers.append(worker)
 
     def pages(self, media_count=None, with_pbar=False):
-        """An iterator over the shared data of an instagram profile
+        """An iterator over the shared data of a profile or hashtag.
 
         Create a connection to www.instagram.com and use successive
-        GET requests to load all pages of a profile.
-        Each page contains 12 media nodes, as well as metadata associated
-        to the account.
+        GET requests to load all pages of a profile. Each page contains
+        12 media nodes, as well as metadata associated to the account.
 
         Arguments:
-            - media_count (int, optional): how many media to show before
+            media_count (int, optional): how many media to show before
                 stopping [default: None]
-            - with_pbar (bool, optional): display a progress bar [default: False]
+            with_pbar (bool, optional): display a progress bar
+                [default: False]
 
         Yields:
-            dict: an dictionnary containing
+            dict: an dictionnary containing the page content deserialised
+                from JSON to a Python dictionary
         """
-
-        url = self.base_url.format(self.target)
+        url = self._base_url.format(self.target)
         while True:
             res = self.session.get(url)
             data = self._get_shared_data(res)
@@ -316,39 +338,87 @@ class InstaLooter(object):
             if not page_info['has_next_page']:
                 break
             else:
-                url = '{}?max_id={}'.format(self.base_url.format(self.target), page_info["end_cursor"])
+                url = '{}?max_id={}'.format(self._base_url.format(self.target), page_info["end_cursor"])
 
     def medias(self, media_count=None, with_pbar=False):
-        """
+        """An iterator over the media nodes of a profile or hashtag.
+
+        Using :obj:`InstaLooter.pages`, extract media nodes from each page
+        and yields them successively.
+
+        Arguments:
+            media_count (int, optional): how many media to show before
+                stopping [default: None]
+            with_pbar (bool, optional): display a progress bar
+                [default: False]
         """
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 yield media
 
-    def download_photos(self, media_count=None, with_pbar=False):
+    def download_pictures(self, media_count=None, with_pbar=False):
+        """Download all the pictures from provided target.
+
+        Arguments:
+            media_count (int, optional): how many media to download before
+                stopping [default: None]
+            with_pbar (bool, optional): display a progress bar
+                [default: False]
+        """
         self.download(media_count=media_count, with_pbar=with_pbar,
                       condition=lambda media: not media['is_video'])
 
     def download_videos(self, media_count=None, with_pbar=False):
+        """Download all the videos from provided target.
+
+        Arguments:
+            media_count (int, optional): how many media to download before
+                stopping [default: None]
+            with_pbar (bool, optional): display a progress bar
+                [default: False]
+        """
         self.download(media_count=media_count, with_pbar=with_pbar,
                       condition=lambda media: media['is_video'])
 
     def get_owner_info(self, code):
+        """Get metadata about the owner of given post.
+
+        Arguments:
+            code (str): the code of the post (can be found in the url:
+                https://www.instagram.com/p/<code>/) when looking at a
+                specific media
+
+        Returns:
+            dict: an dictionnary containing the owner metadata deserialised
+                from JSON to a Python dictionary
+        """
         url = "https://www.instagram.com/p/{}/".format(code)
         res = self.session.get(url)
         data = self._get_shared_data(res)
         return data['entry_data']['PostPage'][0]['media']['owner']
 
-    def download(self, media_count=None, with_pbar=False, condition=None):
+    def download(self, media_count=None, with_pbar=False, **kwargs):
+        """Download all the medias from provided target.
 
+        This method follwows the parameters given in the :obj:`__init__`
+        method (profile or hashtag, directory, get_videos and add_metadata).
+
+        Arguments:
+            media_count (int, optional): how many media to download before
+                stopping [default: None]
+            with_pbar (bool, optional): display a progress bar
+                [default: False]
+        """
         if self.target is None:
             raise ValueError("No download target was specified during initialisation !")
         elif self.directory is None:
             raise ValueError("No directory was specified during initialisation !")
 
         self._init_workers()
-        if condition is None:
+        if not 'condition' in kwargs:
             condition = lambda media: (not media['is_video'] or self.get_videos)
+        else:
+            condition = kwargs.get('condition')
         medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
                                                condition=condition)
         if with_pbar:
@@ -357,6 +427,13 @@ class InstaLooter(object):
         self._join_workers(with_pbar=with_pbar)
 
     def download_post(self, code):
+        """Download a single post referenced by its code.
+
+        Arguments:
+            code (str): the code of the post (can be found in the url:
+                https://www.instagram.com/p/<code>/) when looking at a
+                specific media
+        """
         if self.directory is None:
             raise ValueError("No directory was specified during initialisation !")
 
@@ -369,7 +446,6 @@ class InstaLooter(object):
         self._join_workers()
         if self.add_metadata and not media['is_video']:
             self._add_metadata(photo_name, media)
-
 
     def _get_shared_data(self, res):
         soup = BeautifulSoup(res.text, PARSER)
@@ -427,11 +503,14 @@ class InstaLooter(object):
         return metadata
 
     def is_logged_in(self):
+        """Check if the current instance is logged in.
+        """
         return self.csrftoken is not None
 
 
 def main(argv=sys.argv[1:]):
-    # parse arguments
+    """Run from the command line interface.
+    """
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
     looter = InstaLooter(
