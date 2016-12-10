@@ -30,7 +30,7 @@ Usage
 InstaLooter comes with its CLI::
 
     $ instaLooter <username> <directory> [options]
-    $ instaLooter tag <hashtag> <directory> [options]
+    $ instaLooter hashtag <hashtag> <directory> [options]
 
 Arguments
 ^^^^^^^^^
