@@ -24,7 +24,7 @@ Options:
 
 __author__ = "althonos"
 __author_email__ = "martin.larralde@ens-cachan.fr"
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 import docopt
 import argparse
