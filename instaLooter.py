@@ -88,16 +88,22 @@ class InstaDownloader(threading.Thread):
 
         if PIL is not None:
 
+            try:
+                full_name = self.owner.metadata['full_name']
+            except KeyError:
+                full_name = self.owner.get_owner_info(metadata['code'])['full_name']
+
+
             img = PIL.Image.open(path)
 
             exif_dict = {"0th": {}, "Exif": {}, "GPS": {}, "1st":{}, "thumbnail": None}
 
             exif_dict['0th'] = {
-                piexif.ImageIFD.Artist: "Image creator, {}".format(self.owner.metadata['full_name']),
+                piexif.ImageIFD.Artist: "Image creator, {}".format(full_name).encode('utf-8'),
             }
 
             exif_dict['1st'] = {
-                piexif.ImageIFD.Artist: "Image creator, {}".format(self.owner.metadata['full_name']),
+                piexif.ImageIFD.Artist: "Image creator, {}".format(full_name).encode('utf-8'),
             }
 
             exif_dict['Exif'] = {
