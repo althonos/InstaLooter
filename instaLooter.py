@@ -18,7 +18,7 @@ Options:
     -q, --quiet                  Do not produce any output
     -h, --help                   Display this message and quit
     -c CRED, --credentials CRED  Credentials to login to Instagram with if
-                                 needed (format is login:password)
+                                 needed (format is login[:password])
     --version                    Show program version and quit
 """
 
@@ -31,6 +31,7 @@ import argparse
 import copy
 import datetime
 import docopt
+import getpass
 import gzip
 import json
 import os
@@ -526,7 +527,9 @@ def main(argv=sys.argv[1:]):
         jobs=int(args['--jobs']))
 
     if args['--credentials']:
-        login, password = args['--credentials'].split(':')
+        credentials = args['--credentials'].split(':', 1)
+        login = credentials[0]
+        password = credentials[1] if len(credentials) > 1 else getpass.getpass()
         looter.login(login, password)
 
     try:

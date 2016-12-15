@@ -59,7 +59,7 @@ Options
 - ``-c CRED, --credentials CRED``
     the login and password to use to login to Instagram, if needed
     (for instance: downloading medias from a private account you
-    follow). [format: login:password]
+    follow). [format: login[:password]]
 - ``-q, --quiet``
     do not produce any output.
 
