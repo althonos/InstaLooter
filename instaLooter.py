@@ -421,6 +421,10 @@ class InstaLooter(object):
         elif self.directory is None:
             raise ValueError("No directory was specified during initialisation !")
 
+        # Check if target is a private profile.
+        if self._page_name == 'ProfilePage' and self.is_private_account():
+            raise ValueError("InstaLooter cannot be used with private accounts!")
+
         self._init_workers()
         if not 'condition' in kwargs:
             condition = lambda media: (not media['is_video'] or self.get_videos)
@@ -513,6 +517,14 @@ class InstaLooter(object):
         """Check if the current instance is logged in.
         """
         return self.csrftoken is not None
+
+    def is_private_account(self):
+        """Check if target profile is private.
+        """
+        url = self._base_url.format(self.target)
+        res = self.session.get(url)
+        data = self._get_shared_data(res)
+        return data['entry_data']['ProfilePage'][0]['user']['is_private']
 
 
 def main(argv=sys.argv[1:]):
