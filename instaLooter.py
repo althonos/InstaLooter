@@ -26,25 +26,21 @@ __author__ = "althonos"
 __author_email__ = "martin.larralde@ens-cachan.fr"
 __version__ = "0.3.1"
 
-import docopt
-import argparse
 import copy
 import datetime
-import docopt
 import getpass
-import gzip
 import json
-import os
-import progressbar
 import random
-import re
-import requests
-import six
 import sys
 import threading
 import time
 
-from contextlib import closing
+import docopt
+import os
+import progressbar
+import re
+import requests
+import six
 from bs4 import BeautifulSoup
 
 try:
@@ -423,7 +419,7 @@ class InstaLooter(object):
 
         # Check if target is a private profile.
         if self._page_name == 'ProfilePage' and self.is_private_account():
-            raise ValueError("InstaLooter cannot be used with private accounts!")
+            raise ValueError("You are not authorized to view this private account!")
 
         self._init_workers()
         if not 'condition' in kwargs:
@@ -524,7 +520,8 @@ class InstaLooter(object):
         url = self._base_url.format(self.target)
         res = self.session.get(url)
         data = self._get_shared_data(res)
-        return data['entry_data']['ProfilePage'][0]['user']['is_private']
+        user_data = data['entry_data']['ProfilePage'][0]['user']
+        return user_data['is_private'] and not user_data['followed_by_viewer']
 
 
 def main(argv=sys.argv[1:]):
