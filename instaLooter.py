@@ -26,21 +26,25 @@ __author__ = "althonos"
 __author_email__ = "martin.larralde@ens-cachan.fr"
 __version__ = "0.3.1"
 
+import docopt
+import argparse
 import copy
 import datetime
+import docopt
 import getpass
+import gzip
 import json
+import os
+import progressbar
 import random
+import re
+import requests
+import six
 import sys
 import threading
 import time
 
-import docopt
-import os
-import progressbar
-import re
-import requests
-import six
+from contextlib import closing
 from bs4 import BeautifulSoup
 
 try:
