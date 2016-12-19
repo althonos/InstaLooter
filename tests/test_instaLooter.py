@@ -49,7 +49,7 @@ class TestInstaLooterProfileDownload(unittest.TestCase):
     def test_private_profile(self):
         looter = instaLooter.InstaLooter(self.tmpdir, profile="tldr")
         with self.assertRaises(StopIteration):
-            next(looter.medias())            
+            next(looter.medias())
 
 
 class TestInstaLooterHashtagDownload(unittest.TestCase):

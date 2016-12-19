@@ -27,12 +27,9 @@ __author_email__ = "martin.larralde@ens-cachan.fr"
 __version__ = "0.3.1"
 
 import docopt
-import argparse
 import copy
 import datetime
-import docopt
 import getpass
-import gzip
 import json
 import os
 import progressbar
@@ -44,7 +41,6 @@ import sys
 import threading
 import time
 
-from contextlib import closing
 from bs4 import BeautifulSoup
 
 try:
@@ -499,7 +495,7 @@ class InstaLooter(object):
         self._pbar.start()
 
     def _poison_workers(self):
-        for worker in self._workers:
+        for _ in self._workers:
             self._medias_queue.put(None)
 
     def _parse_metadata_from_profile_page(self, data):
