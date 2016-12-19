@@ -336,16 +336,19 @@ class InstaLooter(object):
                         self._pbar.max_value += 1
                     self._pbar.update(self._pbar.value+1)
 
+            # First page: if user page, get metadata
             if not 'max_id' in url and self._section_name=="user":
                 self.metadata = self._parse_metadata_from_profile_page(data)
 
             yield data
 
-            page_info = data['entry_data'][self._page_name][0][self._section_name]['media']['page_info']
-            if not page_info['has_next_page']:
+            media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
+
+            # Break if the page is private (no media to show) or if the last page was reached
+            if not media_info['page_info']['has_next_page'] or not media_info["nodes"]:
                 break
             else:
-                url = '{}?max_id={}'.format(self._base_url.format(self.target), page_info["end_cursor"])
+                url = '{}?max_id={}'.format(self._base_url.format(self.target), media_info['page_info']["end_cursor"])
 
     def medias(self, media_count=None, with_pbar=False):
         """An iterator over the media nodes of a profile or hashtag.
