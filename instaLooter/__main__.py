@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# coding: utf-8
+"""
+instaLooter - Another API-less Instagram pictures and videos downloader
+
+Usage:
+    instaLooter <profile> [<directory>] [options]
+    instaLooter hashtag <hashtag> [<directory>] [options]
+    instaLooter (--help | --version)
+
+Options:
+    -n NUM, --num-to-dl NUM      Maximum number of new files to download
+    -j JOBS, --jobs JOBS         Number of parallel threads to use to
+                                 download files [default: 16]
+    -v, --get-videos             Get videos as well as photos
+    -m, --add-metadata           Add date and caption metadata to downloaded
+                                 pictures (requires PIL/Pillow and piexif)
+    -q, --quiet                  Do not produce any output
+    -h, --help                   Display this message and quit
+    -c CRED, --credentials CRED  Credentials to login to Instagram with if
+                                 needed (format is login[:password])
+    --version                    Show program version and quit
+"""
+from __future__ import (
+    absolute_import,
+    unicode_literals,
+)
+
+import docopt
+import os
+import sys
+import getpass
+
+from . import __version__, __author__, __author_email__
+from .core import InstaLooter
+
+
+def main(argv=sys.argv[1:]):
+    """Run from the command line interface.
+    """
+    args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
+
+    looter = InstaLooter(
+        directory=os.path.expanduser(args.get('<directory>', os.getcwd())),
+        profile=args['<profile>'],hashtag=args['<hashtag>'],
+        add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
+        jobs=int(args['--jobs']))
+
+    if args['--credentials']:
+        credentials = args['--credentials'].split(':', 1)
+        login = credentials[0]
+        password = credentials[1] if len(credentials) > 1 else getpass.getpass()
+        looter.login(login, password)
+
+    try:
+        looter.download(
+            media_count=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
+            with_pbar=not args['--quiet']
+        )
+    except KeyboardInterrupt:
+        looter.__del__()
+
+
+if __name__ == "__main__":
+    main()

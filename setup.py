@@ -3,6 +3,8 @@
 
 from setuptools import setup, find_packages
 
+import instaLooter
+
 def format_for_setup(requirement_file):
     """Build a list of requirements out of requirements.txt files.
     """
@@ -21,14 +23,14 @@ def format_for_setup(requirement_file):
 ## SETUPTOOLS VERSION
 setup(
     name='instaLooter',
-    version='0.3.1',
+    version=instaLooter.__version__,
 
     packages=find_packages(),
 
     py_modules=['instaLooter'],
 
-    author= "althonos",
-    author_email= "martin.larralde@ens-cachan.fr",
+    author= instaLooter.__author__,
+    author_email= instaLooter.__author_email__,
 
     description="Another API-less Instagram pictures and videos downloader.",
     long_description=open('README.rst').read(),

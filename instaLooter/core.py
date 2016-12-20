@@ -1,35 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
-"""
-instaLooter - Another API-less Instagram pictures and videos downloader
+from __future__ import (
+    absolute_import,
+    unicode_literals,
+)
 
-Usage:
-    instaLooter <profile> [<directory>] [options]
-    instaLooter hashtag <hashtag> [<directory>] [options]
-    instaLooter (--help | --version)
-
-Options:
-    -n NUM, --num-to-dl NUM      Maximum number of new files to download
-    -j JOBS, --jobs JOBS         Number of parallel threads to use to
-                                 download files [default: 16]
-    -v, --get-videos             Get videos as well as photos
-    -m, --add-metadata           Add date and caption metadata to downloaded
-                                 pictures (requires PIL/Pillow and piexif)
-    -q, --quiet                  Do not produce any output
-    -h, --help                   Display this message and quit
-    -c CRED, --credentials CRED  Credentials to login to Instagram with if
-                                 needed (format is login[:password])
-    --version                    Show program version and quit
-"""
-
-__author__ = "althonos"
-__author_email__ = "martin.larralde@ens-cachan.fr"
-__version__ = "0.3.1"
-
-import docopt
 import copy
 import datetime
-import getpass
 import json
 import os
 import progressbar
@@ -38,122 +15,19 @@ import re
 import requests
 import six
 import sys
-import threading
 import time
+import bs4 as bs
 
-from bs4 import BeautifulSoup
+from .worker import InstaDownloader
 
-try:
-    import PIL.Image
-    import piexif
-except ImportError:
-    PIL = None
 
 PARSER = 'html.parser'
 
-
-class InstaDownloader(threading.Thread):
-
-    def __init__(self, owner):
-        super(InstaDownloader, self).__init__()
-        self.medias = owner._medias_queue
-        self.directory = owner.directory
-        self.add_metadata = owner.add_metadata
-        self.owner = owner
-
-        self.session = requests.Session()
-        self.session.cookies = self.owner.session.cookies
-
-        self._killed = False
-
-    def run(self):
-
-        while not self._killed:
-            media = self.medias.get()
-            if media is None:
-                break
-            if not media['is_video']:
-                self._download_photo(media)
-            else:
-                self._download_video(media)
-
-            self.owner.dl_count += 1
-
-    def _add_metadata(self, path, metadata):
-        """
-        """
-
-        if PIL is not None:
-
-            try:
-                full_name = self.owner.metadata['full_name']
-            except KeyError:
-                full_name = self.owner.get_owner_info(metadata['code'])['full_name']
-
-
-            img = PIL.Image.open(path)
-
-            exif_dict = {"0th": {}, "Exif": {}, "GPS": {}, "1st":{}, "thumbnail": None}
-
-            exif_dict['0th'] = {
-                piexif.ImageIFD.Artist: "Image creator, {}".format(full_name).encode('utf-8'),
-            }
-
-            exif_dict['1st'] = {
-                piexif.ImageIFD.Artist: "Image creator, {}".format(full_name).encode('utf-8'),
-            }
-
-            exif_dict['Exif'] = {
-                piexif.ExifIFD.DateTimeOriginal: datetime.datetime.fromtimestamp(metadata['date']).isoformat(),
-                piexif.ExifIFD.UserComment: metadata.get('caption', '').encode('utf-8'),
-            }
-
-            img.save(path, exif=piexif.dump(exif_dict))
-
-    def _download_photo(self, media):
-
-        photo_url = media.get('display_src')
-        photo_basename = os.path.basename(photo_url.split('?')[0])
-        photo_name = os.path.join(self.directory, photo_basename)
-
-        # save full-resolution photo
-        self._dl(photo_url, photo_name)
-
-        # put info from Instagram post into image metadata
-        if self.add_metadata:
-            self._add_metadata(photo_name, media)
-
-    def _download_video(self, media):
-        """
-        """
-
-        url = "https://www.instagram.com/p/{}/".format(media['code'])
-        res = self.session.get(url)
-        data = self.owner._get_shared_data(res)
-
-        video_url = data["entry_data"]["PostPage"][0]["media"]["video_url"]
-        video_basename = os.path.basename(video_url.split('?')[0])
-        video_name = os.path.join(self.directory, video_basename)
-
-        # save full-resolution photo
-        self._dl(video_url, video_name)
-
-    def _dl(self, source, dest):
-        self.session.headers['Accept'] = '*/*'
-        res = self.session.get(source)
-        with open(dest, 'wb') as dest_file:
-            for block in res.iter_content(1024):
-                if block:
-                    dest_file.write(block)
-
-    def kill(self):
-        self._killed = True
 
 
 class InstaLooter(object):
     """A brutal Instagram looter that raids without API tokens.
     """
-
 
     _RX_SHARED_DATA = re.compile(r'window._sharedData = ({[^\n]*});')
 
@@ -454,7 +328,7 @@ class InstaLooter(object):
             self._add_metadata(photo_name, media)
 
     def _get_shared_data(self, res):
-        soup = BeautifulSoup(res.text, PARSER)
+        soup = bs.BeautifulSoup(res.text, PARSER)
         script = soup.find('body').find('script', {'type': 'text/javascript'})
         return json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
 
@@ -514,30 +388,4 @@ class InstaLooter(object):
         return self.csrftoken is not None
 
 
-def main(argv=sys.argv[1:]):
-    """Run from the command line interface.
-    """
-    args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
-    looter = InstaLooter(
-        directory=os.path.expanduser(args.get('<directory>', os.getcwd())),
-        profile=args['<profile>'],hashtag=args['<hashtag>'],
-        add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
-        jobs=int(args['--jobs']))
-
-    if args['--credentials']:
-        credentials = args['--credentials'].split(':', 1)
-        login = credentials[0]
-        password = credentials[1] if len(credentials) > 1 else getpass.getpass()
-        looter.login(login, password)
-
-    try:
-        looter.download(
-            media_count=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
-            with_pbar=not args['--quiet']
-        )
-    except KeyboardInterrupt:
-        looter.__del__()
-
-if __name__ == "__main__":
-    main()
