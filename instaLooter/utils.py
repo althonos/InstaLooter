@@ -20,7 +20,7 @@ def get_times(timeframe):
 
 def get_times_from_cli(cli_token):
 
-    today = datetime.today.today()
+    today = datetime.date.today()
 
     if cli_token=="thisday":
         return today, today
