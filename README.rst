@@ -67,12 +67,12 @@ Options
 - ``-t TIME, --time TIME``
     the timeframe within which to download pictures and videos
     [format: start:stop]. The parameter can be either a combination of
-    start and stop date in ISO format (e.g. `2016-12-21:2016-12-18`,
-    `2015-03-07:`, `:2016-08-02`) or a special value among: `thisday`,
-    `thisweek`, `thismonth`, `thisyear`. Edges are included in the time frame,
-    so if using the following value: `--time 2016-05-10:2016-04-03`,
-    then all medias will be downloaded including the ones posted the 10th
-    of May 2016 and the 3rd of April 2016.
+    start and stop date in ISO format (e.g. ``2016-12-21:2016-12-18``,
+    ``2015-03-07:``, ``:2016-08-02``) or a special value among: ``thisday``,
+    ``thisweek``, ``thismonth``, ``thisyear``. Edges are included in the time frame,
+    so if using the following value: ``--time 2016-05-10:2016-04-03``,
+    then all medias will be downloaded including the ones posted on the 10th
+    of May 2016 and on the 3rd of April 2016.
 
 
 Installation
