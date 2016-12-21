@@ -6,9 +6,9 @@ from __future__ import (
 )
 
 import copy
-import datetime
 import json
 import os
+import datetime
 import progressbar
 import random
 import re
@@ -19,7 +19,7 @@ import time
 import bs4 as bs
 
 from .worker import InstaDownloader
-
+from .utils import get_times
 
 PARSER = 'html.parser'
 
@@ -220,7 +220,7 @@ class InstaLooter(object):
             else:
                 url = '{}?max_id={}'.format(self._base_url.format(self.target), media_info['page_info']["end_cursor"])
 
-    def medias(self, media_count=None, with_pbar=False):
+    def medias(self, media_count=None, with_pbar=False, timeframe=None):
         """An iterator over the media nodes of a profile or hashtag.
 
         Using :obj:`InstaLooter.pages`, extract media nodes from each page
@@ -231,12 +231,32 @@ class InstaLooter(object):
                 stopping [default: None]
             with_pbar (bool, optional): display a progress bar
                 [default: False]
+            timeframe (tuple, optional): a couple of datetime.date object
+                specifying the date frame within which to yield medias
+                (a None value can be given as well) [default: None]
+                [format: (start, stop), stop older than start]
         """
+        if timeframe is None: # Avoid checking timeframe every loop
+            return self._timeless_medias(media_count=media_count, with_pbar=with_pbar)
+        else:
+            return self._timed_medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe)
+
+    def _timeless_medias(self, media_count=None, with_pbar=False):
+        for page in self.pages(media_count=media_count, with_pbar=with_pbar):
+                for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
+                    yield media
+
+    def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
+        start_time, end_time = get_times(timeframe)
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
-                yield media
+                media_date = datetime.date.fromtimestamp(media['date'])
+                if start_time >= media_date >= end_time:
+                    yield media
+                elif media_date < end_time:
+                    return
 
-    def download_pictures(self, media_count=None, with_pbar=False):
+    def download_pictures(self, media_count=None, with_pbar=False, timeframe=None):
         """Download all the pictures from provided target.
 
         Arguments:
@@ -244,11 +264,16 @@ class InstaLooter(object):
                 stopping [default: None]
             with_pbar (bool, optional): display a progress bar
                 [default: False]
+            timeframe (tuple, optional): a couple of datetime.date object
+                specifying the date frame within which to yield medias
+                (a None value can be given as well) [default: None]
+                [format: (start, stop), stop older than start]
         """
         self.download(media_count=media_count, with_pbar=with_pbar,
-                      condition=lambda media: not media['is_video'])
+                      condition=lambda media: not media['is_video'],
+                      timeframe=timeframe)
 
-    def download_videos(self, media_count=None, with_pbar=False):
+    def download_videos(self, media_count=None, with_pbar=False, timeframe=None):
         """Download all the videos from provided target.
 
         Arguments:
@@ -256,9 +281,14 @@ class InstaLooter(object):
                 stopping [default: None]
             with_pbar (bool, optional): display a progress bar
                 [default: False]
+            timeframe (tuple, optional): a couple of datetime.date object
+                specifying the date frame within which to yield medias
+                (a None value can be given as well) [default: None]
+                [format: (start, stop), stop older than start]
         """
         self.download(media_count=media_count, with_pbar=with_pbar,
-                      condition=lambda media: media['is_video'])
+                      condition=lambda media: media['is_video'],
+                      timeframe=timeframe)
 
     def get_owner_info(self, code):
         """Get metadata about the owner of given post.
@@ -277,7 +307,7 @@ class InstaLooter(object):
         data = self._get_shared_data(res)
         return data['entry_data']['PostPage'][0]['media']['owner']
 
-    def download(self, media_count=None, with_pbar=False, **kwargs):
+    def download(self, media_count=None, with_pbar=False, timeframe=None, **kwargs):
         """Download all the medias from provided target.
 
         This method follwows the parameters given in the :obj:`__init__`
@@ -288,6 +318,10 @@ class InstaLooter(object):
                 stopping [default: None]
             with_pbar (bool, optional): display a progress bar
                 [default: False]
+            timeframe (tuple, optional): a couple of datetime.date object
+                specifying the date frame within which to yield medias
+                (a None value can be given as well) [default: None]
+                [format: (start, stop), stop older than start]
         """
         if self.target is None:
             raise ValueError("No download target was specified during initialisation !")
@@ -300,7 +334,7 @@ class InstaLooter(object):
         else:
             condition = kwargs.get('condition')
         medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
-                                               condition=condition)
+                                               condition=condition, timeframe=timeframe)
         if with_pbar:
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
         self._poison_workers()
@@ -332,9 +366,9 @@ class InstaLooter(object):
         script = soup.find('body').find('script', {'type': 'text/javascript'})
         return json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
 
-    def _fill_media_queue(self, media_count=None, with_pbar=False, condition=None):
+    def _fill_media_queue(self, media_count=None, with_pbar=False, condition=None, timeframe=None):
         medias_queued = 0
-        for media in self.medias(media_count=media_count, with_pbar=with_pbar):
+        for media in self.medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe):
             if condition(media):
                 media_url = media.get('display_src')
                 media_basename = os.path.basename(media_url.split('?')[0])

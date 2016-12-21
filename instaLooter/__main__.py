@@ -6,7 +6,7 @@ instaLooter - Another API-less Instagram pictures and videos downloader
 Usage:
     instaLooter <profile> [<directory>] [options]
     instaLooter hashtag <hashtag> [<directory>] [options]
-    instaLooter (--help | --version)
+    instaLooter (-h | --help | --version)
 
 Options:
     -n NUM, --num-to-dl NUM      Maximum number of new files to download
@@ -16,10 +16,21 @@ Options:
     -m, --add-metadata           Add date and caption metadata to downloaded
                                  pictures (requires PIL/Pillow and piexif)
     -q, --quiet                  Do not produce any output
+    -t TIME, --time TIME         The time limit within which to download
+                                 pictures and video (see *Time* section)
     -h, --help                   Display this message and quit
     -c CRED, --credentials CRED  Credentials to login to Instagram with if
-                                 needed (format is login[:password])
+                                 needed [format: login[:password]]
     --version                    Show program version and quit
+
+Time:
+    The --time parameter can be given either a combination of start and stop
+    date in ISO format (e.g. 2016-12-21:2016-12-18, 2015-03-07:, :2016-08-02)
+    or a special value among: "thisday", "thisweek", "thismonth", "thisyear".
+
+    Edges are included in the time frame, so if using the following value:
+    `--time 2016-05-10:2016-04-03`, then all medias will be downloaded
+    including the ones posted the 10th of May 2016 and the 3rd of April 2016.
 """
 from __future__ import (
     absolute_import,
@@ -33,6 +44,7 @@ import getpass
 
 from . import __version__, __author__, __author_email__
 from .core import InstaLooter
+from .utils import get_times_from_cli
 
 
 def main(argv=sys.argv[1:]):
@@ -52,10 +64,19 @@ def main(argv=sys.argv[1:]):
         password = credentials[1] if len(credentials) > 1 else getpass.getpass()
         looter.login(login, password)
 
+    if args['--time']:
+        try:
+            timeframe = get_times_from_cli(args['--time'])
+        except ValueError as ve:
+            print(str(ve))
+            sys.exit(1)
+    else:
+        timeframe = None
+
     try:
         looter.download(
             media_count=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
-            with_pbar=not args['--quiet']
+            with_pbar=not args['--quiet'], timeframe=timeframe,
         )
     except KeyboardInterrupt:
         looter.__del__()
