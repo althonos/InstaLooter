@@ -23,6 +23,8 @@ Requirements
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **six**           |  Python 2/3 compatibility  | |PyPI six|           | |Source six|           | |License six|           |
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **dateutil**      |  Date manipulation         | |PyPI dateutil|      | |Source dateutil|      | |License dateutil|      |
++-------------------+----------------------------+----------------------+------------------------+-------------------------+
 
 Usage
 -----
@@ -62,6 +64,15 @@ Options
     follow). [format: login[:password]]
 - ``-q, --quiet``
     do not produce any output.
+- ``-t TIME, --time TIME``
+    the timeframe within which to download pictures and videos
+    [format: start:stop]. The parameter can be either a combination of
+    start and stop date in ISO format (e.g. `2016-12-21:2016-12-18`,
+    `2015-03-07:`, `:2016-08-02`) or a special value among: `thisday`,
+    `thisweek`, `thismonth`, `thisyear`. Edges are included in the time frame,
+    so if using the following value: `--time 2016-05-10:2016-04-03`,
+    then all medias will be downloaded including the ones posted the 10th
+    of May 2016 and the 3rd of April 2016.
 
 
 Installation
@@ -100,11 +111,17 @@ From GitHub
 .. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/docopt/
 
+.. |PyPI dateutil| image:: https://img.shields.io/pypi/v/python-dateutil.svg?maxAge=3600
+   :target: https://pypi.python.org/pypi/python-dateutil/
+
 .. |Source requests| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
    :target: https://github.com/kennethreitz/requests
 
 .. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
    :target: https://github.com/docopt/docopt
+
+.. |Source dateutil| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+   :target: https://github.com/dateutil/dateutil/
 
 .. |Source BeautifulSoup| image:: https://img.shields.io/badge/source-Launchpad-orange.svg?maxAge=3600
    :target: https://launchpad.net/beautifulsoup
@@ -130,3 +147,5 @@ From GitHub
 .. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg?maxAge=3600
    :target: https://opensource.org/licenses/MIT
 
+.. |License dateutil| image:: https://img.shields.io/pypi/l/python-dateutil.svg?maxAge=3600
+   :target: https://opensource.org/licenses/BSD-3-Clause

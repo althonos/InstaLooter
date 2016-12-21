@@ -3,3 +3,4 @@ beautifulsoup4
 progressbar2
 requests
 docopt
+python-dateutil
