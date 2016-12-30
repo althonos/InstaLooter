@@ -64,6 +64,12 @@ Options
     follow). [format: login[:password]]
 - ``-q, --quiet``
     do not produce any output.
+- ``-N, --new``
+    stop the iteration through Instagram pages when a media on the page
+    is found in the destination directory. This makes it faster when
+    InstaLooter is used to maintain a local copy of an Instagram account
+    and allows only getting the newest pictures/videos without re-checking
+    the oldest.
 - ``-t TIME, --time TIME``
     the timeframe within which to download pictures and videos
     [format: start:stop]. The parameter can be either a combination of
