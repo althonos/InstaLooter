@@ -420,7 +420,7 @@ class InstaLooter(object):
             if not 'video_url' in media:
                 return os.path.basename(self.get_post_info(media['code'])['video_url'].split('?')[0])
             else:
-                return media['video_url'].split('?')[0]
+                return os.path.basename(media['video_url'].split('?')[0])
 
     def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):
