@@ -13,6 +13,8 @@ Options:
     -j JOBS, --jobs JOBS         Number of parallel threads to use to
                                  download files [default: 16]
     -v, --get-videos             Get videos as well as photos
+    -N, --new                    Only look for files newer than the ones in
+                                 the destination directory (faster)
     -m, --add-metadata           Add date and caption metadata to downloaded
                                  pictures (requires PIL/Pillow and piexif)
     -q, --quiet                  Do not produce any output
@@ -77,6 +79,7 @@ def main(argv=sys.argv[1:]):
         looter.download(
             media_count=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
             with_pbar=not args['--quiet'], timeframe=timeframe,
+            only_new=args['--new'],
         )
     except KeyboardInterrupt:
         looter.__del__()
