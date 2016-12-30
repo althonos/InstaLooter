@@ -76,8 +76,7 @@ class InstaDownloader(threading.Thread):
     def _download_photo(self, media):
 
         photo_url = media.get('display_src')
-        photo_basename = os.path.basename(photo_url.split('?')[0])
-        photo_name = os.path.join(self.directory, photo_basename)
+        photo_name = os.path.join(self.directory, self.owner._make_filename(media))
 
         # save full-resolution photo
         self._dl(photo_url, photo_name)
@@ -96,7 +95,7 @@ class InstaDownloader(threading.Thread):
 
         video_url = data["entry_data"]["PostPage"][0]["media"]["video_url"]
         video_basename = os.path.basename(video_url.split('?')[0])
-        video_name = os.path.join(self.directory, video_basename)
+        video_name = os.path.join(self.directory, self._make_filename(data))
 
         # save full-resolution photo
         self._dl(video_url, video_name)
@@ -111,4 +110,3 @@ class InstaDownloader(threading.Thread):
 
     def kill(self):
         self._killed = True
-

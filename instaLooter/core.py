@@ -398,11 +398,12 @@ class InstaLooter(object):
 
     def _fill_media_queue(self, media_count=None, with_pbar=False, condition=None, timeframe=None, new_only=False):
         medias_queued = 0
-
+        condition = condition or bool
         for media in self.medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe):
             if condition(media):
                 # Check that media is not already in dest directory before adding it
-                if not os.path.exists(os.path.join(self.directory, self._make_filename(media))):
+                media_basename = self._make_filename(media)
+                if not os.path.exists(os.path.join(self.directory, media_basename)):
                     self._medias_queue.put(media)
                     medias_queued += 1
                 # stop here if the file already exists and we want only new files
@@ -414,10 +415,13 @@ class InstaLooter(object):
         return medias_queued
 
     def _make_filename(self, media):
-        if not media['is_video']
+        if not media['is_video']:
             return os.path.basename(media['display_src'].split('?')[0])
         else:
-            return os.path.basename(self.get_post_info(media['code'])['video_url'].split('?')[0])
+            if not 'video_url' in media:
+                return os.path.basename(self.get_post_info(media['code'])['video_url'].split('?')[0])
+            else:
+                return media['video_url'].split('?')[0]
 
     def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):
