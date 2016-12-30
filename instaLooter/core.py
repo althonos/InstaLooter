@@ -269,10 +269,13 @@ class InstaLooter(object):
                 specifying the date frame within which to yield medias
                 (a None value can be given as well) [default: None]
                 [format: (start, stop), stop older than start]
+            new_only (bool):
+                stop looking for new medias if old ones are found in the
+                destination directory [default: False]
         """
         self.download(media_count=media_count, with_pbar=with_pbar,
-                      condition=lambda media: not media['is_video'],
-                      timeframe=timeframe)
+                      _condition=lambda media: not media['is_video'],
+                      timeframe=timeframe, new_only=new_only)
 
     def download_videos(self, media_count=None, with_pbar=False, timeframe=None):
         """Download all the videos from provided target.
@@ -286,10 +289,13 @@ class InstaLooter(object):
                 specifying the date frame within which to yield medias
                 (a None value can be given as well) [default: None]
                 [format: (start, stop), stop older than start]
+            new_only (bool):
+                stop looking for new medias if old ones are found in the
+                destination directory [default: False]
         """
         self.download(media_count=media_count, with_pbar=with_pbar,
-                      condition=lambda media: media['is_video'],
-                      timeframe=timeframe)
+                      _condition=lambda media: media['is_video'],
+                      timeframe=timeframe, new_only=new_only)
 
     def get_owner_info(self, code):
         """Get metadata about the owner of given post.
@@ -333,7 +339,7 @@ class InstaLooter(object):
         with_pbar = kwargs.get('with_pbar', False)
         timeframe = kwargs.get('timeframe', None)
         new_only = kwargs.get('new_only', False)
-        condition = kwargs.get('condition', None)
+        _condition = kwargs.get('_condition', None)
 
         if self.target is None:
             raise ValueError("No download target was specified during initialisation !")
@@ -346,7 +352,7 @@ class InstaLooter(object):
         else:
             condition = kwargs.get('condition')
         medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
-                                               condition=condition, timeframe=timeframe,
+                                               condition=_condition, timeframe=timeframe,
                                                new_only=new_only)
         if with_pbar:
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
