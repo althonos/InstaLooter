@@ -339,7 +339,6 @@ class InstaLooter(object):
         with_pbar = kwargs.get('with_pbar', False)
         timeframe = kwargs.get('timeframe', None)
         new_only = kwargs.get('new_only', False)
-        _condition = kwargs.get('_condition', None)
 
         if self.target is None:
             raise ValueError("No download target was specified during initialisation !")
@@ -347,12 +346,12 @@ class InstaLooter(object):
             raise ValueError("No directory was specified during initialisation !")
 
         self._init_workers()
-        if not 'condition' in kwargs:
+        if not '_condition' in kwargs:
             condition = lambda media: (not media['is_video'] or self.get_videos)
         else:
-            condition = kwargs.get('condition')
+            condition = kwargs.get('_condition')
         medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
-                                               condition=_condition, timeframe=timeframe,
+                                               condition=condition, timeframe=timeframe,
                                                new_only=new_only)
         if with_pbar:
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
@@ -398,7 +397,7 @@ class InstaLooter(object):
 
     def _fill_media_queue(self, media_count=None, with_pbar=False, condition=None, timeframe=None, new_only=False):
         medias_queued = 0
-        condition = condition or bool
+        condition = condition or (lambda media: self.get_videos or not media['is_video'])
         for media in self.medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe):
             if condition(media):
                 # Check that media is not already in dest directory before adding it

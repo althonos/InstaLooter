@@ -95,7 +95,7 @@ class InstaDownloader(threading.Thread):
 
         video_url = data["entry_data"]["PostPage"][0]["media"]["video_url"]
         video_basename = os.path.basename(video_url.split('?')[0])
-        video_name = os.path.join(self.directory, self._make_filename(data))
+        video_name = os.path.join(self.directory, self.owner._make_filename(data))
 
         # save full-resolution photo
         self._dl(video_url, video_name)
