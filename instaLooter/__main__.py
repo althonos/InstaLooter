@@ -79,7 +79,7 @@ def main(argv=sys.argv[1:]):
         looter.download(
             media_count=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
             with_pbar=not args['--quiet'], timeframe=timeframe,
-            only_new=args['--new'],
+            new_only=args['--new'],
         )
     except KeyboardInterrupt:
         looter.__del__()
