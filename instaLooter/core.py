@@ -106,6 +106,7 @@ class InstaLooter(object):
             for worker in self._workers:
                 worker.kill()
         if hasattr(self, '_pbar'):
+            self._pbar.max_value = self._pbar.value
             self._pbar.finish()
 
     def login(self, username, password):
@@ -307,22 +308,33 @@ class InstaLooter(object):
         data = self._get_shared_data(res)
         return data['entry_data']['PostPage'][0]['media']['owner']
 
-    def download(self, media_count=None, with_pbar=False, timeframe=None, **kwargs):
+    def download(self, **kwargs):
         """Download all the medias from provided target.
 
         This method follwows the parameters given in the :obj:`__init__`
         method (profile or hashtag, directory, get_videos and add_metadata).
 
-        Arguments:
-            media_count (int, optional): how many media to download before
+        Keyword Arguments:
+            media_count (int): how many media to download before
                 stopping [default: None]
-            with_pbar (bool, optional): display a progress bar
+            with_pbar (bool): display a progress bar
                 [default: False]
-            timeframe (tuple, optional): a couple of datetime.date object
+            timeframe (tuple): a couple of :obj:`datetime.date` object
                 specifying the date frame within which to yield medias
                 (a None value can be given as well) [default: None]
                 [format: (start, stop), stop older than start]
+            new_only (bool):
+                stop looking for new medias if old ones are found in the
+                destination directory [default: False]
         """
+        # extract the parameters here to avoid having a too heavy
+        # function signature
+        media_count = kwargs.get('media_count', None)
+        with_pbar = kwargs.get('with_pbar', False)
+        timeframe = kwargs.get('timeframe', None)
+        new_only = kwargs.get('new_only', False)
+        condition = kwargs.get('condition', None)
+
         if self.target is None:
             raise ValueError("No download target was specified during initialisation !")
         elif self.directory is None:
@@ -334,7 +346,8 @@ class InstaLooter(object):
         else:
             condition = kwargs.get('condition')
         medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
-                                               condition=condition, timeframe=timeframe)
+                                               condition=condition, timeframe=timeframe,
+                                               new_only=new_only)
         if with_pbar:
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
         self._poison_workers()
@@ -377,18 +390,28 @@ class InstaLooter(object):
         script = soup.find('body').find('script', {'type': 'text/javascript'})
         return json.loads(self._RX_SHARED_DATA.match(script.text).group(1))
 
-    def _fill_media_queue(self, media_count=None, with_pbar=False, condition=None, timeframe=None):
+    def _fill_media_queue(self, media_count=None, with_pbar=False, condition=None, timeframe=None, new_only=False):
         medias_queued = 0
+
         for media in self.medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe):
             if condition(media):
-                media_url = media.get('display_src')
-                media_basename = os.path.basename(media_url.split('?')[0])
-                if not os.path.exists(os.path.join(self.directory, media_basename)):
+                # Check that media is not already in dest directory before adding it
+                if not os.path.exists(os.path.join(self.directory, self._make_filename(media))):
                     self._medias_queue.put(media)
                     medias_queued += 1
-            if media_count is not None and medias_queued >= media_count:
-                break
+                # stop here if the file already exists and we want only new files
+                elif new_only:
+                    break
+                # stop here if we have as many files queued as wanted
+                if media_count is not None and medias_queued >= media_count:
+                    break
         return medias_queued
+
+    def _make_filename(self, media):
+        if not media['is_video']
+            return os.path.basename(media['display_src'].split('?')[0])
+        else:
+            return os.path.basename(self.get_post_info(media['code'])['video_url'].split('?')[0])
 
     def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):
