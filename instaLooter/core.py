@@ -352,14 +352,25 @@ class InstaLooter(object):
             raise ValueError("No directory was specified during initialisation !")
 
         self._init_workers()
-        url = "https://www.instagram.com/p/{}/".format(code)
-        res = self.session.get(url)
-        media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+        media = self.get_post_info(code)
         self._medias_queue.put(media)
         self._poison_workers()
         self._join_workers()
         if self.add_metadata and not media['is_video']:
             self._add_metadata(photo_name, media)
+
+    def get_post_info(self, code):
+        """Get info about a single post referenced by its code
+
+        Arguments:
+            code (str): the code of the post (can be found in the url:
+                https://www.instagram.com/p/<code>/) when looking at a
+                specific media
+        """
+        url = "https://www.instagram.com/p/{}/".format(code)
+        res = self.session.get(url)
+        media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+        return media
 
     def _get_shared_data(self, res):
         soup = bs.BeautifulSoup(res.text, PARSER)
@@ -420,6 +431,3 @@ class InstaLooter(object):
         """Check if the current instance is logged in.
         """
         return self.csrftoken is not None
-
-
-
