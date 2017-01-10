@@ -22,14 +22,14 @@ class TestInstaLooterCommandLineInterface(unittest.TestCase):
         shutil.rmtree(self.tmpdir)
 
     def test_cli_plain(self):
-        instaLooter.main(["mysteryjets", self.tmpdir, "--get-videos"])
+        instaLooter.main(["mysteryjets", self.tmpdir, "--get-videos", "-q"])
         self.assertGreaterEqual(len(os.listdir(self.tmpdir)), 686) # nb of post on 2016-12-21
-    
+
     def test_cli_nodirectory(self):
         """Issue #19 acceptance test
         """
         initial_dir = os.getcwd()
         os.chdir(self.tmpdir)
-        instaLooter.main(["mysteryjets", "-n", "10"])
+        instaLooter.main(["mysteryjets", "-n", "10", "-q"])
         self.assertEqual(len(os.listdir(self.tmpdir)), 10)
         os.chdir(initial_dir)
