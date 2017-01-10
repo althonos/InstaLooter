@@ -4,3 +4,4 @@ progressbar2
 requests
 docopt
 python-dateutil
+hues
