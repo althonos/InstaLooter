@@ -43,15 +43,19 @@ import docopt
 import os
 import sys
 import getpass
+import hues
+import warnings
 
 from . import __version__, __author__, __author_email__
 from .core import InstaLooter
-from .utils import get_times_from_cli
+from .utils import get_times_from_cli, warn_with_hues, console
 
 
 def main(argv=sys.argv[1:]):
     """Run from the command line interface.
     """
+    warnings._showwarning = warnings.showwarning
+    warnings.showwarning = warn_with_hues
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
     looter = InstaLooter(
@@ -60,20 +64,24 @@ def main(argv=sys.argv[1:]):
         add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
         jobs=int(args['--jobs']))
 
-    if args['--credentials']:
-        credentials = args['--credentials'].split(':', 1)
-        login = credentials[0]
-        password = credentials[1] if len(credentials) > 1 else getpass.getpass()
-        looter.login(login, password)
+    try:
 
-    if args['--time']:
-        try:
+        if args['--credentials']:
+            credentials = args['--credentials'].split(':', 1)
+            login = credentials[0]
+            password = credentials[1] if len(credentials) > 1 else getpass.getpass()
+            looter.login(login, password)
+            if not args['--quiet']:
+                hues.success('Logged in.')
+
+        if args['--time']:
             timeframe = get_times_from_cli(args['--time'])
-        except ValueError as ve:
-            print(str(ve))
-            sys.exit(1)
-    else:
-        timeframe = None
+        else:
+            timeframe = None
+
+    except ValueError as ve:
+        console.error(ve)
+        sys.exit(1)
 
     try:
         looter.download(
@@ -83,6 +91,8 @@ def main(argv=sys.argv[1:]):
         )
     except KeyboardInterrupt:
         looter.__del__()
+    finally:
+        warnings.showwarning = warnings._showwarning
 
 
 if __name__ == "__main__":

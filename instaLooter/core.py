@@ -12,6 +12,7 @@ import datetime
 import progressbar
 import random
 import re
+import warnings
 import requests
 import six
 import sys
@@ -19,10 +20,9 @@ import time
 import bs4 as bs
 
 from .worker import InstaDownloader
-from .utils import get_times
+from .utils import get_times, warn_with_hues
 
 PARSER = 'html.parser'
-
 
 
 class InstaLooter(object):
@@ -192,14 +192,22 @@ class InstaLooter(object):
                 from JSON to a Python dictionary
         """
         url = self._base_url.format(self.target)
+        current_page = 0
         while True:
+            current_page += 1
             res = self.session.get(url)
             data = self._get_shared_data(res)
+
+            try:
+                media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
+            except KeyError as ke:
+                warnings.warn("Could not find page of user: {}".format(self.target), stacklevel=1)
+                return
 
             if media_count is None:
                 media_count = data['entry_data'][self._page_name][0][self._section_name]['media']['count']
 
-            if with_pbar:
+            if with_pbar and media_info['page_info']['has_next_page'] and media_info["nodes"]:
                 if not 'max_id' in url:  # First page: init pbar
                     self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
                 else:  # Other pages: update pbar
@@ -213,10 +221,16 @@ class InstaLooter(object):
 
             yield data
 
-            media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
-
             # Break if the page is private (no media to show) or if the last page was reached
-            if not media_info['page_info']['has_next_page'] or not media_info["nodes"]:
+            if not media_info['page_info']['has_next_page']:
+                break
+            elif not media_info["nodes"]:
+                if self._section_name == "tag":
+                    warnings.warn("#{} has no medias to show.".format(self.target))
+                elif not self.is_logged_in():
+                    warnings.warn("Profile {} is private, retry after logging in.".format(self.target))
+                else:
+                    warnings.warn("Profile {} is private, and you are not following it.".format(self.target))
                 break
             else:
                 url = '{}?max_id={}'.format(self._base_url.format(self.target), media_info['page_info']["end_cursor"])
@@ -353,7 +367,10 @@ class InstaLooter(object):
         medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
                                                condition=condition, timeframe=timeframe,
                                                new_only=new_only)
-        if with_pbar:
+
+        if medias_queued == 0:
+            warnings.warn("No {}medias found.".format('new ' if new_only else ''))
+        elif with_pbar:
             self._init_pbar(self.dl_count, medias_queued, 'Downloading |')
         self._poison_workers()
         self._join_workers(with_pbar=with_pbar)

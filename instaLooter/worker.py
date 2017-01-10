@@ -6,9 +6,11 @@ from __future__ import (
 )
 
 import requests
+import contextlib
 import threading
 import datetime
 import os
+
 
 try:
     import PIL.Image
@@ -74,7 +76,8 @@ class InstaDownloader(threading.Thread):
             img.save(path, exif=piexif.dump(exif_dict))
 
     def _download_photo(self, media):
-
+        """
+        """
         photo_url = media.get('display_src')
         photo_name = os.path.join(self.directory, self.owner._make_filename(media))
 
@@ -88,25 +91,24 @@ class InstaDownloader(threading.Thread):
     def _download_video(self, media):
         """
         """
-
         url = "https://www.instagram.com/p/{}/".format(media['code'])
-        res = self.session.get(url)
-        data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+        with contextlib.closing(self.session.get(url)) as res:
+            data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
 
         video_url = data["video_url"]
         video_basename = os.path.basename(video_url.split('?')[0])
         video_name = os.path.join(self.directory, self.owner._make_filename(data))
 
-        # save full-resolution photo
+        # save video
         self._dl(video_url, video_name)
 
     def _dl(self, source, dest):
         self.session.headers['Accept'] = '*/*'
-        res = self.session.get(source)
-        with open(dest, 'wb') as dest_file:
-            for block in res.iter_content(1024):
-                if block:
-                    dest_file.write(block)
+        with contextlib.closing(self.session.get(source)) as res:
+            with open(dest, 'wb') as dest_file:
+                for block in res.iter_content(1024):
+                    if block:
+                        dest_file.write(block)
 
     def kill(self):
         self._killed = True

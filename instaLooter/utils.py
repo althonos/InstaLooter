@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import hues
+import sys
 import datetime
 import dateutil.relativedelta
+
+console = hues.SimpleConsole(stdout=sys.stderr)
+
 
 def get_times(timeframe):
     if timeframe is None:
@@ -16,7 +21,6 @@ def get_times(timeframe):
     end_time = timeframe[1] or datetime.date.fromtimestamp(0)
 
     return start_time, end_time
-
 
 def get_times_from_cli(cli_token):
 
@@ -44,8 +48,9 @@ def get_times_from_cli(cli_token):
             raise ValueError("--time parameter was not provided ISO formatted dates")
         return start_date, stop_date
 
-
-
 def date_from_isoformat(isoformat_date):
     year, month, day = isoformat_date.split('-')
     return datetime.date(int(year), int(month), int(day))
+
+def warn_with_hues(message, category, filename, lineno, file=None):
+    console.warn(message)
