@@ -55,7 +55,7 @@ def main(argv=sys.argv[1:]):
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
     looter = InstaLooter(
-        directory=os.path.expanduser(args.get('<directory>', os.getcwd())),
+        directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
         profile=args['<profile>'],hashtag=args['<hashtag>'],
         add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
         jobs=int(args['--jobs']))
