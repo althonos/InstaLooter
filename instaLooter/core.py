@@ -30,12 +30,31 @@ class InstaLooter(object):
     """
 
     _RX_SHARED_DATA = re.compile(r'window._sharedData = ({[^\n]*});')
+    _RX_TEMPLATE = re.compile(r'{([a-zA-Z]*)}')
 
     URL_HOME = "https://www.instagram.com/"
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
     URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
 
-    def __init__(self, directory=None, profile=None, hashtag=None, add_metadata=False, get_videos=False, jobs=16):
+    _TEMPLATE_MAP = {
+        'id': lambda m: m.get('id'),
+        'code': lambda m: m.get('code'),
+        'ownerid': lambda m: m.get('owner', dict()).get('id'),
+        'username': lambda m: m.get('owner', dict()).get('username'),
+        'fullname': lambda m: m.get('owner', dict()).get('full_name'),
+        'datetime': lambda m: datetime.datetime.fromtimestamp(m['date']) if 'date' in m else None,
+        'date': lambda m: datetime.date.fromtimestamp(m['date']) if 'date' in m else None,
+        'width': lambda m: m.get('dimensions', dict()).get('width'),
+        'heigth': lambda m: m.get('dimensions', dict()).get('height'),
+        'likescount': lambda m: m.get('likes', dict()).get('count'),
+        'commentscount': lambda m: m.get('likes', dict()).get('count'),
+        'display_src': lambda m: m.get('display_src'),
+        'video_url': lambda m: m.get('video_url'),
+    }
+
+    _OWNER_MAP = {}
+
+    def __init__(self, directory=None, profile=None, hashtag=None, add_metadata=False, get_videos=False, jobs=16, template="{id}"):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -72,6 +91,10 @@ class InstaLooter(object):
         # Create self.directory if it doesn't exist.
         if directory is not None and not os.path.exists(directory):
             os.makedirs(directory)
+
+        self.template = template
+        self._required_template_keys = self._RX_TEMPLATE.findall(template)
+
 
         self.directory = directory
         self.add_metadata = add_metadata
@@ -431,13 +454,35 @@ class InstaLooter(object):
         return medias_queued
 
     def _make_filename(self, media):
-        if not media['is_video']:
-            return os.path.basename(media['display_src'].split('?')[0])
+
+        try:
+            media['owner'].update(self._OWNER_MAP[media['owner']['id']])
+        except KeyError:
+            pass
+
+        required_template_keys = self._required_template_keys.copy()
+        if media['is_video']:
+            required_template_keys.append('video_url')
         else:
-            if not 'video_url' in media:
-                return os.path.basename(self.get_post_info(media['code'])['video_url'].split('?')[0])
-            else:
-                return os.path.basename(media['video_url'].split('?')[0])
+            required_template_keys.append('display_src')
+
+        try:
+            template_values = {}
+            for x in required_template_keys:
+                template_values[x] = value = self._TEMPLATE_MAP[x](media)
+                assert value is not None
+        except AssertionError:
+            media = self.get_post_info(media['code'])
+            template_values = {x:self._TEMPLATE_MAP[x](media) for x in required_template_keys}
+        finally:
+            self._OWNER_MAP[media['owner']['id']] = media['owner']
+
+        extension = os.path.splitext(os.path.basename(
+            media.get('video_url') or media['display_src']
+        ).split('?')[0])[1]
+
+        return "".join([self.template.format(**template_values), extension])
+
 
     def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):

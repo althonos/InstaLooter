@@ -79,6 +79,29 @@ Options
     so if using the following value: ``--time 2016-05-10:2016-04-03``,
     then all medias will be downloaded including the ones posted on the 10th
     of May 2016 and on the 3rd of April 2016.
+- ``-T TMPL, --template TMPL``
+    A filename template to use to write the files. [default: {id}]
+    The default filename of the pictures and videos on Instagram doesn't show
+    anything about the file you just downloaded. But using the -t argument
+    allows you to give instaLooter a filename template, using the following
+    format with brackets-enclosed (``{}``) variable names among:
+    - ``id``* and ``code``* of the instagram id of the media
+    - ``ownerid``*, ``username`` and ``fullname`` of the owner
+    - ``datetime``*: the date and time of the post (YYYY-MM-DD hh:mm:ss)
+    - ``date``*: the date of the post (YYYY-MM-DD)
+    - ``width``* and ``height``*
+    - ``likescount``* and ``commentscount``*
+
+    *: use these only to quicken download, since fetching the others may take
+    a tad longer (in particular in hashtag download mode).
+
+    You are however to make sure that the generated filename is unique, so you
+    should use at least id, code or datetime somewhere.
+    Examples of acceptable values::
+
+        - {username}.{datetime}
+        - {username}-{likescount}-{width}x{height}.{id}
+
 
 
 Installation

@@ -33,3 +33,10 @@ class TestInstaLooterCommandLineInterface(unittest.TestCase):
         instaLooter.main(["mysteryjets", "-n", "10", "-q"])
         self.assertEqual(len(os.listdir(self.tmpdir)), 10)
         os.chdir(initial_dir)
+
+    def test_cli_template(self):
+        """Issue #14 CLI acceptance test
+        """
+        instaLooter.main(["mysteryjets", self.tmpdir, "-n", "10", "-q", "-T", "{username}.{date}.{id}"])
+        for f in os.listdir(self.tmpdir):
+            self.assertTrue(f.startswith('mysteryjets'))

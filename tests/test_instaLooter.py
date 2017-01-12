@@ -73,6 +73,21 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
         self.assertEqual(len(os.listdir(self.tmpdir)), 200)
 
 
+class TestInstaLooterTemplate(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
+    def test_template_1(self):
+        PROFILE = "therock"
+        looter = instaLooter.InstaLooter(self.tmpdir, profile=PROFILE, get_videos=True, template='{username}')
+        looter.download(media_count=30, with_pbar=True)
+        for f in os.listdir(self.tmpdir):
+            self.assertTrue(f.startswith(PROFILE))
+
 
 
 
@@ -81,6 +96,7 @@ def load_tests(loader, tests, pattern):
     TestInstaLooterProfileDownload.register_tests()
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterProfileDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
+    suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterTemplate))
     return suite
 
 

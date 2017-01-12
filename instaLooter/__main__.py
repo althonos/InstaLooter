@@ -6,24 +6,47 @@ instaLooter - Another API-less Instagram pictures and videos downloader
 Usage:
     instaLooter <profile> [<directory>] [options]
     instaLooter hashtag <hashtag> [<directory>] [options]
-    instaLooter (-h | --help | --version)
+    instaLooter (-h | --help | --version | --usage)
 
 Options:
     -n NUM, --num-to-dl NUM      Maximum number of new files to download
     -j JOBS, --jobs JOBS         Number of parallel threads to use to
                                  download files [default: 16]
+    -T TMPL, --template TMPL     A filename template to use to write the
+                                 files (see *Template*). [default: {id}]
     -v, --get-videos             Get videos as well as photos
-    -N, --new                    Only look for files newer than the ones in
-                                 the destination directory (faster)
+    -N, --new                    Only look for files newer than the ones
+                                 in the destination directory (faster)
     -m, --add-metadata           Add date and caption metadata to downloaded
                                  pictures (requires PIL/Pillow and piexif)
     -q, --quiet                  Do not produce any output
     -t TIME, --time TIME         The time limit within which to download
-                                 pictures and video (see *Time* section)
+                                 pictures and video (see *Time*)
     -h, --help                   Display this message and quit
-    -c CRED, --credentials CRED  Credentials to login to Instagram with if
-                                 needed [format: login[:password]]
+    -c CRED, --credentials CRED  Credentials to login to Instagram with
+                                 if needed [format: login[:password]]
     --version                    Show program version and quit
+
+Template:
+    The default filename of the pictures and videos on Instagram doesn't show
+    anything about the file you just downloaded. But using the -t argument
+    allows you to give instaLooter a filename template, using the following
+    format with brackets-enclosed ({}) variable names among:
+    - ``id``* and ``code``² of the instagram id of the media
+    - ``ownerid``*, ``username`` and ``fullname`` of the owner
+    - ``datetime``*: the date and time of the post (YYYY-MM-DD hh:mm:ss)
+    - ``date``*: the date of the post (YYYY-MM-DD)
+    - ``width``* and ``height``*
+    - ``likescount``* and ``commentscount``*
+
+    *: use these only to quicken download, since fetching the others may take
+    a tad longer (in particular in hashtag download mode).
+
+    You are however to make sure that the generated filename is unique, so you
+    should use at least id, code or datetime somewhere.
+    Examples of acceptable values:
+        - {username}.{datetime}
+        - {username}-{likescount}-{width}x{height}.{id}
 
 Time:
     The --time parameter can be given either a combination of start and stop
@@ -62,7 +85,7 @@ def main(argv=sys.argv[1:]):
         directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
         profile=args['<profile>'],hashtag=args['<hashtag>'],
         add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
-        jobs=int(args['--jobs']))
+        jobs=int(args['--jobs']), template=args['--template'])
 
     try:
 
