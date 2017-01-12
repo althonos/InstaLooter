@@ -460,7 +460,7 @@ class InstaLooter(object):
         except KeyError:
             pass
 
-        required_template_keys = self._required_template_keys.copy()
+        required_template_keys = copy.copy(self._required_template_keys)
         if media['is_video']:
             required_template_keys.append('video_url')
         else:
