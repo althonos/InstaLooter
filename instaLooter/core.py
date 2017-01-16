@@ -47,7 +47,7 @@ class InstaLooter(object):
         'width': lambda m: m.get('dimensions', dict()).get('width'),
         'heigth': lambda m: m.get('dimensions', dict()).get('height'),
         'likescount': lambda m: m.get('likes', dict()).get('count'),
-        'commentscount': lambda m: m.get('likes', dict()).get('count'),
+        'commentscount': lambda m: m.get('comments', dict()).get('count'),
         'display_src': lambda m: m.get('display_src'),
         'video_url': lambda m: m.get('video_url'),
     }
