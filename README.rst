@@ -25,6 +25,9 @@ Requirements
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **dateutil**      |  Date manipulation         | |PyPI dateutil|      | |Source dateutil|      | |License dateutil|      |
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **hues**          |  Colored output            | |PyPI hues|          | |Source hues|          | |License hues|          |
++-------------------+----------------------------+----------------------+------------------------+-------------------------+
+
 
 Usage
 -----
@@ -143,6 +146,9 @@ From GitHub
 .. |PyPI dateutil| image:: https://img.shields.io/pypi/v/python-dateutil.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/python-dateutil/
 
+.. |PyPI hues| image:: https://img.shields.io/pypi/v/hues.svg?maxAge=3600
+   :target: https://pypi.python.org/pypi/hues/
+
 .. |Source requests| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
    :target: https://github.com/kennethreitz/requests
 
@@ -161,6 +167,9 @@ From GitHub
 .. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
    :target: https://github.com/WoLpH/python-progressbar
 
+.. |Source hues| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+   :target: https://github.com/prashnts/hues
+
 .. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?maxAge=3600
    :target: https://opensource.org/licenses/Apache-2.0
 
@@ -178,3 +187,6 @@ From GitHub
 
 .. |License dateutil| image:: https://img.shields.io/pypi/l/python-dateutil.svg?maxAge=3600
    :target: https://opensource.org/licenses/BSD-3-Clause
+
+.. |License hues| image:: https://img.shields.io/pypi/l/hues.svg?maxAge=3600
+   :target: https://opensource.org/licenses/MIT
