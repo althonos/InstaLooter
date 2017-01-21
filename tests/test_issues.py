@@ -28,7 +28,7 @@ class TestInstaLooterResolvedIssues(unittest.TestCase):
         """
         instaLooter.main(["fluoxetine", self.tmpdir, "-n", "10", "-q", "--add-metadata"])
         for f in os.listdir(self.tmpdir):
-            exif = piexif.load(f)
+            exif = piexif.load(os.path.join(self.tmpdir, f))
             self.assertTrue(exif['Exif']) # Date & Caption
             self.assertTrue(exif['0th'])  # Image creator
 
