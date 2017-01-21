@@ -42,8 +42,9 @@ class InstaLooter(object):
         'ownerid': lambda m: m.get('owner', dict()).get('id'),
         'username': lambda m: m.get('owner', dict()).get('username'),
         'fullname': lambda m: m.get('owner', dict()).get('full_name'),
-        'datetime': lambda m: ("{0.year}-{0.month}-{0.day} {0.hour}h{0.minute}m{0.second}s"
-            .format(datetime.datetime.fromtimestamp(m['date']))) if 'date' in m else None,
+        'datetime': lambda m: ("{0.year}-{0.month}-{0.day} {0.hour}h{0.minute}m{0.second}"
+            "s{0.microsecond}".format(datetime.datetime.fromtimestamp(m['date'])))
+            if 'date' in m else None,
         'date': lambda m: datetime.date.fromtimestamp(m['date']) if 'date' in m else None,
         'width': lambda m: m.get('dimensions', dict()).get('width'),
         'heigth': lambda m: m.get('dimensions', dict()).get('height'),
@@ -295,7 +296,7 @@ class InstaLooter(object):
                 elif media_date < end_time:
                     return
 
-    def download_pictures(self, media_count=None, with_pbar=False, timeframe=None):
+    def download_pictures(self, **kwargs):#media_count=None, with_pbar=False, timeframe=None, new_only=False):
         """Download all the pictures from provided target.
 
         Arguments:
@@ -311,11 +312,9 @@ class InstaLooter(object):
                 stop looking for new medias if old ones are found in the
                 destination directory [default: False]
         """
-        self.download(media_count=media_count, with_pbar=with_pbar,
-                      _condition=lambda media: not media['is_video'],
-                      timeframe=timeframe, new_only=new_only)
+        self.download(_condition=lambda media: not media['is_video'], **kwargs)
 
-    def download_videos(self, media_count=None, with_pbar=False, timeframe=None):
+    def download_videos(self, **kwargs):#media_count=None, with_pbar=False, timeframe=None):
         """Download all the videos from provided target.
 
         Arguments:
@@ -331,9 +330,7 @@ class InstaLooter(object):
                 stop looking for new medias if old ones are found in the
                 destination directory [default: False]
         """
-        self.download(media_count=media_count, with_pbar=with_pbar,
-                      _condition=lambda media: media['is_video'],
-                      timeframe=timeframe, new_only=new_only)
+        self.download(_condition=lambda media: media['is_video'], **kwargs)
 
     def get_owner_info(self, code):
         """Get metadata about the owner of given post.
