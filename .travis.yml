@@ -20,13 +20,8 @@ matrix:
   - python: 'pypy'
   - python: 'pypy3'
 
-
-# before_install:
-# - export DOC=$(python -c "import sys; x = float(sys.version[0:3]) > 3.4 if sys.version[0]=='3'
-#   else float(sys.version[0:3])>2.6; sys.exit(x)")
-
 install:
-  - pip install codacy-coverage coverage
+  - pip install -r requirements-test.txt
   - pip install .
 
 script:

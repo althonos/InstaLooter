@@ -1,0 +1,5 @@
+-r requirements.txt
+-r requirements-metadata.txt
+
+coverage
+codacy-coverage
