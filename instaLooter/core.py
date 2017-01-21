@@ -42,7 +42,8 @@ class InstaLooter(object):
         'ownerid': lambda m: m.get('owner', dict()).get('id'),
         'username': lambda m: m.get('owner', dict()).get('username'),
         'fullname': lambda m: m.get('owner', dict()).get('full_name'),
-        'datetime': lambda m: datetime.datetime.fromtimestamp(m['date']) if 'date' in m else None,
+        'datetime': lambda m: ("{0.year}-{0.month}-{0.day} {0.hour}h{0.minute}m{0.second}s"
+            .format(datetime.datetime.fromtimestamp(m['date']))) if 'date' in m else None,
         'date': lambda m: datetime.date.fromtimestamp(m['date']) if 'date' in m else None,
         'width': lambda m: m.get('dimensions', dict()).get('width'),
         'heigth': lambda m: m.get('dimensions', dict()).get('height'),
