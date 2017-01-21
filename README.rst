@@ -33,9 +33,13 @@ Usage
 -----
 
 InstaLooter comes with its CLI::
-
+    
     $ instaLooter <username> <directory> [options]
     $ instaLooter hashtag <hashtag> <directory> [options]
+
+If that doesn't work, try replacing ``instaLooter`` with ``python -m instaLooter``, 
+it may be that the generated command was not put into your **$PATH**.
+    
 
 Arguments
 ^^^^^^^^^
@@ -88,22 +92,24 @@ Options
     anything about the file you just downloaded. But using the -t argument
     allows you to give instaLooter a filename template, using the following
     format with brackets-enclosed (``{}``) variable names among:
-        - ``id*`` and ``code*`` of the instagram id of the media
-        - ``ownerid*``, ``username`` and ``fullname`` of the owner
-        - ``datetime*``: the date and time of the post (YYYY-MM-DD hh:mm:ss)
-        - ``date*``: the date of the post (YYYY-MM-DD)
-        - ``width*`` and ``height*``
-        - ``likescount*`` and ``commentscount*``
+    
+    - ``id*`` and ``code*`` of the instagram id of the media
+    - ``ownerid*``, ``username`` and ``fullname`` of the owner
+    - ``datetime*``: the date and time of the post (YYYY-MM-DD hh:mm:ss)
+    - ``date*``: the date of the post (YYYY-MM-DD)
+    - ``width*`` and ``height*``
+    - ``likescount*`` and ``commentscount*``
 
-    *: use these only to quicken download, since fetching the others may take
-    a tad longer (in particular in hashtag download mode).
+        *: use these only to quicken download, since fetching the others may take
+        a tad longer (in particular in hashtag download mode).
 
     You are however to make sure that the generated filename is unique, so you
     should use at least id, code or datetime somewhere.
     Examples of acceptable values:
-        - ``{username}.{datetime}``
-        - ``{username}-{likescount}-{width}x{height}.{id}``
-        - ``{username}.{datetime}.something_constant``
+    
+    - ``{username}.{datetime}``
+    - ``{username}-{likescount}-{width}x{height}.{id}``
+    - ``{username}.{datetime}.something_constant``
 
 
 
