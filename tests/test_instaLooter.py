@@ -6,7 +6,6 @@ import unittest
 import warnings
 import datetime
 
-sys.path.insert(0, os.path.abspath('..'))
 import instaLooter
 
 
@@ -84,7 +83,6 @@ def load_tests(loader, tests, pattern):
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterTemplate))
     return suite
-
 
 def setUpModule():
    warnings.simplefilter('ignore')
