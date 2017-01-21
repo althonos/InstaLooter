@@ -6,10 +6,7 @@ import unittest
 import warnings
 import datetime
 
-sys.path.insert(0,
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-)
-
+sys.path.insert(0, os.path.abspath('..'))
 import instaLooter
 
 
@@ -46,17 +43,6 @@ class TestInstaLooterProfileDownload(unittest.TestCase):
             self.assertEqual(profile, looter.metadata['username'])
 
         setattr(cls, "test_{}".format(profile), _test)
-
-    def test_private_profile(self):
-        looter = instaLooter.InstaLooter(self.tmpdir, profile="tldr")
-        with self.assertRaises(StopIteration):
-            next(looter.medias())
-
-    def test_timeframe(self):
-        looter = instaLooter.InstaLooter(self.tmpdir, profile="instagram")
-        timeframe = (datetime.date(2016, 12, 17),)*2
-        medias_in_timeframe = list(looter.medias(timeframe=timeframe))
-        self.assertEqual(len(medias_in_timeframe), 3)
 
 
 class TestInstaLooterHashtagDownload(unittest.TestCase):
