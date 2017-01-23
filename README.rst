@@ -3,6 +3,8 @@ InstaLooter |Starme|
 
 *Not all treasure's silver and gold, mate.*
 
+|build| |repo| |versions| |format| |grade| |coverage| |doc|
+
 InstaLooter is a program that can download any picture or video associated
 from an Instagram profile, without any API access. It can be seen as a
 re-implementation of the now deprecated `InstaRaider <https://github.com/akurtovic/InstaRaider>`_
@@ -33,13 +35,13 @@ Usage
 -----
 
 InstaLooter comes with its CLI::
-    
+
     $ instaLooter <username> <directory> [options]
     $ instaLooter hashtag <hashtag> <directory> [options]
 
-If that doesn't work, try replacing ``instaLooter`` with ``python -m instaLooter``, 
+If that doesn't work, try replacing ``instaLooter`` with ``python -m instaLooter``,
 it may be that the generated command was not put into your **$PATH**.
-    
+
 
 Arguments
 ^^^^^^^^^
@@ -92,7 +94,7 @@ Options
     anything about the file you just downloaded. But using the -t argument
     allows you to give instaLooter a filename template, using the following
     format with brackets-enclosed (``{}``) variable names among:
-    
+
     - ``id*`` and ``code*`` of the instagram id of the media
     - ``ownerid*``, ``username`` and ``fullname`` of the owner
     - ``datetime*``: the date and time of the post (YYYY-MM-DD hh:mm:ss)
@@ -106,7 +108,7 @@ Options
     You are however to make sure that the generated filename is unique, so you
     should use at least id, code or datetime somewhere.
     Examples of acceptable values:
-    
+
     - ``{username}.{datetime}``
     - ``{username}-{likescount}-{width}x{height}.{id}``
     - ``{username}.{datetime}.something_constant``
@@ -133,6 +135,28 @@ From GitHub
 
 .. |Starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star
    :target: https://github.com/althonos/InstaLooter
+
+.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg
+   :target: https://github.com/althonos/InstaLooter
+
+.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg
+   :target: https://pypi.python.org/pypi/instaLooter
+
+.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg
+   :target: https://pypi.python.org/pypi/instaLooter
+
+.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg
+   :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
+
+.. |coverage| image:: https://img.shields.io/codacy/coverage/9b8c7da6887c4195b9e960cb04b59a91/master.svg
+   :target: https://www.codacy.com/app/althonos/InstaLooter/files
+
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"
+   :target: https://travis-ci.org/althonos/InstaLooter/
+
+.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest
+   :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
+
 
 .. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/requests
