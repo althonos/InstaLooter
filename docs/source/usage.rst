@@ -50,7 +50,7 @@ Positional Arguments
 Optional Arguments
 ------------------
 
-``-n, --num``
+``-n NUM, --num NUM``
   the maximum number of new files to download
 
 ``-j JOBS, --jobs JOBS``
