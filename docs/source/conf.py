@@ -64,7 +64,6 @@ master_doc = 'index'
 
 # General information about the project.
 project = instaLooter.__name__
-copyright = '2016, althonos'
 author = instaLooter.__author__
 
 # The version info for the project you're documenting, acts as replacement for
@@ -369,7 +368,5 @@ texinfo_documents = [
 intersphinx_mapping = {'https://docs.python.org/3/': None}
 
 # autodoc
-#autoclass_content = "both"
 autodoc_member_order = "groupwise"
-
 default_role = "ref"

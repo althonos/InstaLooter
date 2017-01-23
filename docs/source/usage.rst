@@ -8,6 +8,14 @@ instaLooter - Another API-less Instagram pictures and videos downloader
 instaLooter provides a command line interface, that you can call with
 the ``instaLooter`` command.
 
+.. note::
+
+   In some cases, the ``instaLooter`` command is not added into
+   the ``$PATH`` after installation. It is possible to perform
+   all the following actions nevertheless by replacing occurences
+   of ``instaLooter`` with ``python -m instaLooter`` (or
+   ``python3 -m instaLooter``).
+
 Command Line Interface
 ----------------------
 

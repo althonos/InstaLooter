@@ -19,8 +19,8 @@ explanations on how to setup instaLooter without those.
     you are not familiar with the default Python version on you system, consider
     enforcing an installation with Python 3 using ``pip3`` instead of ``pip``.
 
-PyPI
-----
+PyPI |pypi|
+-----------
 
 If you have super user rights, open up a terminal and type the following:
 
@@ -37,8 +37,8 @@ the current user instead:
    $ pip install instaLooter --user
 
 
-GitHub
-------
+GitHub |build|
+--------------
 
 With ``git`` installed, do the following in a directory on your machine to
 clone the remote repository and install instaLooter from source:
@@ -73,3 +73,12 @@ Or install it to have access to the ``instaLooter`` command everywhere:
 .. code-block:: console
 
   # pip install .
+
+
+
+
+.. |pypi| image:: https://img.shields.io/pypi/v/instaLooter.svg
+   :target: https://pypi.python.org/pypi/instaLooter
+
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"
+   :target: https://travis-ci.org/althonos/InstaLooter/
