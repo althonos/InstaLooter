@@ -10,6 +10,7 @@ import contextlib
 import threading
 import datetime
 import os
+import re
 
 
 try:
@@ -20,6 +21,8 @@ except ImportError:
 
 
 class InstaDownloader(threading.Thread):
+
+    _NO_RESIZE_RX = re.compile(r'(/p[0-9]*x[0-9]*)')
 
     def __init__(self, owner):
         super(InstaDownloader, self).__init__()
@@ -78,7 +81,7 @@ class InstaDownloader(threading.Thread):
     def _download_photo(self, media):
         """
         """
-        photo_url = media.get('display_src')
+        photo_url = self._NO_RESIZE_RX.sub('', media.get('display_src'))
         photo_name = os.path.join(self.directory, self.owner._make_filename(media))
 
         # save full-resolution photo

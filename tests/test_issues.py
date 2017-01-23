@@ -6,6 +6,7 @@ import glob
 import datetime
 import warnings
 import piexif
+import PIL.Image
 
 import instaLooter
 
@@ -102,6 +103,19 @@ class TestInstaLooterResolvedIssues(unittest.TestCase):
         for f in os.listdir(self.tmpdir):
             for char in FORBIDDEN:
                 self.assertNotIn(char, f)
+
+    def test_issue_26(self):
+        """
+        Feature request by @verafide.
+
+        Checks that pictures that are downloaded are not
+        resized.
+        """
+        looter = instaLooter.InstaLooter(self.tmpdir)
+        looter.download_post("BO0XpEshejh")
+        filename = "1419863760138791137.jpg"
+        pic = PIL.Image.open(os.path.join(self.tmpdir, filename))
+        self.assertEqual(pic.size, (525, 612))
 
 
 def setUpModule():
