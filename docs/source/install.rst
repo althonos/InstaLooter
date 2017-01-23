@@ -11,6 +11,11 @@ The python modules ``pip`` and ``setuptools`` are required before you start
 installing InstaLooter. Although not strictly required, there will be no
 explanations on how to setup instaLooter without those.
 
+.. hint::
+
+   See the `PyPA web page <https://pip.pypa.io/en/stable/installing/>`_
+   page to install ``pip`` if it is not already installed.
+
 .. attention::
 
     Using ``pip`` will install InstaLooter with the default Python version.
