@@ -1,0 +1,5 @@
+-r requirements-metadata.txt
+
+sphinx
+sphinxcontrib-napoleon
+sphinxjp.themes.basicstrap

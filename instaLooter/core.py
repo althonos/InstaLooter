@@ -60,19 +60,19 @@ class InstaLooter(object):
         """Create a new looter instance.
 
         Keyword Arguments:
-            directory (str, optional): where downloaded medias will be stored
-                [default: None]
-            profile (str, optional): a profile to download media from
-                [default: None]
-            hashtag (str, optional): a hashtag to download media from
-                [default: None]
-            add_metadata (bool, optional): Add date and comment metadata to
-                the downloaded pictures [default: False]
-            get_videos (bool, optional): Also get the videos from the given
-                target [default: False]
-            jobs (bool, optional): the number of parallel threads to use to
+            directory (`str`): where downloaded medias will be stored
+                **[default: None]**
+            profile (`str`): a profile to download media from
+                **[default: None]**
+            hashtag (`str`): a hashtag to download media from
+                **[default: None]**
+            add_metadata (`bool`): Add date and comment metadata to
+                the downloaded pictures. **[default: False]**
+            get_videos (`bool`): Also get the videos from the given
+                target **[default: False]**
+            jobs (`bool`): the number of parallel threads to use to
                 download media (12 or more is advised to have a true parallel
-                download of media files) [default: 16]
+                download of media files) **[default: 16]**
         """
         if profile is not None and hashtag is not None:
             raise ValueError("Give only a profile or an hashtag, not both !")
@@ -138,10 +138,12 @@ class InstaLooter(object):
         """Login with provided credentials.
 
         Arguments:
-            username (str): the username to log in with
-            password (str): the password to log in with
+            username (`str`): the username to log in with
+            password (`str`): the password to log in with
 
-        (Code taken from LevPasha/instabot.py)
+        .. note::
+
+            Code taken from LevPasha/instabot.py
         """
         self.session.cookies.update({
             'sessionid': '',
@@ -182,7 +184,9 @@ class InstaLooter(object):
     def logout(self):
         """Log out from current session
 
-        (Code taken from LevPasha/instabot.py)
+        .. note::
+
+            Code taken from LevPasha/instabot.py
         """
         logout_post = {'csrfmiddlewaretoken': self.csrftoken}
         logout = self.session.post(self.URL_LOGOUT, data=logout_post)
@@ -207,14 +211,12 @@ class InstaLooter(object):
         12 media nodes, as well as metadata associated to the account.
 
         Arguments:
-            media_count (int, optional): how many media to show before
-                stopping [default: None]
-            with_pbar (bool, optional): display a progress bar
-                [default: False]
+            media_count (`int`): how many media to show before
+                stopping **[default: None]**
+            with_pbar (`bool`): display a progress bar. **[default: False]**
 
         Yields:
-            dict: an dictionnary containing the page content deserialised
-                from JSON to a Python dictionary
+            `dict`: the page content deserialised from JSON
         """
         url = self._base_url.format(self.target)
         current_page = 0
@@ -267,14 +269,13 @@ class InstaLooter(object):
         and yields them successively.
 
         Arguments:
-            media_count (int, optional): how many media to show before
-                stopping [default: None]
-            with_pbar (bool, optional): display a progress bar
-                [default: False]
-            timeframe (tuple, optional): a couple of datetime.date object
+            media_count (`int`): how many media to show before
+                stopping **[default: None]**
+            with_pbar (`bool`): display a progress bar **[default: False]**
+            timeframe (`tuple`): a couple of datetime.date object
                 specifying the date frame within which to yield medias
-                (a None value can be given as well) [default: None]
-                [format: (start, stop), stop older than start]
+                (a None value can be given as well) **[default: None]**
+                **[format: (start, stop), stop older than start]**
         """
         if timeframe is None: # Avoid checking timeframe every loop
             return self._timeless_medias(media_count=media_count, with_pbar=with_pbar)
@@ -299,36 +300,34 @@ class InstaLooter(object):
     def download_pictures(self, **kwargs):#media_count=None, with_pbar=False, timeframe=None, new_only=False):
         """Download all the pictures from provided target.
 
-        Arguments:
-            media_count (int, optional): how many media to download before
-                stopping [default: None]
-            with_pbar (bool, optional): display a progress bar
-                [default: False]
-            timeframe (tuple, optional): a couple of datetime.date object
+        Keyword Arguments:
+            media_count (`int`): how many media to download before
+                stopping **[default: None]**
+            with_pbar (`bool`): display a progress bar **[default: False]**
+            timeframe (`tuple`): a couple of datetime.date object
                 specifying the date frame within which to yield medias
-                (a None value can be given as well) [default: None]
-                [format: (start, stop), stop older than start]
-            new_only (bool):
+                (a None value can be given as well) **[default: None]**
+                **[format: (start, stop), stop older than start]**
+            new_only (`bool`):
                 stop looking for new medias if old ones are found in the
-                destination directory [default: False]
+                destination directory **[default: False]**
         """
         self.download(_condition=lambda media: not media['is_video'], **kwargs)
 
     def download_videos(self, **kwargs):#media_count=None, with_pbar=False, timeframe=None):
         """Download all the videos from provided target.
 
-        Arguments:
-            media_count (int, optional): how many media to download before
-                stopping [default: None]
-            with_pbar (bool, optional): display a progress bar
-                [default: False]
-            timeframe (tuple, optional): a couple of datetime.date object
+        Keyword Arguments:
+            media_count (`int`): how many media to download before
+                stopping **[default: None]**
+            with_pbar (`bool`): display a progress bar **[default: False]**
+            timeframe (`tuple`): a couple of datetime.date object
                 specifying the date frame within which to yield medias
-                (a None value can be given as well) [default: None]
-                [format: (start, stop), stop older than start]
-            new_only (bool):
+                (a None value can be given as well) **[default: None]**
+                **[format: (start, stop), stop older than start]**
+            new_only (`bool`):
                 stop looking for new medias if old ones are found in the
-                destination directory [default: False]
+                destination directory **[default: False]**
         """
         self.download(_condition=lambda media: media['is_video'], **kwargs)
 
@@ -336,13 +335,12 @@ class InstaLooter(object):
         """Get metadata about the owner of given post.
 
         Arguments:
-            code (str): the code of the post (can be found in the url:
-                https://www.instagram.com/p/<code>/) when looking at a
+            code (`str`): the code of the post (can be found in the url:
+                ``https://www.instagram.com/p/<code>/``) when looking at a
                 specific media
 
         Returns:
-            dict: an dictionnary containing the owner metadata deserialised
-                from JSON to a Python dictionary
+            `dict`: the owner metadata deserialised from JSON
         """
         url = "https://www.instagram.com/p/{}/".format(code)
         res = self.session.get(url)
@@ -356,17 +354,17 @@ class InstaLooter(object):
         method (profile or hashtag, directory, get_videos and add_metadata).
 
         Keyword Arguments:
-            media_count (int): how many media to download before
-                stopping [default: None]
-            with_pbar (bool): display a progress bar
-                [default: False]
-            timeframe (tuple): a couple of :obj:`datetime.date` object
+            media_count (`int`): how many media to download before
+                stopping **[default: None]**
+            with_pbar (`bool`): display a progress bar
+                **[default: False]**
+            timeframe (`tuple`): a couple of :obj:`datetime.date` object
                 specifying the date frame within which to yield medias
-                (a None value can be given as well) [default: None]
-                [format: (start, stop), stop older than start]
-            new_only (bool):
+                (a None value can be given as well) **[default: None]**
+                **[format: (start, stop), stop older than start]**
+            new_only (`bool`):
                 stop looking for new medias if old ones are found in the
-                destination directory [default: False]
+                destination directory **[default: False]**
         """
         # extract the parameters here to avoid having a too heavy
         # function signature
@@ -400,9 +398,9 @@ class InstaLooter(object):
         """Download a single post referenced by its code.
 
         Arguments:
-            code (str): the code of the post (can be found in the url:
-                https://www.instagram.com/p/<code>/) when looking at a
-                specific media
+            code (`str`): the code of the post (can be found in the url:
+                ``https://www.instagram.com/p/<code>/``) when looking
+                at a specific media.
         """
         if self.directory is None:
             raise ValueError("No directory was specified during initialisation !")
@@ -419,9 +417,9 @@ class InstaLooter(object):
         """Get info about a single post referenced by its code
 
         Arguments:
-            code (str): the code of the post (can be found in the url:
-                https://www.instagram.com/p/<code>/) when looking at a
-                specific media
+            code (`str`): the code of the post (can be found in the url:
+                ``https://www.instagram.com/p/<code>/``) when looking
+                at a specific media.
         """
         url = "https://www.instagram.com/p/{}/".format(code)
         res = self.session.get(url)
@@ -521,5 +519,8 @@ class InstaLooter(object):
 
     def is_logged_in(self):
         """Check if the current instance is logged in.
+
+        Returns:
+            `bool`: if the user is logged in or not
         """
         return self.csrftoken is not None
