@@ -433,7 +433,6 @@ class InstaLooter(object):
         if result is None:
             raise ValueError("Invalid post url: {}".format(url))
         else:
-            print(result.group(1))
             return result.group(1)
 
     def _get_shared_data(self, res):

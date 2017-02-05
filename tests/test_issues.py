@@ -42,7 +42,7 @@ class TestInstaLooterResolvedIssues(unittest.TestCase):
         looter = instaLooter.InstaLooter(self.tmpdir, profile="instagram")
         timeframe = (datetime.date(2016, 12, 17),)*2
         medias_in_timeframe = list(looter.medias(timeframe=timeframe))
-        self.assertEqual(len(medias_in_timeframe), 2)
+        self.assertEqual(len(medias_in_timeframe), 3)
 
     def test_issue_19(self):
         """
