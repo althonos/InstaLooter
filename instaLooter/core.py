@@ -31,6 +31,7 @@ class InstaLooter(object):
 
     _RX_SHARED_DATA = re.compile(r'window._sharedData = ({[^\n]*});')
     _RX_TEMPLATE = re.compile(r'{([a-zA-Z]*)}')
+    _RX_CODE_URL = re.compile(r'p/([^/]*)')
 
     URL_HOME = "https://www.instagram.com/"
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
@@ -426,6 +427,15 @@ class InstaLooter(object):
         media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
         return media
 
+    @classmethod
+    def _extract_code_from_url(cls, url):
+        result = cls._RX_CODE_URL.search(url)
+        if result is None:
+            raise ValueError("Invalid post url: {}".format(url))
+        else:
+            print(result.group(1))
+            return result.group(1)
+
     def _get_shared_data(self, res):
         soup = bs.BeautifulSoup(res.text, PARSER)
         script = soup.find('body').find('script', {'type': 'text/javascript'})
@@ -478,7 +488,6 @@ class InstaLooter(object):
         ).split('?')[0])[1]
 
         return "".join([self.template.format(**template_values), extension])
-
 
     def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):

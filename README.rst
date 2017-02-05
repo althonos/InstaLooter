@@ -49,6 +49,7 @@ InstaLooter comes with its CLI:
 
     $ instaLooter <username> [<directory>] [options]
     $ instaLooter hashtag <hashtag> [<directory>] [options]
+    $ instaLooter post <post_token> [<directory>] [options]
 
 Examples
 --------
@@ -60,6 +61,9 @@ Examples
 
     Download the latest 20 pictures or videos tagged with *python* to */tmp*
     $ instaLooter hashtag python /tmp -n 20 -v
+
+    Download a single post from an url in the current directory
+    $ instaLooter post "https://www.instagram.com/p/BFB6znLg5s1/"
 
 See more at the `Usage page <http://instalooter.readthedocs.io/en/latest/usage.html>`_
 of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.html>`_.

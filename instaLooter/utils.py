@@ -22,6 +22,7 @@ def get_times(timeframe):
 
     return start_time, end_time
 
+
 def get_times_from_cli(cli_token):
 
     today = datetime.date.today()
@@ -48,9 +49,11 @@ def get_times_from_cli(cli_token):
             raise ValueError("--time parameter was not provided ISO formatted dates")
         return start_date, stop_date
 
+
 def date_from_isoformat(isoformat_date):
     year, month, day = isoformat_date.split('-')
     return datetime.date(int(year), int(month), int(day))
 
-def warn_with_hues(message, category, filename, lineno, file=None):
+
+def warn_with_hues(message, category, filename, lineno, file=None, line=None):
     console.warn(message)

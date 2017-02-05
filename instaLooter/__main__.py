@@ -6,7 +6,16 @@ instaLooter - Another API-less Instagram pictures and videos downloader
 Usage:
     instaLooter <profile> [<directory>] [options]
     instaLooter hashtag <hashtag> [<directory>] [options]
+    instaLooter post <post_token> [<directory>] [options]
     instaLooter (-h | --help | --version | --usage)
+
+Arguments:
+    <profile>                    The username of the profile to download
+                                 videos and pictures from
+    <hashtag>                    A hashtag to download pictures and videos
+                                 from
+    <post_token>                 Either the url or the code of a single post
+                                 to download the picture or video from.
 
 Options:
     -n NUM, --num-to-dl NUM      Maximum number of new files to download
@@ -64,6 +73,7 @@ from __future__ import (
 
 import docopt
 import os
+import re
 import sys
 import getpass
 import hues
@@ -80,6 +90,9 @@ def main(argv=sys.argv[1:]):
     warnings._showwarning = warnings.showwarning
     warnings.showwarning = warn_with_hues
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
+
+    if args['<post_token>'] is not None:
+        args['--get-videos'] = True
 
     looter = InstaLooter(
         directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
@@ -107,11 +120,18 @@ def main(argv=sys.argv[1:]):
         sys.exit(1)
 
     try:
-        looter.download(
-            media_count=int(args['--num-to-dl']) if args['--num-to-dl'] else None,
-            with_pbar=not args['--quiet'], timeframe=timeframe,
-            new_only=args['--new'],
-        )
+        post_token = args['<post_token>']
+        if post_token is None:
+            looter.download(
+                media_count=int(args['--num-to-dl']) \
+                            if args['--num-to-dl'] else None,
+                with_pbar=not args['--quiet'], timeframe=timeframe,
+                new_only=args['--new'],
+            )
+        else:
+            if 'insta' in post_token:
+                post_token = looter._extract_code_from_url(post_token)
+            looter.download_post(post_token)
     except KeyboardInterrupt:
         looter.__del__()
     finally:

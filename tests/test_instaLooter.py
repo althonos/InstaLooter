@@ -74,6 +74,27 @@ class TestInstaLooterTemplate(unittest.TestCase):
             self.assertTrue(f.startswith(PROFILE))
 
 
+class TestInstaLooterUtils(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
+    def test_extract_post_code_from_url(self):
+        url = "https://www.instagram.com/p/BFB6znLg5s1/"
+
+        self.assertEqual(
+            instaLooter.InstaLooter._extract_code_from_url(url),
+            'BFB6znLg5s1',
+        )
+
+        with self.assertRaises(ValueError):
+            instaLooter.InstaLooter._extract_code_from_url(
+                'https://www.instagram.com/'
+            )
+
 
 
 def load_tests(loader, tests, pattern):
