@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+from __future__ import print_function
 
 import hues
 import sys
@@ -57,3 +58,7 @@ def date_from_isoformat(isoformat_date):
 
 def warn_with_hues(message, category, filename, lineno, file=None, line=None):
     console.warn(message)
+
+def warn_windows(message, category, filename, lineno, file=None, line=None):
+    print(("{t.tm_hour}:{t.tm_min}:{t.tm_sec} - WARNING - "
+          "{msg}").format(t=time.localtime(), msg=message), file=sys.stderr)

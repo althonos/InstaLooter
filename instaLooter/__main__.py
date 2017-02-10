@@ -81,14 +81,16 @@ import warnings
 
 from . import __version__, __author__, __author_email__
 from .core import InstaLooter
-from .utils import get_times_from_cli, warn_with_hues, console
+from .utils import (
+    get_times_from_cli, warn_with_hues,
+    console, warn_windows)
 
 
 def main(argv=sys.argv[1:]):
     """Run from the command line interface.
     """
     warnings._showwarning = warnings.showwarning
-    warnings.showwarning = warn_with_hues
+    warnings.showwarning = warn_with_hues if os.name == "posix" else warn_windows
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
     if args['<post_token>'] is not None:
