@@ -22,7 +22,7 @@ except ImportError:
 
 class InstaDownloader(threading.Thread):
 
-    _NO_RESIZE_RX = re.compile(r'(/p[0-9]*x[0-9]*)')
+    _NO_RESIZE_RX = re.compile(r'(/[p|s][0-9]*x[0-9]*)')
 
     def __init__(self, owner):
         super(InstaDownloader, self).__init__()
