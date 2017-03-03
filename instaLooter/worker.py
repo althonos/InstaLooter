@@ -40,12 +40,12 @@ class InstaDownloader(threading.Thread):
             media = self.medias.get()
             if media is None:
                 break
-            elif media["__typename"] == "GraphVideo":
+            elif media.get('is_video'):
                 self._download_video(media)
-            elif media["__typename"] == "GraphImage":
-                self._download_photo(media)
-            elif media["__typename"] == "GraphSidecar":
+            elif media.get('__typename') == "GraphSidecar":
                 self._download_sidecar(media)
+            else:
+                self._download_photo(media)
             self.owner.dl_count += 1
 
     def _add_metadata(self, path, metadata):
