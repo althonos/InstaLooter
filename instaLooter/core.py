@@ -39,7 +39,7 @@ class InstaLooter(object):
 
     _TEMPLATE_MAP = {
         'id': lambda m: m.get('id'),
-        'code': lambda m: m.get('code'),
+        'code': lambda m: m.get('code') or m.get('shortcode'),
         'ownerid': lambda m: m.get('owner', dict()).get('id'),
         'username': lambda m: m.get('owner', dict()).get('username'),
         'fullname': lambda m: m.get('owner', dict()).get('full_name'),

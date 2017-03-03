@@ -12,7 +12,7 @@ import instaLooter
 
 
 
-class TestInstaLooterResolvedIssues(unittest.TestCase):
+class TestResolvedIssues(unittest.TestCase):
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -116,6 +116,26 @@ class TestInstaLooterResolvedIssues(unittest.TestCase):
         filename = "1419863760138791137.jpg"
         pic = PIL.Image.open(os.path.join(self.tmpdir, filename))
         self.assertEqual(pic.size, (525, 612))
+
+    def test_issue_39(self):
+        """
+        Feature request by @verafide
+
+        Checks that all pictures are downloaded from posts
+        with more than one picture.
+        """
+        looter = instaLooter.InstaLooter(self.tmpdir)
+        looter.download_post("BRHecUuFhPl")
+        self.assertEqual(
+            set(os.listdir(self.tmpdir)),
+            {
+                "1461270165803344956.jpg",
+                "1461270167497776767.jpg",
+                "1461270174435133336.jpg",
+                "1461270172581471925.jpg",
+                "1461270181565655668.jpg",
+            }
+        )
 
 
 def setUpModule():
