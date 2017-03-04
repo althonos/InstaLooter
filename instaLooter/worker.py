@@ -42,11 +42,10 @@ class InstaDownloader(threading.Thread):
                 break
             elif media.get('is_video'):
                 self._download_video(media)
-            elif media.get('__typename') == "GraphSidecar":
-                self._download_sidecar(media)
             else:
                 self._download_photo(media)
             self.owner.dl_count += 1
+
 
     def _add_metadata(self, path, metadata):
         """
@@ -92,16 +91,20 @@ class InstaDownloader(threading.Thread):
         if self.add_metadata:
             self._add_metadata(photo_name, media)
 
-    def _download_sidecar(self, media):
-        """
-        """
-        url = "https://www.instagram.com/p/{}/".format(media['code'])
-        with contextlib.closing(self.session.get(url)) as res:
-            data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
 
-        for edge in data['edge_sidecar_to_children']['edges']:
-            if edge['node']['__typename'] == 'GraphImage':
-                self._download_photo(self._sidecar_to_image(edge['node'], data))
+
+    # def _download_sidecar(self, media):
+    #     """
+    #     """
+    #     url = "https://www.instagram.com/p/{}/".format(media['code'])
+    #     with contextlib.closing(self.session.get(url)) as res:
+    #         data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+    #
+    #     for edge in data['edge_sidecar_to_children']['edges']:
+    #         if edge['node']['__typename'] == 'GraphImage':
+    #             self._download_photo(self._sidecar_to_image(edge['node'], data))
+    #         elif self.owner.get_videos:
+    #             self._download_video(self._sidecar_to_image(edge['node'], data))
 
 
     def _download_video(self, media):
@@ -117,14 +120,6 @@ class InstaDownloader(threading.Thread):
 
         # save video
         self._dl(video_url, video_name)
-
-    @staticmethod
-    def _sidecar_to_image(sidecar, media):
-        for key in ("owner", "likes", "comments", "caption", "location"):
-            sidecar.setdefault(key, media.get(key))
-        sidecar['display_src'] = sidecar.get('display_url')
-        sidecar['code'] = sidecar.get('shortcode')
-        return sidecar
 
 
 

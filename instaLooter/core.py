@@ -408,7 +408,7 @@ class InstaLooter(object):
 
         self._init_workers()
         media = self.get_post_info(code)
-        self._medias_queue.put(media)
+        self._add_media_to_queue(media, lambda m: True, None, 0, False)
         self._poison_workers()
         self._join_workers()
         if self.add_metadata and not media['is_video']:
@@ -444,19 +444,41 @@ class InstaLooter(object):
         medias_queued = 0
         condition = condition or (lambda media: self.get_videos or not media['is_video'])
         for media in self.medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe):
-            if condition(media):
-                # Check that media is not already in dest directory before adding it
-                media_basename = self._make_filename(media)
-                if not os.path.exists(os.path.join(self.directory, media_basename)):
-                    self._medias_queue.put(media)
-                    medias_queued += 1
-                # stop here if the file already exists and we want only new files
-                elif new_only:
-                    break
-                # stop here if we have as many files queued as wanted
-                if media_count is not None and medias_queued >= media_count:
-                    break
+            medias_queued, stop = self._add_media_to_queue(media, condition, media_count, medias_queued, new_only)
+            if stop:
+                break
         return medias_queued
+
+
+
+    def _add_media_to_queue(self, media, condition, media_count, medias_queued, new_only):
+        if media.get('__typename') == "GraphSidecar":
+            return self._add_sidecars_to_queue(
+                media, condition, media_count, medias_queued, new_only)
+        elif condition(media):
+            media_basename = self._make_filename(media)
+            if not os.path.exists(os.path.join(self.directory, media_basename)):
+                medias_queued += 1
+                self._medias_queue.put(media)
+            # stop here if the file already exists and we want only new files
+            elif new_only:
+                return medias_queued, True
+            # stop here if we have as many files queued as wanted
+            if media_count is not None and medias_queued >= media_count:
+                return medias_queued, True
+        return medias_queued, False
+
+
+    def _add_sidecars_to_queue(self, media, condition, media_count, medias_queued, new_only):
+        media = self.get_post_info(media['code'])
+        for sidecar in media['edge_sidecar_to_children']['edges']:
+            sidecar = self._sidecar_to_media(sidecar['node'], media)
+            medias_queued, stop = self._add_media_to_queue(
+                sidecar, condition, media_count, medias_queued, new_only)
+            if stop:
+                break
+        return medias_queued, stop
+
 
     def _make_filename(self, media):
 
@@ -524,6 +546,14 @@ class InstaLooter(object):
         metadata['followed_by'] = metadata['followed_by']['count']
         del metadata['media']['nodes']
         return metadata
+
+    @staticmethod
+    def _sidecar_to_media(sidecar, media):
+        for key in ("owner", "likes", "comments", "caption", "location"):
+            sidecar.setdefault(key, media.get(key))
+        sidecar['display_src'] = sidecar.get('display_url')
+        sidecar['code'] = sidecar.get('shortcode')
+        return sidecar
 
     def is_logged_in(self):
         """Check if the current instance is logged in.
