@@ -1,10 +1,7 @@
 import os
 import shutil
-import sys
 import tempfile
 import unittest
-import warnings
-import datetime
 
 import instaLooter
 

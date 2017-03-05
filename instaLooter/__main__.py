@@ -73,13 +73,12 @@ from __future__ import (
 
 import docopt
 import os
-import re
 import sys
 import getpass
 import hues
 import warnings
 
-from . import __version__, __author__, __author_email__
+from . import __version__#, __author__, __author_email__
 from .core import InstaLooter
 from .utils import (
     get_times_from_cli, warn_with_hues,

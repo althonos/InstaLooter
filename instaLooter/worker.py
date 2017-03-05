@@ -115,7 +115,7 @@ class InstaDownloader(threading.Thread):
             data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
 
         video_url = data["video_url"]
-        video_basename = os.path.basename(video_url.split('?')[0])
+        #video_basename = os.path.basename(video_url.split('?')[0])
         video_name = os.path.join(self.directory, self.owner._make_filename(data))
 
         # save video

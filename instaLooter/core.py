@@ -15,12 +15,11 @@ import re
 import warnings
 import requests
 import six
-import sys
 import time
 import bs4 as bs
 
 from .worker import InstaDownloader
-from .utils import get_times, warn_with_hues
+from .utils import get_times
 
 PARSER = 'html.parser'
 
@@ -228,7 +227,7 @@ class InstaLooter(object):
 
             try:
                 media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
-            except KeyError as ke:
+            except KeyError:
                 warnings.warn("Could not find page of user: {}".format(self.target), stacklevel=1)
                 return
 
