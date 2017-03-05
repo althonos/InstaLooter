@@ -137,22 +137,22 @@ of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.
    :target: https://github.com/prashnts/hues
 
 .. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?maxAge=3600
-   :target: https://opensource.org/licenses/Apache-2.0
+   :target: https://choosealicense.com/licenses/apache-2.0/
 
 .. |License BeautifulSoup| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600
-   :target: https://opensource.org/licenses/MIT
+   :target: https://choosealicense.com/licenses/mit/
 
 .. |License six| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600
-   :target: https://opensource.org/licenses/MIT
+   :target: https://choosealicense.com/licenses/mit/
 
 .. |License progressbar2| image:: https://img.shields.io/pypi/l/progressbar2.svg?maxAge=3600
-   :target: https://opensource.org/licenses/BSD-3-Clause
+   :target: https://choosealicense.com/licenses/bsd-3-clause/
 
 .. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg?maxAge=3600
-   :target: https://opensource.org/licenses/MIT
+   :target: https://choosealicense.com/licenses/mit/
 
 .. |License dateutil| image:: https://img.shields.io/pypi/l/python-dateutil.svg?maxAge=3600
-   :target: https://opensource.org/licenses/BSD-3-Clause
+   :target: https://choosealicense.com/licenses/bsd-3-clause/
 
 .. |License hues| image:: https://img.shields.io/pypi/l/hues.svg?maxAge=3600
-   :target: https://opensource.org/licenses/MIT
+   :target: https://choosealicense.com/licenses/mit/
