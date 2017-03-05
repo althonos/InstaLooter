@@ -72,87 +72,87 @@ of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.
 .. |Starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star&maxAge=3600
    :target: https://github.com/althonos/InstaLooter
 
-.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600
+.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600&style=flat-square
    :target: https://github.com/althonos/InstaLooter
 
-.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600
+.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/instaLooter
 
-.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600
+.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/instaLooter
 
-.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600
+.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
    :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
 
-.. |coverage| image:: https://img.shields.io/codacy/coverage/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600
+.. |coverage| image:: https://img.shields.io/codacy/coverage/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
    :target: https://www.codacy.com/app/althonos/InstaLooter/files
 
-.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"&maxAge=3600
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"&maxAge=3600&style=flat-square
    :target: https://travis-ci.org/althonos/InstaLooter/
 
-.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest&maxAge=3600
+.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest&maxAge=3600&style=flat-square
    :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
 
 
-.. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?maxAge=3600
+.. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/requests
 
-.. |PyPI BeautifulSoup| image:: https://img.shields.io/pypi/v/beautifulsoup4.svg?maxAge=3600
+.. |PyPI BeautifulSoup| image:: https://img.shields.io/pypi/v/beautifulsoup4.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/beautifulsoup4
 
-.. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?maxAge=3600
+.. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/six
 
-.. |PyPI progressbar2| image:: https://img.shields.io/pypi/v/progressbar2.svg?maxAge=3600
+.. |PyPI progressbar2| image:: https://img.shields.io/pypi/v/progressbar2.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/progressbar2
 
-.. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg?maxAge=3600
+.. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/docopt/
 
-.. |PyPI dateutil| image:: https://img.shields.io/pypi/v/python-dateutil.svg?maxAge=3600
+.. |PyPI dateutil| image:: https://img.shields.io/pypi/v/python-dateutil.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/python-dateutil/
 
-.. |PyPI hues| image:: https://img.shields.io/pypi/v/hues.svg?maxAge=3600
+.. |PyPI hues| image:: https://img.shields.io/pypi/v/hues.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/hues/
 
-.. |Source requests| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+.. |Source requests| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
    :target: https://github.com/kennethreitz/requests
 
-.. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+.. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
    :target: https://github.com/docopt/docopt
 
-.. |Source dateutil| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+.. |Source dateutil| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
    :target: https://github.com/dateutil/dateutil/
 
-.. |Source BeautifulSoup| image:: https://img.shields.io/badge/source-Launchpad-orange.svg?maxAge=3600
+.. |Source BeautifulSoup| image:: https://img.shields.io/badge/source-Launchpad-orange.svg?maxAge=3600&style=flat-square
    :target: https://launchpad.net/beautifulsoup
 
-.. |Source six| image:: https://img.shields.io/badge/source-Bitbucket-blue.svg?maxAge=3600
+.. |Source six| image:: https://img.shields.io/badge/source-Bitbucket-blue.svg?maxAge=3600&style=flat-square
    :target: https://bitbucket.org/gutworth/six
 
-.. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+.. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
    :target: https://github.com/WoLpH/python-progressbar
 
-.. |Source hues| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600
+.. |Source hues| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
    :target: https://github.com/prashnts/hues
 
-.. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?maxAge=3600
+.. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/apache-2.0/
 
-.. |License BeautifulSoup| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600
+.. |License BeautifulSoup| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License six| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600
+.. |License six| image:: https://img.shields.io/pypi/l/BeautifulSoup4.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License progressbar2| image:: https://img.shields.io/pypi/l/progressbar2.svg?maxAge=3600
+.. |License progressbar2| image:: https://img.shields.io/pypi/l/progressbar2.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/bsd-3-clause/
 
-.. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg?maxAge=3600
+.. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License dateutil| image:: https://img.shields.io/pypi/l/python-dateutil.svg?maxAge=3600
+.. |License dateutil| image:: https://img.shields.io/pypi/l/python-dateutil.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/bsd-3-clause/
 
-.. |License hues| image:: https://img.shields.io/pypi/l/hues.svg?maxAge=3600
+.. |License hues| image:: https://img.shields.io/pypi/l/hues.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/mit/
