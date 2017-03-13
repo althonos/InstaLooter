@@ -82,8 +82,8 @@ Or install it to have access to the ``instaLooter`` command everywhere:
 
 
 
-.. |pypi| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600
+.. |pypi| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/instaLooter
 
-.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"&maxAge=3600
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&maxAge=3600&style=flat-square
    :target: https://travis-ci.org/althonos/InstaLooter/

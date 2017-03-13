@@ -3,7 +3,7 @@ InstaLooter
 
 *Not all treasure's silver and gold, mate.*
 
-|build| |repo| |versions| |format| |grade| |coverage| |doc| |license|
+|build| |repo| |versions| |format| |coverage| |doc| |requirements| |health|
 
 InstaLooter is a program that can download pictures and videos from any profile
 or hashtag on `Instagram <https://instagram.com>`_, without any API token. It is
@@ -26,7 +26,7 @@ License |license|
 -----------------
 
 InstaLooter is released under the
-`GNU General Public License v3 <https://opensource.org/licenses/GPL-3.0>`_,
+`GNU General Public License v3 <:target: https://choosealicense.com/licenses/gpl-3.0/>`_,
 and is fully open-source. See the actual ``LICENSE`` file distributed
 with the software for a detail of the license.
 
@@ -56,29 +56,32 @@ Indices and tables
 * :ref:`search`
 
 
-.. |license| image:: https://img.shields.io/pypi/l/InstaLooter.svg?maxAge=3600
-   :target: https://opensource.org/licenses/GPL-3.0
-
-.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600
+.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600&style=flat-square
    :target: https://github.com/althonos/InstaLooter
 
-.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600
+.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/instaLooter
 
-.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600
+.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/instaLooter
 
-.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600
+.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
    :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
 
-.. |coverage| image:: https://img.shields.io/codacy/coverage/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600
-   :target: https://www.codacy.com/app/althonos/InstaLooter/files
+.. |coverage| image:: https://img.shields.io/codecov/c/github/althonos/InstaLooter/master.svg?maxAge=3600&style=flat-square
+   :target: https://codecov.io/gh/althonos/InstaLooter
 
-.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"&maxAge=3600
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&maxAge=3600&style=flat-square
    :target: https://travis-ci.org/althonos/InstaLooter/
 
-.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest&maxAge=3600
+.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest&maxAge=3600&style=flat-square
    :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
 
-.. |issues| image:: https://img.shields.io/github/issues/althonos/InstaLooter.svg?maxAge=3600
-   :target: https://github.com/althonos/InstaLooter/issues/
+.. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square&maxAge=3600
+   :target: https://requires.io/github/althonos/InstaLooter/requirements/?branch=master
+
+.. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square&maxAge=3600
+   :target: https://landscape.io/github/althonos/InstaLooter/master
+
+.. |license| image:: https://img.shields.io/pypi/l/InstaLooter.svg?maxAge=3600&style=flat-square
+   :target: https://choosealicense.com/licenses/gpl-3.0/
