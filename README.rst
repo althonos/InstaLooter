@@ -84,8 +84,8 @@ of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.
 .. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
    :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
 
-.. |coverage| image:: https://img.shields.io/codacy/coverage/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
-   :target: https://www.codacy.com/app/althonos/InstaLooter/files
+.. |coverage| image:: https://img.shields.io/codecov/c/github/althonos/InstaLooter/master.svg?maxAge=3600&style=flat-square
+   :target: https://codecov.io/gh/althonos/InstaLooter
 
 .. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"&maxAge=3600&style=flat-square
    :target: https://travis-ci.org/althonos/InstaLooter/

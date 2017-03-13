@@ -1,4 +1,4 @@
 -r requirements-metadata.txt
 
 coverage
-codacy-coverage
+codecov

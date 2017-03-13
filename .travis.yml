@@ -31,7 +31,7 @@ script:
   - coverage xml
 
 after_success:
-  - python-codacy-coverage -r "coverage.xml"
+  - codecov
 
 deploy:
   - provider: pypi
