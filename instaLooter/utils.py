@@ -60,5 +60,5 @@ def warn_with_hues(message, category, filename, lineno, file=None, line=None):
     console.warn(message)
 
 def warn_windows(message, category, filename, lineno, file=None, line=None):
-    print(("{t.tm_hour}:{t.tm_min}:{t.tm_sec} - WARNING - "
-          "{msg}").format(t=time.localtime(), msg=message), file=sys.stderr)
+    print(("{d.hour}:{d.minute}:{d.second} - WARNING - "
+          "{msg}").format(d=datetime.datetime.now(), msg=message), file=sys.stderr)
