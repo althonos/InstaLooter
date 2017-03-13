@@ -407,7 +407,12 @@ class InstaLooter(object):
 
         self._init_workers()
         media = self.get_post_info(code)
-        self._add_media_to_queue(media, lambda m: True, None, 0, False)
+
+        if media.get('__typename') == "GraphSidecar":
+            self._add_sidecars_to_queue(media, lambda m: True, None, 0, False)
+        else:
+            self._add_media_to_queue(media, lambda m: True, None, 0, False)
+
         self._poison_workers()
         self._join_workers()
         if self.add_metadata and not media['is_video']:
@@ -448,9 +453,8 @@ class InstaLooter(object):
                 break
         return medias_queued
 
-
-
     def _add_media_to_queue(self, media, condition, media_count, medias_queued, new_only):
+
         if media.get('__typename') == "GraphSidecar":
             return self._add_sidecars_to_queue(
                 media, condition, media_count, medias_queued, new_only)
@@ -467,7 +471,6 @@ class InstaLooter(object):
                 return medias_queued, True
         return medias_queued, False
 
-
     def _add_sidecars_to_queue(self, media, condition, media_count, medias_queued, new_only):
         media = self.get_post_info(media['code'])
         for sidecar in media['edge_sidecar_to_children']['edges']:
@@ -477,7 +480,6 @@ class InstaLooter(object):
             if stop:
                 break
         return medias_queued, stop
-
 
     def _make_filename(self, media):
 
@@ -548,7 +550,7 @@ class InstaLooter(object):
 
     @staticmethod
     def _sidecar_to_media(sidecar, media):
-        for key in ("owner", "likes", "comments", "caption", "location"):
+        for key in ("owner", "likes", "comments", "caption", "location", "date"):
             sidecar.setdefault(key, media.get(key))
         sidecar['display_src'] = sidecar.get('display_url')
         sidecar['code'] = sidecar.get('shortcode')
