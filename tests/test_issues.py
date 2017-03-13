@@ -16,9 +16,11 @@ class TestResolvedIssues(unittest.TestCase):
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
+        warnings._showwarning = warnings.showwarning
 
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
+        warnings.showwarning = warnings._showwarning
 
     def test_issue_9(self):
         """
@@ -136,6 +138,42 @@ class TestResolvedIssues(unittest.TestCase):
                 "1461270181565655668.jpg",
             }
         )
+
+    def test_issue_42(self):
+        """
+        Thanks to @MohamedIM for reporting this bug.
+
+        Checks that a multipost is successfully downloaded from
+        the CLI `post` option.
+        """
+        looter = instaLooter.InstaLooter(self.tmpdir)
+        looter.download_post('BRW-j_dBI6F')
+        self.assertEqual(
+            set(os.listdir(self.tmpdir)),
+            {
+                '1465633492745668095.mp4',
+                '1465633517836005761.mp4',
+                '1465633541559037966.mp4',
+                '1465633561523918792.mp4',
+            }
+        )
+
+    def test_issue_44(self):
+        """
+        Thanks to @Bangaio64 for reporting this bug.
+
+        Checks that warn_windows does not trigger an exception.
+        """
+        import instaLooter.utils
+        warnings.showwarning = instaLooter.utils.warn_windows
+        l = instaLooter.InstaLooter(
+            directory="/tmp",
+            profile="akjhdskjhfkjsdhfkjhdskjhfkjdshkfjhsdkjfdhkjdfshdfskhfd"
+        )
+        try:
+            l.download()
+        except:
+            self.fail()
 
 
 def setUpModule():
