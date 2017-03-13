@@ -13,7 +13,7 @@ __version__ = "0.7.1"
 
 
 try:
-    from .__main__ import main
+    from .cli import main
     from .core import InstaLooter
 except ImportError:
     pass
