@@ -26,7 +26,7 @@ License |license|
 -----------------
 
 InstaLooter is released under the
-`GNU General Public License v3 <:target: https://choosealicense.com/licenses/gpl-3.0/>`_,
+`GNU General Public License v3 <https://choosealicense.com/licenses/gpl-3.0/>`_,
 and is fully open-source. See the actual ``LICENSE`` file distributed
 with the software for a detail of the license.
 
@@ -85,3 +85,6 @@ Indices and tables
 
 .. |license| image:: https://img.shields.io/pypi/l/InstaLooter.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/gpl-3.0/
+
+.. |issues| image:: https://img.shields.io/github/issues/althonos/InstaLooter.svg?maxAge=3600&style=flat-square
+   :target: https://github.com/althonos/InstaLooter/issues
