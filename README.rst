@@ -3,12 +3,47 @@ InstaLooter |Starme|
 
 *Not all treasure's silver and gold, mate.*
 
-|build| |repo| |versions| |format| |grade| |coverage| |doc|
+|build| |repo| |versions| |format| |coverage| |doc| |requirements| |health| |license|
 
 InstaLooter is a program that can download any picture or video associated
 from an Instagram profile, without any API access. It can be seen as a
 re-implementation of the now deprecated `InstaRaider <https://github.com/akurtovic/InstaRaider>`_
 developed by `@akurtovic <https://github.com/akurtovic>`_.
+
+.. |Starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star&maxAge=3600
+   :target: https://github.com/althonos/InstaLooter
+
+.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600&style=flat-square
+   :target: https://github.com/althonos/InstaLooter
+
+.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
+   :target: https://pypi.python.org/pypi/instaLooter
+
+.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600&style=flat-square
+   :target: https://pypi.python.org/pypi/instaLooter
+
+.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
+   :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
+
+.. |coverage| image:: https://img.shields.io/codecov/c/github/althonos/InstaLooter/master.svg?maxAge=3600&style=flat-square
+   :target: https://codecov.io/gh/althonos/InstaLooter
+
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&maxAge=3600&style=flat-square
+   :target: https://travis-ci.org/althonos/InstaLooter/
+
+.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest&maxAge=3600&style=flat-square
+   :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
+
+.. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square&maxAge=3600
+   :target: https://requires.io/github/althonos/InstaLooter/requirements/?branch=master
+
+.. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square&maxAge=3600
+   :target: https://landscape.io/github/althonos/InstaLooter/master
+
+.. |license| image:: https://img.shields.io/pypi/l/InstaLooter.svg?maxAge=3600&style=flat-square
+   :target: https://choosealicense.com/licenses/gpl-3.0/
+
+
 
 
 Requirements
@@ -63,35 +98,10 @@ Examples
     $ instaLooter hashtag python /tmp -n 20 -v
 
     Download a single post from an url in the current directory
-    $ instaLooter post "https://www.instagram.com/p/BFB6znLg5s1/"
+    $ instaLooter post "https://www.instagram.com/p/BFB6znLg5s1/" .
 
 See more at the `Usage page <http://instalooter.readthedocs.io/en/latest/usage.html>`_
 of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.html>`_.
-
-
-.. |Starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star&maxAge=3600
-   :target: https://github.com/althonos/InstaLooter
-
-.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600&style=flat-square
-   :target: https://github.com/althonos/InstaLooter
-
-.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
-   :target: https://pypi.python.org/pypi/instaLooter
-
-.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600&style=flat-square
-   :target: https://pypi.python.org/pypi/instaLooter
-
-.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
-   :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
-
-.. |coverage| image:: https://img.shields.io/codecov/c/github/althonos/InstaLooter/master.svg?maxAge=3600&style=flat-square
-   :target: https://codecov.io/gh/althonos/InstaLooter
-
-.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label="travis-ci"&maxAge=3600&style=flat-square
-   :target: https://travis-ci.org/althonos/InstaLooter/
-
-.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest&maxAge=3600&style=flat-square
-   :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
 
 
 .. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?maxAge=3600&style=flat-square
