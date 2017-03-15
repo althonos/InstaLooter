@@ -235,7 +235,7 @@ class InstaLooter(object):
                 media_count = data['entry_data'][self._page_name][0][self._section_name]['media']['count']
 
             if with_pbar and media_info['page_info']['has_next_page'] and media_info["nodes"]:
-                if not 'max_id' in url:  # First page: init pbar
+                if 'max_id' not in url:  # First page: init pbar
                     self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
                 else:  # Other pages: update pbar
                     if self._pbar.value  == self._pbar.max_value:
@@ -243,7 +243,7 @@ class InstaLooter(object):
                     self._pbar.update(self._pbar.value+1)
 
             # First page: if user page, get metadata
-            if not 'max_id' in url and self._section_name=="user":
+            if 'max_id' not in url and self._section_name=="user":
                 self.metadata = self._parse_metadata_from_profile_page(data)
 
             yield data
@@ -284,8 +284,8 @@ class InstaLooter(object):
 
     def _timeless_medias(self, media_count=None, with_pbar=False):
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
-                for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
-                    yield media
+            for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
+                yield media
 
     def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
         start_time, end_time = get_times(timeframe)
@@ -379,7 +379,7 @@ class InstaLooter(object):
             raise ValueError("No directory was specified during initialisation !")
 
         self._init_workers()
-        if not '_condition' in kwargs:
+        if '_condition' not in kwargs:
             condition = lambda media: (not media['is_video'] or self.get_videos)
         else:
             condition = kwargs.get('_condition')
@@ -416,7 +416,10 @@ class InstaLooter(object):
         self._poison_workers()
         self._join_workers()
         if self.add_metadata and not media['is_video']:
-            self._add_metadata(photo_name, media)
+            self._add_metadata(
+                os.path.join(self.directory, self._make_filename(media)),
+                media
+            )
 
     def get_post_info(self, code):
         """Get info about a single post referenced by its code

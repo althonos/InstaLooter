@@ -112,7 +112,7 @@ class InstaDownloader(threading.Thread):
         """
         url = "https://www.instagram.com/p/{}/".format(media['code'])
 
-        if not "video_url" in media:
+        if "video_url" not in media:
             with contextlib.closing(self.session.get(url)) as res:
                 data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
         else:
