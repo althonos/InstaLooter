@@ -92,6 +92,10 @@ def main(argv=sys.argv[1:]):
     warnings.showwarning = warn_with_hues if os.name == "posix" else warn_windows
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
+    if args['<hashtag>'] and not args['--credentials']:
+        warnings.warn("#hashtag downloading requires an Instagram account.")
+        sys.exit(1)
+
     if args['<post_token>'] is not None:
         args['--get-videos'] = True
 

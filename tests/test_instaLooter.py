@@ -54,6 +54,7 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
 
+    @unittest.skip("Hashtag downloading requires an IG account")
     def test_hashtag_download(self):
         looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
         looter.download(media_count=200)

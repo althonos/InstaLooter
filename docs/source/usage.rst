@@ -3,8 +3,6 @@ Usage
 
 .. toctree::
 
-instaLooter - Another API-less Instagram pictures and videos downloader
-
 instaLooter provides a command line interface, that you can call with
 the ``instaLooter`` command.
 
@@ -26,7 +24,9 @@ Download pictures/videos from the profile of a single user:
    $ instaLooter <username> [<directory>] [options]
 
 
-Download pictures/videos tagged with a given *#hashtag*:
+Download pictures/videos tagged with a given *#hashtag* (this requires
+that you are **logged-in**, so use the ``-c`` flag to pass a username or a
+username:password pair):
 
 .. code-block:: console
 

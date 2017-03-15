@@ -4,7 +4,9 @@ Examples
 .. toctree::
 
 ``instaLooter`` also provides an :abbr:`API (Application Programmable Interface)`
-that can be used to extend the capabilities of ``instaLooter``.
+that can be used to extend the capabilities of ``instaLooter``, to fit your
+needs more tightly or to integrate ``instaLooter`` to your program.
+
 
 Store the links to the pictures and videos of a profile into a file
 -------------------------------------------------------------------
