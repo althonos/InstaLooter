@@ -95,7 +95,7 @@ Examples
     $ instaLooter instagram
 
     Download the latest 20 pictures or videos tagged with *python* to */tmp*
-    $ instaLooter hashtag python /tmp -n 20 -v
+    $ instaLooter hashtag python /tmp -n 20 -v -c MYLOGIN
 
     Download a single post from an url in the current directory
     $ instaLooter post "https://www.instagram.com/p/BFB6znLg5s1/" .

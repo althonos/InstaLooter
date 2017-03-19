@@ -24,9 +24,13 @@ Download pictures/videos from the profile of a single user:
    $ instaLooter <username> [<directory>] [options]
 
 
-Download pictures/videos tagged with a given *#hashtag* (this requires
-that you are **logged-in**, so use the ``-c`` flag to pass a username or a
-username:password pair):
+Download pictures/videos tagged with a given *#hashtag*:
+
+.. warning::
+
+  This requires that you are **logged-in**, as since 2017 Instagram made
+  hashtag browsing restricted to users with an account, so using the ``-c``
+  flag is mandatory to use your Instagram account
 
 .. code-block:: console
 
@@ -63,6 +67,9 @@ Optional Arguments
 
 ``-v, --get-videos``
   Get videos as well as pictures.
+
+``-V, --videos-only``
+  Only download videos.
 
 ``-N, --new``
   Only download files newer than the ones in the destination directory (faster
