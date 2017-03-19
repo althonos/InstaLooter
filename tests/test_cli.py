@@ -20,7 +20,7 @@ class TestInstaLooterCommandLineInterface(unittest.TestCase):
 
     def test_cli_single(self):
         instaLooter.main(
-            ["post", "https://www.instagram.com/p/BFB6znLg5s1/", self.tmpdir]
+            ["post", "https://www.instagram.com/p/BFB6znLg5s1/", self.tmpdir, "-q"]
         )
         self.assertIn("1243533605591030581.jpg", os.listdir(self.tmpdir))
 

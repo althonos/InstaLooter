@@ -56,7 +56,9 @@ class InstaLooter(object):
 
     _OWNER_MAP = {}
 
-    def __init__(self, directory=None, profile=None, hashtag=None, add_metadata=False, get_videos=False, jobs=16, template="{id}"):
+    def __init__(self, directory=None, profile=None, hashtag=None,
+                add_metadata=False, get_videos=False, videos_only=False,
+                jobs=16, template="{id}"):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -70,6 +72,8 @@ class InstaLooter(object):
                 the downloaded pictures. **[default: False]**
             get_videos (`bool`): Also get the videos from the given
                 target **[default: False]**
+            videos_only (`bool`): Only download videos (implies
+                ``get_videos=True``). **[default: False]**
             jobs (`bool`): the number of parallel threads to use to
                 download media (12 or more is advised to have a true parallel
                 download of media files) **[default: 16]**
@@ -97,15 +101,16 @@ class InstaLooter(object):
         self.template = template
         self._required_template_keys = self._RX_TEMPLATE.findall(template)
 
-
         self.directory = directory
         self.add_metadata = add_metadata
-        self.get_videos = get_videos
+        self.get_videos = get_videos or videos_only
+        self.videos_only = videos_only
         self.jobs = jobs
 
         self.session = requests.Session()
-        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
         self.csrftoken = None
+        self.user_agent = ("Mozilla/5.0 (Windows NT 10.0; WOW64; "  # seems legit
+                           "rv:50.0) Gecko/20100101 Firefox/50.0")
 
         self.dl_count = 0
         self.metadata = {}
@@ -351,7 +356,8 @@ class InstaLooter(object):
         """Download all the medias from provided target.
 
         This method follwows the parameters given in the :obj:`__init__`
-        method (profile or hashtag, directory, get_videos and add_metadata).
+        method (profile or hashtag, directory, get_videos, videos_only
+        and add_metadata).
 
         Keyword Arguments:
             media_count (`int`): how many media to download before
@@ -380,12 +386,20 @@ class InstaLooter(object):
 
         self._init_workers()
         if '_condition' not in kwargs:
-            condition = lambda media: (not media['is_video'] or self.get_videos)
+            if self.videos_only:
+                condition = lambda media: media['is_video']
+            elif not self.get_videos:
+                condition = lambda media: not media['is_video']
+            else:
+                condition = lambda media: True
         else:
             condition = kwargs.get('_condition')
-        medias_queued = self._fill_media_queue(media_count=media_count, with_pbar=with_pbar,
-                                               condition=condition, timeframe=timeframe,
-                                               new_only=new_only)
+
+        medias_queued = self._fill_media_queue(
+            media_count=media_count, with_pbar=with_pbar,
+            condition=condition, timeframe=timeframe,
+            new_only=new_only
+        )
 
         if medias_queued == 0:
             warnings.warn("No {}medias found.".format('new ' if new_only else ''))

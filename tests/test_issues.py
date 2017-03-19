@@ -166,15 +166,25 @@ class TestResolvedIssues(unittest.TestCase):
         """
         import instaLooter.utils
         warnings.showwarning = instaLooter.utils.warn_windows
-        l = instaLooter.InstaLooter(
-            directory="/tmp",
+        looter = instaLooter.InstaLooter(
+            directory=self.tmpdir,
             profile="akjhdskjhfkjsdhfkjhdskjhfkjdshkfjhsdkjfdhkjdfshdfskhfd"
         )
         try:
-            l.download()
+            looter.download()
         except:
             self.fail()
 
+    def test_issue_41(self):
+        """
+        Feature request by @liorlior
+
+        Allow downloading only videos.
+        """
+        looter = instaLooter.InstaLooter(self.tmpdir, profile="nintendo")
+        looter.download(timeframe=(datetime.date(2017, 3, 10))*2)
+        self.assertEqual(os.listdir(self.tmpdir), ["1467639884243493431.mp4"])
+        
 
 def setUpModule():
    warnings.simplefilter('ignore')

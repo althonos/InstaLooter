@@ -92,21 +92,6 @@ class InstaDownloader(threading.Thread):
             self._add_metadata(photo_name, media)
 
 
-
-    # def _download_sidecar(self, media):
-    #     """
-    #     """
-    #     url = "https://www.instagram.com/p/{}/".format(media['code'])
-    #     with contextlib.closing(self.session.get(url)) as res:
-    #         data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
-    #
-    #     for edge in data['edge_sidecar_to_children']['edges']:
-    #         if edge['node']['__typename'] == 'GraphImage':
-    #             self._download_photo(self._sidecar_to_image(edge['node'], data))
-    #         elif self.owner.get_videos:
-    #             self._download_video(self._sidecar_to_image(edge['node'], data))
-
-
     def _download_video(self, media):
         """
         """

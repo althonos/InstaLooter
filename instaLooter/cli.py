@@ -24,6 +24,7 @@ Options:
     -T TMPL, --template TMPL     A filename template to use to write the
                                  files (see *Template*). [default: {id}]
     -v, --get-videos             Get videos as well as photos
+    -V, --videos-only            Get videos only
     -N, --new                    Only look for files newer than the ones
                                  in the destination directory (faster)
     -m, --add-metadata           Add date and caption metadata to downloaded
@@ -103,7 +104,9 @@ def main(argv=sys.argv[1:]):
         directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
         profile=args['<profile>'],hashtag=args['<hashtag>'],
         add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
-        jobs=int(args['--jobs']), template=args['--template'])
+        videos_only=args['--videos-only'], jobs=int(args['--jobs']),
+        template=args['--template']
+    )
 
     try:
 
@@ -127,9 +130,9 @@ def main(argv=sys.argv[1:]):
     try:
         post_token = args['<post_token>']
         if post_token is None:
+            media_count = int(args['--num-to-dl']) if args['--num-to-dl'] else None
             looter.download(
-                media_count=int(args['--num-to-dl']) \
-                            if args['--num-to-dl'] else None,
+                media_count=media_count,
                 with_pbar=not args['--quiet'], timeframe=timeframe,
                 new_only=args['--new'],
             )

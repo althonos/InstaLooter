@@ -54,7 +54,6 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
 
-    @unittest.skip("Hashtag downloading requires an IG account")
     def test_hashtag_download(self):
         looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
         looter.download(media_count=200)
@@ -104,7 +103,8 @@ def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
     TestInstaLooterProfileDownload.register_tests()
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterProfileDownload))
-    suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
+    # NB: requires an account to scrape hashtag since March 2017
+    # suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterTemplate))
     return suite
 
