@@ -9,7 +9,7 @@ from __future__ import (
 
 __author__ = "althonos"
 __author_email__ = "martin.larralde@ens-cachan.fr"
-__version__ = "0.7.3"
+__version__ = "0.8.0"
 
 
 try:
