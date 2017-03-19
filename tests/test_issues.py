@@ -181,10 +181,10 @@ class TestResolvedIssues(unittest.TestCase):
 
         Allow downloading only videos.
         """
-        looter = instaLooter.InstaLooter(self.tmpdir, profile="nintendo")
-        looter.download(timeframe=(datetime.date(2017, 3, 10))*2)
+        looter = instaLooter.InstaLooter(self.tmpdir, profile="nintendo", videos_only=True)
+        looter.download(timeframe=(datetime.date(2017, 3, 10), )*2)
         self.assertEqual(os.listdir(self.tmpdir), ["1467639884243493431.mp4"])
-        
+
 
 def setUpModule():
    warnings.simplefilter('ignore')

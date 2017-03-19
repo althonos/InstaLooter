@@ -54,10 +54,10 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
 
-    def test_hashtag_download(self):
-        looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
-        looter.download(media_count=200)
-        self.assertEqual(len(os.listdir(self.tmpdir)), 200)
+    # def test_hashtag_download(self):
+    #     looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
+    #     looter.download(media_count=200)
+    #     self.assertEqual(len(os.listdir(self.tmpdir)), 200)
 
 
 class TestInstaLooterTemplate(unittest.TestCase):
@@ -70,7 +70,10 @@ class TestInstaLooterTemplate(unittest.TestCase):
 
     def test_template_1(self):
         PROFILE = "therock"
-        looter = instaLooter.InstaLooter(self.tmpdir, profile=PROFILE, get_videos=True, template='{username}')
+        looter = instaLooter.InstaLooter(
+            self.tmpdir, profile=PROFILE, get_videos=True,
+            template='{username}-{id}'
+        )
         looter.download(media_count=30, with_pbar=True)
         for f in os.listdir(self.tmpdir):
             self.assertTrue(f.startswith(PROFILE))
