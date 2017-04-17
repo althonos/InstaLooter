@@ -54,10 +54,10 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
 
-    # def test_hashtag_download(self):
-    #     looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
-    #     looter.download(media_count=200)
-    #     self.assertEqual(len(os.listdir(self.tmpdir)), 200)
+    def test_hashtag_download(self):
+        looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
+        looter.download(media_count=200)
+        self.assertEqual(len(os.listdir(self.tmpdir)), 200)
 
 
 class TestInstaLooterTemplate(unittest.TestCase):
