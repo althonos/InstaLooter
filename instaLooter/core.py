@@ -447,9 +447,9 @@ class InstaLooter(object):
         res = self.session.get(url)
         # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
         media = self._get_shared_data(res)['entry_data']['PostPage'][0]['graphql']['shortcode_media']
-        # Fix renaming of 'shortcode' to 'code'
-        if not 'code' in media:
-            media['code'] = media['shortcode']
+        # Fix renaming of attributes
+        media['code'] = media.get('shortcode')
+        media['display_src'] = media.get('display_url')
         return media
 
     @classmethod
