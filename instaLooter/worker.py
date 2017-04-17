@@ -99,7 +99,8 @@ class InstaDownloader(threading.Thread):
 
         if "video_url" not in media:
             with contextlib.closing(self.session.get(url)) as res:
-                data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+                # data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+                data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['graphql']['shortcode_media']
         else:
             data = media
 
