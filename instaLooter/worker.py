@@ -56,7 +56,9 @@ class InstaDownloader(threading.Thread):
             try:
                 full_name = self.owner.metadata['full_name']
             except KeyError:
-                full_name = self.owner.get_owner_info(metadata['code'])['full_name']
+                full_name = self.owner.get_owner_info(
+                    metadata.get('shortcode') or ['code']
+                )['full_name']
 
 
             img = PIL.Image.open(path)
@@ -95,7 +97,7 @@ class InstaDownloader(threading.Thread):
     def _download_video(self, media):
         """
         """
-        url = "https://www.instagram.com/p/{}/".format(media['code'])
+        url = "https://www.instagram.com/p/{}/".format(media.get('shortcode') or media['code'])
 
         if "video_url" not in media:
             with contextlib.closing(self.session.get(url)) as res:

@@ -448,7 +448,7 @@ class InstaLooter(object):
         # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
         media = self._get_shared_data(res)['entry_data']['PostPage'][0]['graphql']['shortcode_media']
         # Fix renaming of attributes
-        media['code'] = media.get('shortcode')
+        # media['code'] = media.get('shortcode')
         media['display_src'] = media.get('display_url')
         return media
 
@@ -493,7 +493,7 @@ class InstaLooter(object):
         return medias_queued, False
 
     def _add_sidecars_to_queue(self, media, condition, media_count, medias_queued, new_only):
-        media = self.get_post_info(media['code'])
+        media = self.get_post_info(media.get('shortcode') or media['code'])
         for sidecar in media['edge_sidecar_to_children']['edges']:
             sidecar = self._sidecar_to_media(sidecar['node'], media)
             medias_queued, stop = self._add_media_to_queue(
@@ -521,7 +521,7 @@ class InstaLooter(object):
                 template_values[x] = value = self._TEMPLATE_MAP[x](media)
                 assert value is not None
         except AssertionError:
-            media = self.get_post_info(media['code'])
+            media = self.get_post_info(media.get('code') or media['shortcode'])
             template_values = {x:self._TEMPLATE_MAP[x](media) for x in required_template_keys}
         finally:
             self._OWNER_MAP[media['owner']['id']] = media['owner']
@@ -574,7 +574,7 @@ class InstaLooter(object):
         for key in ("owner", "likes", "comments", "caption", "location", "date"):
             sidecar.setdefault(key, media.get(key))
         sidecar['display_src'] = sidecar.get('display_url')
-        sidecar['code'] = sidecar.get('shortcode')
+        # sidecar['code'] = sidecar.get('shortcode')
         return sidecar
 
     def is_logged_in(self):
