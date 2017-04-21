@@ -56,8 +56,8 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
 
     def test_hashtag_download(self):
         looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
-        looter.download(media_count=200)
-        self.assertEqual(len(os.listdir(self.tmpdir)), 200)
+        looter.download(media_count=50)
+        self.assertEqual(len(os.listdir(self.tmpdir)), 50)
 
 
 class TestInstaLooterTemplate(unittest.TestCase):
@@ -82,6 +82,7 @@ class TestInstaLooterTemplate(unittest.TestCase):
 class TestInstaLooterUtils(unittest.TestCase):
 
     def setUp(self):
+        self.looter = instaLooter.InstaLooter()
         self.tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -91,14 +92,25 @@ class TestInstaLooterUtils(unittest.TestCase):
         url = "https://www.instagram.com/p/BFB6znLg5s1/"
 
         self.assertEqual(
-            instaLooter.InstaLooter._extract_code_from_url(url),
+            self.looter._extract_code_from_url(url),
             'BFB6znLg5s1',
         )
 
         with self.assertRaises(ValueError):
-            instaLooter.InstaLooter._extract_code_from_url(
+            self.looter._extract_code_from_url(
                 'https://www.instagram.com/'
             )
+
+    def test_get_owner_info(self):
+        therock = self.looter.get_owner_info("BTHqEhWFR4y"),
+        self.assertEqual(therock['username'], 'therock')
+        self.assertEqual(therock['id'], '232192182')
+        self.assertFalse(therock['is_private'])
+
+        squareenix = self.looter.get_owner_info("BS9UVpcjfCZ")
+        self.assertEqual(squareenix['username'], 'squareenix')
+        self.assertEqual(squareenix['id'], '2117884847')
+        self.assertFalse(squareenix['is_private'])
 
 
 
@@ -106,8 +118,7 @@ def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
     TestInstaLooterProfileDownload.register_tests()
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterProfileDownload))
-    # NB: requires an account to scrape hashtag since March 2017
-    # suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
+    suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterTemplate))
     return suite
 

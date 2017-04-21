@@ -350,7 +350,7 @@ class InstaLooter(object):
         url = "https://www.instagram.com/p/{}/".format(code)
         res = self.session.get(url)
         data = self._get_shared_data(res)
-        return data['entry_data']['PostPage'][0]['media']['owner']
+        return data['entry_data']['PostPage'][0]['graphql']['shortcode_media']['owner']
 
     def download(self, **kwargs):
         """Download all the medias from provided target.
@@ -574,7 +574,7 @@ class InstaLooter(object):
         for key in ("owner", "likes", "comments", "caption", "location", "date"):
             sidecar.setdefault(key, media.get(key))
         sidecar['display_src'] = sidecar.get('display_url')
-        # sidecar['code'] = sidecar.get('shortcode')
+        sidecar['code'] = sidecar.get('shortcode')
         return sidecar
 
     def is_logged_in(self):
