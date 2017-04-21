@@ -95,7 +95,7 @@ def main(argv=sys.argv[1:]):
 
     if args['<hashtag>'] and not args['--credentials']:
         warnings.warn("#hashtag downloading requires an Instagram account.")
-        sys.exit(1)
+        return 1
 
     if args['<post_token>'] is not None:
         args['--get-videos'] = True
@@ -125,7 +125,7 @@ def main(argv=sys.argv[1:]):
 
     except ValueError as ve:
         console.error(ve)
-        sys.exit(1)
+        return 1
 
     try:
         post_token = args['<post_token>']
