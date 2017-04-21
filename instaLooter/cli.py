@@ -36,6 +36,9 @@ Options:
     -c CRED, --credentials CRED  Credentials to login to Instagram with
                                  if needed [format: login[:password]]
     --version                    Show program version and quit
+    -W WARNINGCTL                Change warning behaviour (same as python -W)
+                                 [default: default]
+
 
 Template:
     The default filename of the pictures and videos on Instagram doesn't show
@@ -79,71 +82,85 @@ import getpass
 import hues
 import warnings
 
-from . import __version__#, __author__, __author_email__
+from . import __version__
 from .core import InstaLooter
-from .utils import (
-    get_times_from_cli, warn_with_hues,
-    console, warn_windows)
+from .utils import get_times_from_cli, console, wrap_warnings
 
+WARNING_ACTIONS = {'error', 'ignore', 'always', 'default', 'module', 'once'}
 
+@wrap_warnings
 def main(argv=sys.argv[1:]):
     """Run from the command line interface.
     """
-    warnings._showwarning = warnings.showwarning
-    warnings.showwarning = warn_with_hues if os.name == "posix" else warn_windows
     args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
 
-    if args['<hashtag>'] and not args['--credentials']:
-        warnings.warn("#hashtag downloading requires an Instagram account.")
+    if args['-W'] not in WARNING_ACTIONS:
+        print("Unknown warning action: {}".format(args['-W']))
+        print("   available action: {}".format(', '.join(WARNING_ACTIONS)))
         return 1
 
-    if args['<post_token>'] is not None:
-        args['--get-videos'] = True
+    with warnings.catch_warnings():
+        warnings.simplefilter(args['-W'])
 
-    looter = InstaLooter(
-        directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
-        profile=args['<profile>'],hashtag=args['<hashtag>'],
-        add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
-        videos_only=args['--videos-only'], jobs=int(args['--jobs']),
-        template=args['--template']
-    )
+        if args['<hashtag>'] and not args['--credentials']:
+            warnings.warn("#hashtag downloading requires an Instagram account.")
+            return 1
 
-    try:
+        if args['<post_token>'] is not None:
+            args['--get-videos'] = True
 
-        if args['--credentials']:
-            credentials = args['--credentials'].split(':', 1)
-            login = credentials[0]
-            password = credentials[1] if len(credentials) > 1 else getpass.getpass()
-            looter.login(login, password)
-            if not args['--quiet']:
-                hues.success('Logged in.')
+        looter = InstaLooter(
+            directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
+            profile=args['<profile>'],hashtag=args['<hashtag>'],
+            add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
+            videos_only=args['--videos-only'], jobs=int(args['--jobs']),
+            template=args['--template']
+        )
 
-        if args['--time']:
-            timeframe = get_times_from_cli(args['--time'])
+        try:
+
+            if args['--credentials']:
+                credentials = args['--credentials'].split(':', 1)
+                login = credentials[0]
+                password = credentials[1] if len(credentials) > 1 else getpass.getpass()
+                looter.login(login, password)
+                if not args['--quiet']:
+                    hues.success('Logged in.')
+
+            if args['--time']:
+                timeframe = get_times_from_cli(args['--time'])
+            else:
+                timeframe = None
+
+        except ValueError as ve:
+            console.error(ve)
+            return 1
+
+        try:
+            post_token = args['<post_token>']
+            if post_token is None:
+                media_count = int(args['--num-to-dl']) if args['--num-to-dl'] else None
+                looter.download(
+                    media_count=media_count,
+                    with_pbar=not args['--quiet'], timeframe=timeframe,
+                    new_only=args['--new'],
+                )
+            else:
+                if 'insta' in post_token:
+                    post_token = looter._extract_code_from_url(post_token)
+                looter.download_post(post_token)
+
+        except Exception as e:
+            console.error(e)
+            looter.__del__()
+            return 1
+
+        except KeyboardInterrupt:
+            looter.__del__()
+            return 1
+
         else:
-            timeframe = None
-
-    except ValueError as ve:
-        console.error(ve)
-        return 1
-
-    try:
-        post_token = args['<post_token>']
-        if post_token is None:
-            media_count = int(args['--num-to-dl']) if args['--num-to-dl'] else None
-            looter.download(
-                media_count=media_count,
-                with_pbar=not args['--quiet'], timeframe=timeframe,
-                new_only=args['--new'],
-            )
-        else:
-            if 'insta' in post_token:
-                post_token = looter._extract_code_from_url(post_token)
-            looter.download_post(post_token)
-    except KeyboardInterrupt:
-        looter.__del__()
-    finally:
-        warnings.showwarning = warnings._showwarning
+            return 0
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from __future__ import (
     unicode_literals,
 )
 
+import queue
 import requests
 import contextlib
 import threading
@@ -37,14 +38,17 @@ class InstaDownloader(threading.Thread):
     def run(self):
 
         while not self._killed:
-            media = self.medias.get()
-            if media is None:
-                break
-            elif media.get('is_video'):
-                self._download_video(media)
-            else:
-                self._download_photo(media)
-            self.owner.dl_count += 1
+            try:
+                media = self.medias.get(timeout=1)
+                if media is None:
+                    break
+                elif media.get('is_video'):
+                    self._download_video(media)
+                else:
+                    self._download_photo(media)
+                self.owner.dl_count += 1
+            except queue.Empty:
+                pass
 
 
     def _add_metadata(self, path, metadata):

@@ -2,10 +2,13 @@
 # coding: utf-8
 from __future__ import print_function
 
+import os
 import hues
 import sys
+import functools
 import datetime
 import dateutil.relativedelta
+import warnings
 
 console = hues.SimpleConsole(stdout=sys.stderr)
 
@@ -62,3 +65,16 @@ def warn_with_hues(message, category, filename, lineno, file=None, line=None):
 def warn_windows(message, category, filename, lineno, file=None, line=None):
     print(("{d.hour}:{d.minute}:{d.second} - WARNING - "
           "{msg}").format(d=datetime.datetime.now(), msg=message), file=sys.stderr)
+
+def wrap_warnings(func):
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        showwarning = warnings.showwarning
+        if os.name == 'posix':
+            warnings.showwarning = warn_with_hues
+        else:
+            warnings.showwarning = warn_windows
+        result = func(*args, **kwargs)
+        warnings.showwarning = showwarning
+        return result
+    return new_func

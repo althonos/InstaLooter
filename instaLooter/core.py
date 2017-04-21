@@ -5,6 +5,7 @@ from __future__ import (
     unicode_literals,
 )
 
+import atexit
 import copy
 import json
 import os
@@ -125,6 +126,8 @@ class InstaLooter(object):
             'DNT': '1',
             'Upgrade-Insecure-Requests': '1',
         })
+
+        atexit.register(self.__del__)
 
     def __del__(self):
         if hasattr(self, 'session'):
