@@ -1,2 +1,3 @@
 from .cli import main
-main()
+import sys
+sys.exit(main())
