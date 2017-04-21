@@ -5,14 +5,13 @@ from __future__ import (
     unicode_literals,
 )
 
-import queue
 import requests
 import contextlib
 import threading
 import datetime
 import os
 import re
-
+import six
 
 try:
     import PIL.Image
@@ -47,7 +46,7 @@ class InstaDownloader(threading.Thread):
                 else:
                     self._download_photo(media)
                 self.owner.dl_count += 1
-            except queue.Empty:
+            except six.moves.queue.Empty:
                 pass
 
 
