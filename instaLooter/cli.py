@@ -104,9 +104,9 @@ def main(argv=sys.argv[1:]):
     with warnings.catch_warnings():
         warnings.simplefilter(args['-W'])
 
-        if args['<hashtag>'] and not args['--credentials']:
-            warnings.warn("#hashtag downloading requires an Instagram account.")
-            return 1
+        # if args['<hashtag>'] and not args['--credentials']:
+        #    warnings.warn("#hashtag downloading requires an Instagram account.")
+        #    return 1
 
         if args['<post_token>'] is not None:
             args['--get-videos'] = True
