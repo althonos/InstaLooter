@@ -138,9 +138,6 @@ class InstaLooter(object):
         if hasattr(self, "_workers"):
             for worker in self._workers:
                 worker.kill()
-        if hasattr(self, '_pbar'):
-            self._pbar.max_value = self._pbar.value
-            self._pbar.finish()
 
     def login(self, username, password):
         """Login with provided credentials.
