@@ -46,7 +46,8 @@ class InstaLooter(object):
         'datetime': lambda m: ("{0.year}-{0.month}-{0.day} {0.hour}h{0.minute}m{0.second}"
             "s{0.microsecond}".format(datetime.datetime.fromtimestamp(m['date'])))
             if 'date' in m else None,
-        'date': lambda m: datetime.date.fromtimestamp(m['date']) if 'date' in m else None,
+        'date': lambda m: datetime.date.fromtimestamp(m['date'])
+            if 'date' in m else None,
         'width': lambda m: m.get('dimensions', dict()).get('width'),
         'heigth': lambda m: m.get('dimensions', dict()).get('height'),
         'likescount': lambda m: m.get('likes', dict()).get('count'),
@@ -448,8 +449,9 @@ class InstaLooter(object):
         # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
         media = self._get_shared_data(res)['entry_data']['PostPage'][0]['graphql']['shortcode_media']
         # Fix renaming of attributes
-        # media['code'] = media.get('shortcode')
-        media['display_src'] = media.get('display_url')
+        media.setdefault('code', media.get('shortcode'))
+        media.setdefault('date', media.get('taken_at_timestamp'))
+        media.setdefault('display_src', media.get('display_url'))
         return media
 
     @classmethod
