@@ -38,6 +38,7 @@ Options:
     --version                    Show program version and quit
     -W WARNINGCTL                Change warning behaviour (same as python -W)
                                  [default: default]
+    --traceback                  Print error traceback if any (debug).
 
 
 Template:
@@ -81,6 +82,7 @@ import sys
 import getpass
 import hues
 import warnings
+import traceback
 
 from . import __version__
 from .core import InstaLooter
@@ -134,6 +136,8 @@ def main(argv=sys.argv[1:]):
 
         except ValueError as ve:
             console.error(ve)
+            if args["--traceback"]:
+               traceback.print_exc()
             return 1
 
         try:
@@ -152,6 +156,8 @@ def main(argv=sys.argv[1:]):
 
         except Exception as e:
             console.error(e)
+            if args["--traceback"]:
+               traceback.print_exc()
             looter.__del__()
             return 1
 
