@@ -185,6 +185,18 @@ class TestResolvedIssues(unittest.TestCase):
         looter.download(timeframe=(datetime.date(2017, 3, 10), )*2)
         self.assertEqual(os.listdir(self.tmpdir), ["1467639884243493431.mp4"])
 
+    def test_issue_52(self):
+        """
+        Thanks to @cyrusclarke for reporting this bug.
+
+        Checks that on hashtags with a lot of posts, the time parameter
+        doesn't cause the program to crash without finding any media to
+        download.
+        """
+        instaLooter.main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", 20])
+        self.assertEqual(len(os.listdir(self.tmpdir)), 20)
+
+
 
 def setUpModule():
    warnings.simplefilter('ignore')
