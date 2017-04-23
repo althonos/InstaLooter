@@ -475,7 +475,6 @@ class InstaLooter(object):
         return medias_queued
 
     def _add_media_to_queue(self, media, condition, media_count, medias_queued, new_only):
-
         if media.get('__typename') == "GraphSidecar":
             return self._add_sidecars_to_queue(
                 media, condition, media_count, medias_queued, new_only)
@@ -571,10 +570,13 @@ class InstaLooter(object):
 
     @staticmethod
     def _sidecar_to_media(sidecar, media):
-        for key in ("owner", "likes", "comments", "caption", "location", "date"):
+        for key in ("owner", "caption", "location"):
             sidecar.setdefault(key, media.get(key))
-        sidecar['display_src'] = sidecar.get('display_url')
-        sidecar['code'] = sidecar.get('shortcode')
+        sidecar['likes'] = media['edge_media_preview_like']['count']
+        sidecar['comments'] = media['edge_media_to_comment']['count']
+        sidecar['display_src'] = sidecar['display_url']
+        sidecar['code'] = sidecar['shortcode']
+        sidecar['date'] = media['taken_at_timestamp']
         return sidecar
 
     def is_logged_in(self):
