@@ -83,8 +83,8 @@ InstaLooter comes with its CLI:
 .. code-block:: console
 
     $ instaLooter <username> [<directory>] [options]
-    $ instaLooter hashtag <hashtag> [<directory>] [options]
-    $ instaLooter post <post_token> [<directory>] [options]
+    $ instaLooter hashtag <hashtag> <directory> [options]
+    $ instaLooter post <post_token> <directory> [options]
 
 Examples
 --------
