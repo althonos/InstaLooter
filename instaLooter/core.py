@@ -493,8 +493,10 @@ class InstaLooter(object):
                 return medias_queued, True
         return medias_queued, False
 
-    def _add_sidecars_to_queue(self, media, condition, media_count, medias_queued, new_only):
-        media = self.get_post_info(media.get('shortcode') or media['code'])
+    def _add_sidecars_to_queue(self, media0, condition, media_count, medias_queued, new_only):
+        media = self.get_post_info(media0.get('shortcode') or media0['code'])
+        if 'caption' in media0 and media0['caption']:
+            media.setdefault('caption', media0['caption'])
         for sidecar in media['edge_sidecar_to_children']['edges']:
             sidecar = self._sidecar_to_media(sidecar['node'], media)
             medias_queued, stop = self._add_media_to_queue(
@@ -573,7 +575,7 @@ class InstaLooter(object):
     @staticmethod
     def _sidecar_to_media(sidecar, media):
         for key in ("owner", "caption", "location"):
-            sidecar.setdefault(key, media.get(key))
+            sidecar.setdefault(key, media.get(key) if key in media and media.get(key) else "")
         sidecar['likes'] = media['edge_media_preview_like']['count']
         sidecar['comments'] = media['edge_media_to_comment']['count']
         sidecar['display_src'] = sidecar['display_url']
