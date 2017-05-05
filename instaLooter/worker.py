@@ -60,7 +60,7 @@ class InstaDownloader(threading.Thread):
                 full_name = self.owner.metadata['full_name']
             except KeyError:
                 full_name = self.owner.get_owner_info(
-                    metadata.get('shortcode') or ['code']
+                    metadata.get('shortcode') or metadata['code']
                 )['full_name']
 
 

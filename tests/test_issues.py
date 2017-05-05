@@ -1,4 +1,5 @@
 import os
+import six
 import unittest
 import tempfile
 import shutil
@@ -195,6 +196,28 @@ class TestResolvedIssues(unittest.TestCase):
         """
         instaLooter.main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", 20])
         self.assertEqual(len(os.listdir(self.tmpdir)), 20)
+
+    def test_issue_57(self):
+        """
+        Thanks to @VasiliPupkin256 for reporting this bug.
+
+        Checks that metadata can successfully extract caption
+        out of multiposts containing images.
+        """
+        looter = instaLooter.InstaLooter(
+            self.tmpdir, profile="awwwwshoot_ob", get_videos=True,
+            add_metadata=True
+        )
+
+        looter._medias_queue = six.moves.queue.Queue()
+        looter._fill_media_queue()
+
+        while not looter._medias_queue.empty():
+            media = looter._medias_queue.get()
+            for key in ('caption', 'code', 'date'):
+                self.assertIn(key, media)
+                self.assertIsNotNone(key, media[key])
+
 
 
 

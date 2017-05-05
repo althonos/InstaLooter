@@ -573,12 +573,15 @@ class InstaLooter(object):
     @staticmethod
     def _sidecar_to_media(sidecar, media, index):
         for key in ("owner", "location"):
-            sidecar.setdefault(key, media.get(key))
+            sidecar.setdefault(key, media[key])
 
+        # try to get a caption if available
+        captions = media['edge_media_to_caption']['edges']
         try:
-            sidecar['caption'] = media['edge_media_to_caption']['edges'][index]['node']['text']
+            sidecar['caption'] = captions[index]['node']['text']
         except IndexError:
-            sidecar['caption'] = media['edge_media_to_caption']['edges'][0]['node']['text']
+            if captions:
+                sidecar['caption'] = captions[0]['node']['text']
 
         sidecar['likes'] = media['edge_media_preview_like']['count']
         sidecar['comments'] = media['edge_media_to_comment']['count']
