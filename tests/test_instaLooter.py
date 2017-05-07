@@ -74,7 +74,7 @@ class TestInstaLooterTemplate(unittest.TestCase):
             self.tmpdir, profile=PROFILE, get_videos=True,
             template='{username}-{id}'
         )
-        looter.download(media_count=30, with_pbar=True)
+        looter.download(media_count=30, with_pbar=False)
         for f in os.listdir(self.tmpdir):
             self.assertTrue(f.startswith(PROFILE))
 

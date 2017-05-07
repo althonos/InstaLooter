@@ -22,7 +22,7 @@ except ImportError:
 
 class InstaDownloader(threading.Thread):
 
-    _NO_RESIZE_RX = re.compile(r'(/[p|s][0-9]*x[0-9]*)')
+    _SANITIZING_RX = re.compile(r'(https://.*?/).*(/.*\.jpg)')
 
     def __init__(self, owner):
         super(InstaDownloader, self).__init__()
@@ -51,7 +51,7 @@ class InstaDownloader(threading.Thread):
 
 
     def _add_metadata(self, path, metadata):
-        """
+        """Add some metadata to the picture located at `path`.
         """
 
         if PIL is not None:
@@ -84,9 +84,9 @@ class InstaDownloader(threading.Thread):
             img.save(path, exif=piexif.dump(exif_dict))
 
     def _download_photo(self, media):
+        """Download a picture from a media dictionnary.
         """
-        """
-        photo_url = self._NO_RESIZE_RX.sub('', media.get('display_src'))
+        photo_url = ''.join(self._SANITIZING_RX.search(media['display_src']).groups())
         photo_name = os.path.join(self.directory, self.owner._make_filename(media))
 
         # save full-resolution photo
@@ -98,7 +98,7 @@ class InstaDownloader(threading.Thread):
 
 
     def _download_video(self, media):
-        """
+        """Download a video from a media dictionnary.
         """
         url = "https://www.instagram.com/p/{}/".format(media.get('shortcode') or media['code'])
 
@@ -119,6 +119,8 @@ class InstaDownloader(threading.Thread):
 
 
     def _dl(self, source, dest):
+        """Download a file located at `source` to `dest`.
+        """
         self.session.headers['Accept'] = '*/*'
         with contextlib.closing(self.session.get(source)) as res:
             with open(dest, 'wb') as dest_file:
@@ -127,4 +129,11 @@ class InstaDownloader(threading.Thread):
                         dest_file.write(block)
 
     def kill(self):
+        """Kill the Thread.
+
+        This method actually performs a soft kill, it just
+        forces the Thread to break the infinite loop. If the Thread
+        is currently downloading a file, it will first finish the
+        download before exiting.
+        """
         self._killed = True
