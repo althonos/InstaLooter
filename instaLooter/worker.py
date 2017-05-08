@@ -45,7 +45,8 @@ class InstaDownloader(threading.Thread):
                     self._download_video(media)
                 else:
                     self._download_photo(media)
-                self.owner.dl_count += 1
+                with self.owner.dl_count_lock:
+                    self.owner.dl_count += 1
             except six.moves.queue.Empty:
                 pass
 

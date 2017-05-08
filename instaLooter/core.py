@@ -14,6 +14,7 @@ import progressbar
 import random
 import re
 import warnings
+import threading
 import requests
 import six
 import time
@@ -117,6 +118,7 @@ class InstaLooter(object):
         self.dl_count = 0
         self.metadata = {}
         self._workers = []
+        self.dl_count_lock = threading.Lock()
 
         self.session.headers.update({
             'User-Agent': self.user_agent,
@@ -537,9 +539,11 @@ class InstaLooter(object):
     def _join_workers(self, with_pbar=False):
         while any(w.is_alive() for w in self._workers):
             if with_pbar and hasattr(self, '_pbar'):
-                self._pbar.update(self.dl_count)
+                with self.dl_count_lock:
+                    self._pbar.update(self.dl_count)
         if with_pbar and hasattr(self, '_pbar'):
-            self._pbar.update(self.dl_count)
+            with self.dl_count_lock:
+                self._pbar.update(self.dl_count)
 
     def _init_pbar(self, ini_val, max_val, label):
         self._pbar = progressbar.ProgressBar(
