@@ -3,12 +3,13 @@
 from __future__ import print_function
 
 import os
-import hues
 import sys
+import six
 import functools
+import warnings
 import datetime
 import dateutil.relativedelta
-import warnings
+import hues
 
 console = hues.SimpleConsole(stdout=sys.stderr)
 
@@ -17,13 +18,11 @@ def get_times(timeframe):
     if timeframe is None:
         timeframe = (None, None)
     else:
-        assert isinstance(timeframe, tuple)
-        assert isinstance(timeframe[0], datetime.date)
-        assert isinstance(timeframe[1], datetime.date)
-
-    start_time = timeframe[0] or datetime.date.today()
-    end_time = timeframe[1] or datetime.date.fromtimestamp(0)
-
+        try:
+            start_time = timeframe[0] or datetime.date.today()
+            end_time = timeframe[1] or datetime.date.fromtimestamp(0)
+        except (IndexError, AttributeError):
+            raise TypeError("'timeframe' must be a tuple of dates !")
     return start_time, end_time
 
 

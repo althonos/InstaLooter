@@ -520,8 +520,9 @@ class InstaLooter(object):
             template_values = {}
             for x in required_template_keys:
                 template_values[x] = value = self._TEMPLATE_MAP[x](media)
-                assert value is not None
-        except AssertionError:
+                if value is None:
+                    raise ValueError
+        except ValueError:
             media = self.get_post_info(media.get('code') or media['shortcode'])
             template_values = {x:self._TEMPLATE_MAP[x](media) for x in required_template_keys}
         finally:
