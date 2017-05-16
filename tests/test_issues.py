@@ -218,6 +218,25 @@ class TestResolvedIssues(unittest.TestCase):
                 self.assertIn(key, media)
                 self.assertIsNotNone(key, media[key])
 
+    def test_issue_66(self):
+        """
+        Thanks to @douglasrizzo for reporting this bug.
+
+        Check that likescount and commentscount can be used
+        in filename templates without causing the program to
+        crash.
+        """
+        looter = instaLooter.InstaLooter(
+            self.tmpdir, profile="zuck",
+            get_videos=True, add_metadata=True,
+            template='{id}-{likescount}-{commentscount}',
+        )
+        looter.download(media_count=10)
+        for image in os.listdir(self.tmpdir):
+            self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.jpg')
+
+
+
 
 
 
