@@ -51,8 +51,8 @@ class InstaLooter(object):
             if 'date' in m else None,
         'width': lambda m: m.get('dimensions', dict()).get('width'),
         'heigth': lambda m: m.get('dimensions', dict()).get('height'),
-        'likescount': lambda m: m.get('likes', dict()).get('count'),
-        'commentscount': lambda m: m.get('comments', dict()).get('count'),
+        'likescount': lambda m: m.get('likes'),
+        'commentscount': lambda m: m.get('comments'),
         'display_src': lambda m: m.get('display_src'),
         'video_url': lambda m: m.get('video_url'),
     }
