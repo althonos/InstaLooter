@@ -94,7 +94,11 @@ WARNING_ACTIONS = {'error', 'ignore', 'always', 'default', 'module', 'once'}
 def main(argv=sys.argv[1:]):
     """Run from the command line interface.
     """
-    args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
+    try:
+        args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
+    except docopt.DocoptExit as de:
+        print(de)
+        return 1
 
     if args['-W'] not in WARNING_ACTIONS:
         print("Unknown warning action: {}".format(args['-W']))
