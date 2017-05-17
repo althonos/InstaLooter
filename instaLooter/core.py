@@ -51,8 +51,8 @@ class InstaLooter(object):
             if 'date' in m else None,
         'width': lambda m: m.get('dimensions', dict()).get('width'),
         'heigth': lambda m: m.get('dimensions', dict()).get('height'),
-        'likescount': lambda m: m.get('likes'),
-        'commentscount': lambda m: m.get('comments'),
+        'likescount': lambda m: m.get('likes', dict()).get('count'),
+        'commentscount': lambda m: m.get('comments', dict()).get('count'),
         'display_src': lambda m: m.get('display_src'),
         'video_url': lambda m: m.get('video_url'),
     }
@@ -588,8 +588,8 @@ class InstaLooter(object):
             if captions:
                 sidecar['caption'] = captions[0]['node']['text']
 
-        sidecar['likes'] = media['edge_media_preview_like']['count']
-        sidecar['comments'] = media['edge_media_to_comment']['count']
+        sidecar['likes'] = media['edge_media_preview_like']
+        sidecar['comments'] = media['edge_media_to_comment']
         sidecar['display_src'] = sidecar['display_url']
         sidecar['code'] = sidecar['shortcode']
         sidecar['date'] = media['taken_at_timestamp']
