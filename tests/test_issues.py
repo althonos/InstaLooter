@@ -233,7 +233,7 @@ class TestResolvedIssues(unittest.TestCase):
         )
         looter.download(media_count=10)
         for image in os.listdir(self.tmpdir):
-            self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.jpg')
+            self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.(jpg|mp4)')
 
 
 

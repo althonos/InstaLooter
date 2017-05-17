@@ -454,6 +454,8 @@ class InstaLooter(object):
         media.setdefault('code', media.get('shortcode'))
         media.setdefault('date', media.get('taken_at_timestamp'))
         media.setdefault('display_src', media.get('display_url'))
+        media.setdefault('likes', media['edge_media_preview_like'])
+        media.setdefault('comments', media['edge_media_to_comment'])
         return media
 
     @classmethod
