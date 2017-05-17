@@ -14,6 +14,10 @@ import instaLooter
 
 
 class TestResolvedIssues(unittest.TestCase):
+    
+    if six.PY2:
+        assertRegex = unittest.TestCase.assertRegexpMatches
+
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
