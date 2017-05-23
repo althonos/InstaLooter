@@ -22,7 +22,7 @@ except ImportError:
 
 class InstaDownloader(threading.Thread):
 
-    _SANITIZING_RX = re.compile(r'(https://.*?/).*(/.*\.jpg)')
+    _SANITIZING_RX = re.compile(r'(https://.*?/.*?/).*(/.*\.jpg)')
 
     def __init__(self, owner):
         super(InstaDownloader, self).__init__()
