@@ -22,6 +22,8 @@ import bs4 as bs
 
 from .worker import InstaDownloader
 from .utils import get_times
+from .utils import save_cookies
+from .utils import load_cookies
 
 PARSER = 'html.parser'
 
@@ -111,6 +113,7 @@ class InstaLooter(object):
         self.jobs = jobs
 
         self.session = requests.Session()
+        load_cookies(self.session, 'cookies.txt')
         self.csrftoken = None
         self.user_agent = ("Mozilla/5.0 (Windows NT 10.0; WOW64; "  # seems legit
                            "rv:50.0) Gecko/20100101 Firefox/50.0")
@@ -180,6 +183,7 @@ class InstaLooter(object):
         login = self.session.post(self.URL_LOGIN, data=login_post, allow_redirects=True)
         self.session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
         self.csrftoken = login.cookies['csrftoken']
+        save_cookies(self.session, 'cookies.txt')
 
         if login.status_code != 200:
             self.csrftoken = None
