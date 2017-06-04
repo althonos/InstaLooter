@@ -53,12 +53,15 @@ Template:
     anything about the file you just downloaded. But using the -t argument
     allows you to give instaLooter a filename template, using the following
     format with brackets-enclosed ({}) variable names among:
-    - ``id``* and ``code``² of the instagram id of the media
+    - ``id``*² and ``code``² of the instagram id of the media
     - ``ownerid``*, ``username`` and ``fullname`` of the owner
     - ``datetime``*: the date and time of the post (YYYY-MM-DD hh:mm:ss)
     - ``date``*: the date of the post (YYYY-MM-DD)
     - ``width``* and ``height``*
     - ``likescount``* and ``commentscount``*
+
+    ²: use at least one of these to make sure the generated file name
+    is unique (``datetime`` is not unique anymore since multiple-image-posts).
 
     *: use these only to quicken download, since fetching the others may take
     a tad longer (in particular in hashtag download mode).

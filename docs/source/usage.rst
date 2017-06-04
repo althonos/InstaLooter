@@ -108,7 +108,7 @@ format with brackets-enclosed (``{}``) variable names among:
 
 - ``id``\*\² and ``code``\² of the instagram id of the media
 - ``ownerid``\*, ``username`` and ``fullname`` of the owner
-- ``datetime``\*\²: the date and time of the post (YYYY-MM-DD hh:mm:ss)
+- ``datetime``\*: the date and time of the post (YYYY-MM-DD hh:mm:ss)
 - ``date``\*: the date of the post (YYYY-MM-DD)
 - ``width``\* and ``height``\*
 - ``likescount``\* and ``commentscount``\*
