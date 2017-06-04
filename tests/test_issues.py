@@ -14,7 +14,7 @@ import instaLooter
 
 
 class TestResolvedIssues(unittest.TestCase):
-    
+
     if six.PY2:
         assertRegex = unittest.TestCase.assertRegexpMatches
 
@@ -198,7 +198,7 @@ class TestResolvedIssues(unittest.TestCase):
         doesn't cause the program to crash without finding any media to
         download.
         """
-        instaLooter.main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", 20])
+        instaLooter.main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", "20"])
         self.assertEqual(len(os.listdir(self.tmpdir)), 20)
 
     def test_issue_57(self):

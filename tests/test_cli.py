@@ -26,3 +26,11 @@ class TestInstaLooterCommandLineInterface(unittest.TestCase):
 
         instaLooter.main(["post", "BIqZ8L8AHmH", self.tmpdir])
         self.assertIn("1308972728853756295.jpg", os.listdir(self.tmpdir))
+
+    def test_cli_no_directory_fail(self):
+        self.assertTrue(
+            ["post", "https://www.instagram.com/p/BFB6znLg5s1/", "-q"]
+        )
+        self.assertTrue(
+            ["hashtag", "anything", "-q"]
+        )
