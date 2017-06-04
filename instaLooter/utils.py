@@ -10,9 +10,30 @@ import warnings
 import datetime
 import dateutil.relativedelta
 import hues
+import requests.cookies
 
 console = hues.SimpleConsole(stdout=sys.stderr)
 
+def save_cookies(session, filename):
+    if not os.path.isdir(os.path.dirname(filename)):
+        return False
+    with open(filename, 'w') as f:
+        f.truncate()
+        pickle.dump(session.cookies._cookies, f)
+
+
+def load_cookies(session, filename):
+    if not os.path.isfile(filename):
+        return False
+
+    with open(filename) as f:
+        cookies = pickle.load(f)
+        if cookies:
+            jar = requests.cookies.RequestsCookieJar()
+            jar._cookies = cookies
+            session.cookies = jar
+        else:
+            return False
 
 def get_times(timeframe):
     if timeframe is None:
