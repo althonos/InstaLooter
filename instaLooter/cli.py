@@ -18,7 +18,14 @@ Arguments:
                                  to download the picture or video from.
     <directory>                  The directory in which to download files.
 
-Options:
+Options - Credentials:
+    -u USER, --username USER     The username to connect to Instagram with.
+    -p PASS, --password PASS     The password to connect to Instagram with
+                                 (will be asked in the shell if the `--username`
+                                  option was given without the corresponding
+                                  `--password`).
+
+Options - Files:
     -n NUM, --num-to-dl NUM      Maximum number of new files to download
     -j JOBS, --jobs JOBS         Number of parallel threads to use to
                                  download files [default: 16]
@@ -30,17 +37,16 @@ Options:
                                  in the destination directory (faster)
     -m, --add-metadata           Add date and caption metadata to downloaded
                                  pictures (requires PIL/Pillow and piexif)
-    -q, --quiet                  Do not produce any output
     -t TIME, --time TIME         The time limit within which to download
                                  pictures and video (see *Time*)
+
+Options - Miscellaneous:
+    -q, --quiet                  Do not produce any output
     -h, --help                   Display this message and quit
-    -c CRED, --credentials CRED  Credentials to login to Instagram with
-                                 if needed [format: login[:password]]
     --version                    Show program version and quit
+    --traceback                  Print error traceback if any (debug).
     -W WARNINGCTL                Change warning behaviour (same as python -W)
                                  [default: default]
-    --traceback                  Print error traceback if any (debug).
-
 
 Template:
     The default filename of the pictures and videos on Instagram doesn't show
@@ -136,11 +142,10 @@ def main(argv=sys.argv[1:]):
 
         try:
 
-            if args['--credentials']:
-                credentials = args['--credentials'].split(':', 1)
-                login = credentials[0]
-                password = credentials[1] if len(credentials) > 1 else getpass.getpass()
-                looter.login(login, password)
+            if args['--username']:
+                username = args['--username']
+                password = args['--password'] or getpass.getpass()
+                looter.login(username, password)
                 if not args['--quiet']:
                     hues.success('Logged in.')
 
