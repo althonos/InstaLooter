@@ -16,6 +16,7 @@ Arguments:
                                  from
     <post_token>                 Either the url or the code of a single post
                                  to download the picture or video from.
+    <directory>                  The directory in which to download files.
 
 Options:
     -n NUM, --num-to-dl NUM      Maximum number of new files to download
@@ -59,7 +60,7 @@ Template:
     You are however to make sure that the generated filename is unique, so you
     should use at least id, code or datetime somewhere.
     Examples of acceptable values:
-        - {username}.{datetime}
+        - {username}.{datetime}.{code}
         - {username}-{likescount}-{width}x{height}.{id}
 
 Time:
@@ -88,7 +89,12 @@ from . import __version__
 from .core import InstaLooter
 from .utils import get_times_from_cli, console, wrap_warnings
 
-WARNING_ACTIONS = {'error', 'ignore', 'always', 'default', 'module', 'once'}
+WARNING_ACTIONS = {'error', 'ignore', 'always',
+                   'default', 'module', 'once'}
+
+def usage():
+    return next(section for section in __doc__.split("\n\n")
+                if section.startswith("Usage"))
 
 @wrap_warnings
 def main(argv=sys.argv[1:]):
@@ -98,6 +104,11 @@ def main(argv=sys.argv[1:]):
         args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
     except docopt.DocoptExit as de:
         print(de)
+        return 1
+
+    argv_positional = [param for param in argv if not param.startswith("-")]
+    if argv_positional[0] in ("post", "hashtag") and len(argv_positional) < 3:
+        print(usage())
         return 1
 
     if args['-W'] not in WARNING_ACTIONS:
