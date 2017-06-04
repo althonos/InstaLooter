@@ -147,10 +147,14 @@ def main(argv=sys.argv[1:]):
 
             if args['--username']:
                 username = args['--username']
-                password = args['--password'] or getpass.getpass()
-                looter.login(username, password)
-                if not args['--quiet']:
-                    hues.success('Logged in.')
+
+                if not looter.is_logged_in():
+                    password = args['--password'] or getpass.getpass()
+                    looter.login(username, password)
+                    if not args['--quiet']:
+                        hues.success('Logged in.')
+                elif not args['--quiet']:
+                    hues.success("Already logged in.")
 
             if args['--time']:
                 timeframe = get_times_from_cli(args['--time'])

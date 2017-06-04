@@ -18,12 +18,11 @@ import threading
 import requests
 import six
 import time
+import tempfile
 import bs4 as bs
 
 from .worker import InstaDownloader
-from .utils import get_times
-from .utils import save_cookies
-from .utils import load_cookies
+from .utils import get_times, save_cookies, load_cookies
 
 PARSER = 'html.parser'
 
@@ -39,6 +38,8 @@ class InstaLooter(object):
     URL_HOME = "https://www.instagram.com/"
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
     URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
+
+    COOKIE_FILE = os.path.join(tempfile.gettempdir(), "instaLooter", "cookies.txt")
 
     _TEMPLATE_MAP = {
         'id': lambda m: m.get('id'),
@@ -113,8 +114,14 @@ class InstaLooter(object):
         self.jobs = jobs
 
         self.session = requests.Session()
-        load_cookies(self.session, 'cookies.txt')
-        self.csrftoken = None
+        self.session.cookies = six.moves.http_cookiejar.LWPCookieJar(self.COOKIE_FILE)
+
+        try:
+            self.session.cookies.load()
+            self.session.cookies.clear_expired_cookies()
+        except OSError:
+            pass
+
         self.user_agent = ("Mozilla/5.0 (Windows NT 10.0; WOW64; "  # seems legit
                            "rv:50.0) Gecko/20100101 Firefox/50.0")
 
@@ -156,15 +163,15 @@ class InstaLooter(object):
 
             Code taken from LevPasha/instabot.py
         """
-        self.session.cookies.update({
-            'sessionid': '',
-            'mid': '',
-            'ig_pr': '1',
-            'ig_vw': '1920',
-            'csrftoken': '',
-            's_network': '',
-            'ds_user_id': ''
-        })
+        # self.session.cookies.update({
+        #     'sessionid': '',
+        #     'mid': '',
+        #     'ig_pr': '1',
+        #     'ig_vw': '1920',
+        #     'csrftoken': '',
+        #     's_network': '',
+        #     'ds_user_id': ''
+        # })
 
         login_post = {'username': username,
                       'password': password}
@@ -183,18 +190,18 @@ class InstaLooter(object):
         login = self.session.post(self.URL_LOGIN, data=login_post, allow_redirects=True)
         self.session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
         self.csrftoken = login.cookies['csrftoken']
-        save_cookies(self.session, 'cookies.txt')
+        # save_cookies(self.session, 'cookies.txt')
 
-        if login.status_code != 200:
-            self.csrftoken = None
-            raise SystemError("Login error: check your connection")
-        else:
+        if login.status_code == 200:
             r = self.session.get(self.URL_HOME)
             if r.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
+            save_cookies(self.session, self.COOKIE_FILE)
+        else:
+            raise SystemError("Login error: check your connection")
 
     def logout(self):
-        """Log out from current session
+        """Log out from current session.
 
         .. note::
 
@@ -203,9 +210,11 @@ class InstaLooter(object):
         logout_post = {'csrfmiddlewaretoken': self.csrftoken}
         logout = self.session.post(self.URL_LOGOUT, data=logout_post)
         self.csrftoken = None
+        if os.path.isfile(self.COOKIE_FILE):
+            os.remove(self.COOKIE_FILE)
 
     def _init_workers(self):
-        """Initialize a pool of workers to download files
+        """Initialize a pool of workers to download files.
         """
         self._shared_map = {}
         self._workers = []
@@ -266,7 +275,7 @@ class InstaLooter(object):
             elif not media_info["nodes"]:
                 if self._section_name == "tag":
                     warnings.warn("#{} has no medias to show.".format(self.target))
-                elif not self.is_logged_in():
+                elif self.is_logged_in() is None:
                     warnings.warn("Profile {} is private, retry after logging in.".format(self.target))
                 else:
                     warnings.warn("Profile {} is private, and you are not following it.".format(self.target))
@@ -607,4 +616,5 @@ class InstaLooter(object):
         Returns:
             `bool`: if the user is logged in or not
         """
-        return self.csrftoken is not None
+        return self.session.cookies._cookies.get(
+            "www.instagram.com", {"/":{}})["/"].get("sessionid") is not None

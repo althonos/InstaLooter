@@ -5,45 +5,43 @@ from __future__ import print_function
 import os
 import sys
 import six
+import json
 import functools
 import warnings
 import datetime
 import dateutil.relativedelta
 import hues
-import requests.cookies
+import requests
 
 console = hues.SimpleConsole(stdout=sys.stderr)
 
+
 def save_cookies(session, filename):
     if not os.path.isdir(os.path.dirname(filename)):
-        return False
-    with open(filename, 'w') as f:
-        f.truncate()
-        pickle.dump(session.cookies._cookies, f)
+        os.mkdir(os.path.dirname(filename))
+    session.cookies.save()
+    # cookiedict = requests.utils.dict_from_cookiejar(session.cookies)
+    # with open(filename, 'w') as f:
+    #     json.dump(cookiedict, f)
 
 
 def load_cookies(session, filename):
-    if not os.path.isfile(filename):
-        return False
+    # with open(filename) as f:
+    #     cookies = json.load(f)
+    # session.cookies = requests.utils.cookiejar_from_dict(cookies)
+    session.cookies.load()
 
-    with open(filename) as f:
-        cookies = pickle.load(f)
-        if cookies:
-            jar = requests.cookies.RequestsCookieJar()
-            jar._cookies = cookies
-            session.cookies = jar
-        else:
-            return False
+
+
 
 def get_times(timeframe):
     if timeframe is None:
         timeframe = (None, None)
-    else:
-        try:
-            start_time = timeframe[0] or datetime.date.today()
-            end_time = timeframe[1] or datetime.date.fromtimestamp(0)
-        except (IndexError, AttributeError):
-            raise TypeError("'timeframe' must be a tuple of dates !")
+    try:
+        start_time = timeframe[0] or datetime.date.today()
+        end_time = timeframe[1] or datetime.date.fromtimestamp(0)
+    except (IndexError, AttributeError):
+        raise TypeError("'timeframe' must be a tuple of dates !")
     return start_time, end_time
 
 
