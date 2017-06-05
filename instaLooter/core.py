@@ -115,12 +115,7 @@ class InstaLooter(object):
 
         self.session = requests.Session()
         self.session.cookies = six.moves.http_cookiejar.LWPCookieJar(self.COOKIE_FILE)
-
-        try:
-            self.session.cookies.load()
-            self.session.cookies.clear_expired_cookies()
-        except OSError:
-            pass
+        load_cookies(self.session)
 
         self.user_agent = ("Mozilla/5.0 (Windows NT 10.0; WOW64; "  # seems legit
                            "rv:50.0) Gecko/20100101 Firefox/50.0")
@@ -196,7 +191,7 @@ class InstaLooter(object):
             r = self.session.get(self.URL_HOME)
             if r.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
-            save_cookies(self.session, self.COOKIE_FILE)
+            save_cookies(self.session)
         else:
             raise SystemError("Login error: check your connection")
 

@@ -16,22 +16,21 @@ import requests
 console = hues.SimpleConsole(stdout=sys.stderr)
 
 
-def save_cookies(session, filename):
-    if not os.path.isdir(os.path.dirname(filename)):
-        os.mkdir(os.path.dirname(filename))
-    session.cookies.save()
-    # cookiedict = requests.utils.dict_from_cookiejar(session.cookies)
-    # with open(filename, 'w') as f:
-    #     json.dump(cookiedict, f)
+def save_cookies(session):
+    try:
+        if not os.path.isdir(os.path.dirname(session.cookies.filename)):
+            os.mkdir(os.path.dirname(session.cookies.filename))
+        session.cookies.save()
+    except IOError:
+        pass
 
 
-def load_cookies(session, filename):
-    # with open(filename) as f:
-    #     cookies = json.load(f)
-    # session.cookies = requests.utils.cookiejar_from_dict(cookies)
-    session.cookies.load()
-
-
+def load_cookies(session):
+    try:
+        session.cookies.load()
+    except IOError:
+        pass
+    session.cookies.clear_expired_cookies()
 
 
 def get_times(timeframe):
