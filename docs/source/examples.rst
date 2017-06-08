@@ -57,27 +57,21 @@ Get a set of users tagged in pictures of a given profile
            users.add(user)
 
 
-Use Instagram to get links to resized pictures
+Use Instagram to download resized pictures
 -----------------------------------------------
 
-In this example, every link stored in the file called "links.csv" will refer
-to a picture resized to be 320x320 pixel.
+Downloaded pictures will all be resized by IG to be 320x320 pixels
+before being downloaded.
 
 .. code::
 
     import re # the regex module
     from instaLooter import InstaLooter
 
-    looter = InstaLooter(profile="xxxx", get_videos=True)
-    cleaning_regex = re.compile(r"(s[0-9x]*/)?(e[0-9]*)/")
 
-    with open("instagram_links.csv", "w+") as output:
-        output.write('"instagram_link","picture_link","small_picture_link"\n')
+    def resizer(media):
+        cleaning_regex = re.compile(r"(s[0-9x]*/)?(e[0-9]*)/")
+        return cleaning_regex.sub('s320x320/', media['display_src'])
 
-        for media in looter.medias():
-            post_url = "https://www.instagram.com/p/{}".format(media["code"])
-            picture_url = media['display_src']
-            small_picture_url = cleaning_regex.sub('s320x320/', media['display_src'])
-            output.write('"{}","{}","{}"\n'.format(
-                post_url, picture_url, small_picture_url
-            ))
+    looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=resizer)
+    looter.download()
