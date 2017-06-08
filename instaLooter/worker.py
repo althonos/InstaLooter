@@ -22,8 +22,6 @@ except ImportError:
 
 class InstaDownloader(threading.Thread):
 
-    _SANITIZING_RX = re.compile(r'(https://.*?/.*?/).*(/.*\.jpg)')
-
     def __init__(self, owner):
         super(InstaDownloader, self).__init__()
         self.medias = owner._medias_queue
@@ -121,8 +119,6 @@ class InstaDownloader(threading.Thread):
         # save video
         self._dl(video_url, video_name)
 
-
-
     def _dl(self, source, dest):
         """Download a file located at `source` to `dest`.
         """
@@ -132,14 +128,6 @@ class InstaDownloader(threading.Thread):
                 for block in res.iter_content(1024):
                     if block:
                         dest_file.write(block)
-
-    @classmethod
-    def _default_url_generator(cls, media):
-        """Default photo URL generator.
-
-        This method strips out any width and height specifications.
-        """
-        return ''.join(cls._SANITIZING_RX.search(media['display_src']).groups())
 
     def kill(self):
         """Kill the Thread.

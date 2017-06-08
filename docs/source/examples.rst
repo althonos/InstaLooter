@@ -57,21 +57,28 @@ Get a set of users tagged in pictures of a given profile
            users.add(user)
 
 
-Use Instagram to download resized pictures
------------------------------------------------
+Download resized pictures
+-------------------------
 
-Downloaded pictures will all be resized by IG to be 320x320 pixels
-before being downloaded.
+Downloaded pictures will all be resized by IG to be 320 pixels wide
+with the same aspect ratio before being downloaded.
 
 .. code::
 
-    import re # the regex module
     from instaLooter import InstaLooter
+    from instaLooter.urlgen import resizer
+
+    looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=resizer(320))
+    looter.download()
 
 
-    def resizer(media):
-        cleaning_regex = re.compile(r"(s[0-9x]*/)?(e[0-9]*)/")
-        return cleaning_regex.sub('s320x320/', media['display_src'])
+Download thumbnails
+-------------------
 
-    looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=resizer)
+.. code::
+
+    from instaLooter import InstaLooter
+    from instaLooter.urlgen import thumbnail
+
+    looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=thumbnail)
     looter.download()

@@ -21,6 +21,7 @@ import time
 import tempfile
 import bs4 as bs
 
+from .urlgen import default
 from .worker import InstaDownloader
 from .utils import get_times, save_cookies, load_cookies
 
@@ -64,8 +65,7 @@ class InstaLooter(object):
 
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
-                jobs=16, template="{id}",
-                url_generator=InstaDownloader._default_url_generator):
+                jobs=16, template="{id}", url_generator=default):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -84,7 +84,7 @@ class InstaLooter(object):
             jobs (`bool`): the number of parallel threads to use to
                 download media (12 or more is advised to have a true parallel
                 download of media files) **[default: 16]**
-            url_generator (callable): a callable that takes a media
+            url_generator (`function`): a callable that takes a media
                 dictionnary as argument and returs the URL it should
                 download the picture from. The default tries to get
                 the best available size.

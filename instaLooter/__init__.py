@@ -15,5 +15,6 @@ __version__ = "0.9.9"
 try:
     from .cli import main
     from .core import InstaLooter
+    from . import urlgen
 except ImportError:
     pass
