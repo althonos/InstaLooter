@@ -64,8 +64,8 @@ def get_times_from_cli(cli_token):
         if not start_date and not stop_date: # ':', no start date, no stop date
             return None
         try:
-            start_date = date_from_isoformat(start_date) if start_date else datetime.date.today()
-            stop_date = date_from_isoformat(stop_date) if stop_date else datetime.date.fromtimestamp(0)
+            start_date = date_from_isoformat(start_date) if start_date else None #datetime.date.today()
+            stop_date = date_from_isoformat(stop_date) if stop_date else None #datetime.date.fromtimestamp(0)
         except ValueError:
             raise ValueError("--time parameter was not provided ISO formatted dates")
         return start_date, stop_date
