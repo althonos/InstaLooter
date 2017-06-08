@@ -1,8 +1,10 @@
 import os
+import re
 import shutil
 import tempfile
 import unittest
 import warnings
+import PIL.Image
 
 import instaLooter
 
@@ -102,7 +104,7 @@ class TestInstaLooterUtils(unittest.TestCase):
             )
 
     def test_get_owner_info(self):
-        therock = self.looter.get_owner_info("BTHqEhWFR4y"),
+        therock = self.looter.get_owner_info("BTHqEhWFR4y")
         self.assertEqual(therock['username'], 'therock')
         self.assertEqual(therock['id'], '232192182')
         self.assertFalse(therock['is_private'])
@@ -111,6 +113,31 @@ class TestInstaLooterUtils(unittest.TestCase):
         self.assertEqual(squareenix['username'], 'squareenix')
         self.assertEqual(squareenix['id'], '2117884847')
         self.assertFalse(squareenix['is_private'])
+
+    def test_url_generator_nocallable(self):
+        with self.assertRaises(ValueError):
+            self.looter = instaLooter.InstaLooter(
+                self.tmpdir, profile="instagram", url_generator=1
+            )
+
+    def test_url_generator_resize(self):
+
+        def square_resizer(media):
+            cleaning_regex = re.compile(r"(s[0-9x]*/)?(e[0-9]*)/")
+            return cleaning_regex.sub('s320x320/', media['display_src'])
+
+        self.looter = instaLooter.InstaLooter(
+            self.tmpdir, url_generator=square_resizer
+        )
+
+        self.looter.download_post("BFB6znLg5s1")
+
+        with PIL.Image.open(os.path.join(self.tmpdir, '1243533605591030581.jpg')) as img:
+            width, height = img.size
+            self.assertEqual(width, 320)
+            self.assertEqual(height, 320)
+
+
 
 
 def load_tests(loader, tests, pattern):
