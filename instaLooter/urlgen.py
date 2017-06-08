@@ -24,15 +24,17 @@ def default(media):
     return ''.join(DEFAULT_RX.search(media['display_src']).groups())
 
 
-def resizer(width):
+def resizer(size):
     """Creates a generator that generate a link to a scaled picture.
 
-    Aspect ratio is not modified.
+    Aspect ratio is not modified, and the largets of the two
+    dimensions of the picture will equal to ``size`` once it
+    is transformed.
     """
-    target = 's{0}x{0}/'.format(width)
+    target = 's{0}x{0}/'.format(size)
     def resize(media):
         return RESIZER_RX.sub(target, media['display_src'])
-    resize.__doc__ = "Generates a link to a picture {} pixels wide.".format(width)
+    resize.__doc__ = "Generates a link to a picture {} pixels large.".format(size)
     return resize
 
 

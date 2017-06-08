@@ -131,22 +131,7 @@ class TestInstaLooterUtils(unittest.TestCase):
                 self.tmpdir, profile="instagram", url_generator=1
             )
 
-    def test_url_generator_resize(self):
 
-        def square_resizer(media):
-            cleaning_regex = re.compile(r"(s[0-9x]*/)?(e[0-9]*)/")
-            return cleaning_regex.sub('s320x320/', media['display_src'])
-
-        self.looter = instaLooter.InstaLooter(
-            self.tmpdir, url_generator=square_resizer, profile="instagram"
-        )
-        self.looter.download(media_count=self.MEDIA_COUNT)
-
-        for img_file in glob.iglob(os.path.join(self.tmpdir, "*.jpg")):
-            with PIL.Image.open(img_file) as img:
-                width, height = img.size
-                self.assertLesserEqual(width, 320)
-                self.assertLesserEqual(height, 320)
 
 
 def load_tests(loader, tests, pattern):
