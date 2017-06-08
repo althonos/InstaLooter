@@ -1,5 +1,6 @@
 import os
 import re
+import glob
 import shutil
 import tempfile
 import unittest
@@ -19,6 +20,7 @@ class TestInstaLooterProfileDownload(unittest.TestCase):
         'cristiano', 'kyliejenner', 'therock',
     ]
 
+    MEDIA_COUNT = 30
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -37,18 +39,23 @@ class TestInstaLooterProfileDownload(unittest.TestCase):
 
         def _test(self):
             looter = instaLooter.InstaLooter(self.tmpdir, profile=profile, get_videos=True)
-            looter.download(media_count=200)
+            looter.download(media_count=cls.MEDIA_COUNT)
 
             # We have to use GreaterEqual since multi media posts
             # are counted as 1 but will download more than one
             # picture / video
-            self.assertGreaterEqual(len(os.listdir(self.tmpdir)), min(200, int(looter.metadata['media']['count'])))
+            self.assertGreaterEqual(
+                len(os.listdir(self.tmpdir)),
+                min(cls.MEDIA_COUNT, int(looter.metadata['media']['count']))
+            )
             self.assertEqual(profile, looter.metadata['username'])
 
         setattr(cls, "test_{}".format(profile), _test)
 
 
 class TestInstaLooterHashtagDownload(unittest.TestCase):
+
+    MEDIA_COUNT = 30
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -58,11 +65,13 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
 
     def test_hashtag_download(self):
         looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
-        looter.download(media_count=50)
-        self.assertEqual(len(os.listdir(self.tmpdir)), 50)
+        looter.download(media_count=self.MEDIA_COUNT)
+        self.assertEqual(len(os.listdir(self.tmpdir)), self.MEDIA_COUNT)
 
 
 class TestInstaLooterTemplate(unittest.TestCase):
+
+    MEDIA_COUNT = 30
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -71,17 +80,19 @@ class TestInstaLooterTemplate(unittest.TestCase):
         shutil.rmtree(self.tmpdir)
 
     def test_template_1(self):
-        PROFILE = "therock"
+        profile = "therock"
         looter = instaLooter.InstaLooter(
-            self.tmpdir, profile=PROFILE, get_videos=True,
+            self.tmpdir, profile=profile, get_videos=True,
             template='{username}-{id}'
         )
-        looter.download(media_count=30, with_pbar=False)
+        looter.download(media_count=self.MEDIA_COUNT, with_pbar=False)
         for f in os.listdir(self.tmpdir):
-            self.assertTrue(f.startswith(PROFILE))
+            self.assertTrue(f.startswith(profile))
 
 
 class TestInstaLooterUtils(unittest.TestCase):
+
+    MEDIA_COUNT = 30
 
     def setUp(self):
         self.looter = instaLooter.InstaLooter()
@@ -127,17 +138,15 @@ class TestInstaLooterUtils(unittest.TestCase):
             return cleaning_regex.sub('s320x320/', media['display_src'])
 
         self.looter = instaLooter.InstaLooter(
-            self.tmpdir, url_generator=square_resizer
+            self.tmpdir, url_generator=square_resizer, profile="instagram"
         )
+        self.looter.download(media_count=self.MEDIA_COUNT)
 
-        self.looter.download_post("BFB6znLg5s1")
-
-        with PIL.Image.open(os.path.join(self.tmpdir, '1243533605591030581.jpg')) as img:
-            width, height = img.size
-            self.assertEqual(width, 320)
-            self.assertEqual(height, 320)
-
-
+        for img_file in glob.iglob(os.path.join(self.tmpdir, "*.jpg")):
+            with PIL.Image.open(img_file) as img:
+                width, height = img.size
+                self.assertEqual(width, 320)
+                self.assertEqual(height, 320)
 
 
 def load_tests(loader, tests, pattern):
