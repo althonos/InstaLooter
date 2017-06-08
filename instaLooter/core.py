@@ -64,7 +64,7 @@ class InstaLooter(object):
 
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
-                jobs=16, template="{id}"):
+                jobs=16, template="{id}", custom_photo_url=None):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -106,6 +106,8 @@ class InstaLooter(object):
 
         self.template = template
         self._required_template_keys = self._RX_TEMPLATE.findall(template)
+
+        self._custom_photo_url = custom_photo_url
 
         self.directory = directory
         self.add_metadata = add_metadata
