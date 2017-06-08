@@ -145,8 +145,8 @@ class TestInstaLooterUtils(unittest.TestCase):
         for img_file in glob.iglob(os.path.join(self.tmpdir, "*.jpg")):
             with PIL.Image.open(img_file) as img:
                 width, height = img.size
-                self.assertEqual(width, 320)
-                self.assertEqual(height, 320)
+                self.assertLesserEqual(width, 320)
+                self.assertLesserEqual(height, 320)
 
 
 def load_tests(loader, tests, pattern):
