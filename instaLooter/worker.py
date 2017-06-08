@@ -139,7 +139,6 @@ class InstaDownloader(threading.Thread):
 
         This method strips out any width and height specifications.
         """
-        
         return ''.join(self._SANITIZING_RX.search(media['display_src']).groups())
 
     def kill(self):
