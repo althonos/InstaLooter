@@ -64,7 +64,8 @@ class InstaLooter(object):
 
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
-                jobs=16, template="{id}", custom_photo_url=None):
+                jobs=16, template="{id}",
+                url_generator=InstaDownloader._default_url_generator):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -83,6 +84,10 @@ class InstaLooter(object):
             jobs (`bool`): the number of parallel threads to use to
                 download media (12 or more is advised to have a true parallel
                 download of media files) **[default: 16]**
+            url_generator (callable): a callable that takes a media
+                dictionnary as argument and returs the URL it should
+                download the picture from. The default tries to get
+                the best available size.
         """
         if profile is not None and hashtag is not None:
             raise ValueError("Give only a profile or an hashtag, not both !")
@@ -107,7 +112,9 @@ class InstaLooter(object):
         self.template = template
         self._required_template_keys = self._RX_TEMPLATE.findall(template)
 
-        self._custom_photo_url = custom_photo_url
+        self.url_generator = url_generator
+        if not callable(url_generator):
+            raise ValueError("url_generator must be a callable !")
 
         self.directory = directory
         self.add_metadata = add_metadata
