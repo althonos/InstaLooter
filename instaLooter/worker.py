@@ -27,6 +27,7 @@ class InstaDownloader(threading.Thread):
     def __init__(self, owner):
         super(InstaDownloader, self).__init__()
         self.medias = owner._medias_queue
+        self.photo_url_generator = owner._custom_photo_url or self._default_url_generator
         self.directory = owner.directory
         self.add_metadata = owner.add_metadata
         self.owner = owner
@@ -87,7 +88,11 @@ class InstaDownloader(threading.Thread):
     def _download_photo(self, media):
         """Download a picture from a media dictionnary.
         """
-        photo_url = ''.join(self._SANITIZING_RX.search(media['display_src']).groups())
+        photo_url = self.photo_url_generator(media)
+
+        if not isinstance(photo_url, six.string_types):
+            raise ValueError('The "custom_photo_url" option must return a string !')
+
         photo_name = os.path.join(self.directory, self.owner._make_filename(media))
 
         # save full-resolution photo
@@ -128,6 +133,13 @@ class InstaDownloader(threading.Thread):
                 for block in res.iter_content(1024):
                     if block:
                         dest_file.write(block)
+
+    def _default_url_generator(self, media):
+        """Default photo URL generator.
+
+        This method strips out any width and height specifications.
+        """
+        return ''.join(self._SANITIZING_RX.search(media['display_src']).groups())
 
     def kill(self):
         """Kill the Thread.

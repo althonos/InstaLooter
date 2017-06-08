@@ -113,7 +113,6 @@ class TestInstaLooterUtils(unittest.TestCase):
         self.assertFalse(squareenix['is_private'])
 
 
-
 def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
     TestInstaLooterProfileDownload.register_tests()
