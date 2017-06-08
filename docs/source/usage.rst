@@ -26,15 +26,15 @@ Download pictures/videos from the profile of a single user:
 
 Download pictures/videos tagged with a given *#hashtag*:
 
-.. warning::
+.. code-block:: console
 
-  This requires that you are **logged-in**, as since 2017 Instagram made
-  hashtag browsing restricted to users with an account, so using the ``-c``
-  flag is mandatory to use your Instagram account
+   $ instaLooter hashtag <hashtag> <directory> [options]
+
+Download pictures/videos from a single post:
 
 .. code-block:: console
 
-   $ instaLooter hashtag <hashtag> [<directory>] [options]
+   $ instaLooter post <post_token> <directory> [options]
 
 
 Positional Arguments
@@ -46,55 +46,76 @@ Positional Arguments
 ``hashtag``
   the hashtag to download pictures/videos from.
 
-``optional``
-  the directory in which to download pictures/videos. If not given, the current
-  directory is used.
+``post_token``
+  the URL or the code of the post to download.
+
+``directory``
+  the directory in which to download pictures/videos. Optional for
+  profile download, will then use current directory.
 
 
-Optional Arguments
-------------------
+Options - Credentials:
+----------------------
 
-``-n NUM, --num NUM``
-  the maximum number of new files to download
+``-u USER, --username USER``
+  The username to connect to Instagram with.
+
+``-p PASS, --password PASS``
+  The password to connect to Instagram with (will be asked in the shell
+  if the ``--username`` option was given without the corresponding
+  ``--password``).
+
+Options - Files:
+----------------
+
+``-n NUM, --num-to-dl NUM``
+  Maximum number of new files to download
 
 ``-j JOBS, --jobs JOBS``
-  the number of parallel threads to use to download files. A value greater than
-  12 is advised since each page has 12 single medias on it. **[default: 16]**
+  Number of parallel threads to use to download files **[default: 16]**
 
 ``-T TMPL, --template TMPL``
-  A filename template to use to write files (see :ref:`Template`).
+  A filename template to use to write the files (see :ref:`Template`).
   **[default: {id}]**
 
 ``-v, --get-videos``
-  Get videos as well as pictures.
+  Get videos as well as photos
 
 ``-V, --videos-only``
-  Only download videos.
+  Get videos only (implies ``--get-videos``)
 
 ``-N, --new``
-  Only download files newer than the ones in the destination directory (faster
-  if you use instaLooter to sync a local copy of a profile). This used filenames
-  to check for present and missing files, so make sure you use the same template
-  as the older runs.
+  Only look for files newer than the ones in the destination directory
+  (faster).
 
 ``-m, --add-metadata``
-  Add date, caption and authorship metadata to downloaded pictures. Requires
-  ``PIL`` or ``Pillow`` as well as ``piexif``.
-
-``-q, --quiet``
-  Do not display and progress bar output.
+  Add date and caption metadata to downloaded pictures (requires
+  `PIL <http://www.pythonware.com/products/pil/>`_ or
+  `Pillow <https://python-pillow.org/>`_ as well as
+  `piexif <https://pypi.python.org/pypi/piexif>`_).
 
 ``-t TIME, --time TIME``
-  The time limit within which to download pictures and videos (see :ref:`Time`).
+  The time limit within which to download pictures and video
+  (see :ref:`Time`)
 
-``-c CRED, --credentials CRED``
-  Credentials to login to Instagram with if needed (see :ref:`Credentials`).
+Options - Miscellaneous:
+------------------------
+
+``-q, --quiet``
+  Do not produce any output
 
 ``-h, --help``
-  Show the complete help message.
+  Display the help message
 
 ``--version``
-  Show version and exit.
+  Show program version and quit
+
+``--traceback``
+  Print error traceback if any (debug).
+
+``-W WARNINGCTL``
+  Change warning behaviour (same as ``python -W``) **[default: default]**
+
 
 .. _Template:
 
@@ -149,13 +170,13 @@ including the ones posted the 10th of May 2016 and the 3rd of April 2016.
 Credentials
 -----------
 
-The ``-c`` parameter can be used to log to Instagram. This allows you to
-download pictures/videos from private profiles you are following. You can
-either provide your password directly or type it in later for privacy
-purposes.
+The ``--username`` and ``--password`` parameters can be used to log to
+Instagram. This allows you to download pictures/videos from private profiles
+you are following. You can either provide your password directly
+or type it in later for privacy purposes.
 
 .. code-block:: console
 
-   $ instaLooter ... -c MYLOGIN:MYPASSWORD
-   $ instaLooter ... -c MYLOGIN
-   Password: # type MYPASSWORD privately here
+   $ instaLooter ... --username USERNAME --password PASSWORD
+   $ instaLooter ... --username USERNAME
+   Password: # type PASSWORD privately here

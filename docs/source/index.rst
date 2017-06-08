@@ -44,8 +44,9 @@ instaLooter is maintained by:
   * `Martin Larralde <https://github.com/althonos>`_
 
 Special thanks to the following contributors:
-  * `mohan3d <https://github.com/mohan3d>`_
+  * `Mohaned Magdy <https://github.com/mohan3d>`_
   * `Daniel Lee Harple <https://github.com/dlh>`_
+  * `Bryan Massoth <https://github.com/bmass02>`_
 
 
 Indices and tables
