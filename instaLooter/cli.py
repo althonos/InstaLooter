@@ -106,11 +106,12 @@ def usage():
                 if section.startswith("Usage"))
 
 @wrap_warnings
-def main(argv=sys.argv[1:]):
+def main(argv=None):
     """Run from the command line interface.
     """
     try:
-        args = docopt.docopt(__doc__, argv, version='instaLooter {}'.format(__version__))
+        args = docopt.docopt(__doc__, argv or sys.argv[1:],
+                             version='instaLooter {}'.format(__version__))
     except docopt.DocoptExit as de:
         print(de)
         return 1

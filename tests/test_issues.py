@@ -177,7 +177,7 @@ class TestResolvedIssues(unittest.TestCase):
         )
         try:
             looter.download()
-        except:
+        except Exception:
             self.fail()
 
     def test_issue_41(self):
