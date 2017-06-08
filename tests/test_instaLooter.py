@@ -35,12 +35,12 @@ class TestInstaLooterProfileDownload(unittest.TestCase):
 
         def _test(self):
             looter = instaLooter.InstaLooter(self.tmpdir, profile=profile, get_videos=True)
-            looter.download(media_count=10)
+            looter.download(media_count=200)
 
             # We have to use GreaterEqual since multi media posts
             # are counted as 1 but will download more than one
             # picture / video
-            self.assertGreaterEqual(len(os.listdir(self.tmpdir)), min(10, int(looter.metadata['media']['count'])))
+            self.assertGreaterEqual(len(os.listdir(self.tmpdir)), min(200, int(looter.metadata['media']['count'])))
             self.assertEqual(profile, looter.metadata['username'])
 
         setattr(cls, "test_{}".format(profile), _test)
