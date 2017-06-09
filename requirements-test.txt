@@ -2,3 +2,4 @@
 
 coverage
 codecov
+codacy-coverage
