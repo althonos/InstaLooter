@@ -109,8 +109,10 @@ def usage():
 def main(argv=None):
     """Run from the command line interface.
     """
+    argv = argv or sys.argv[1:]
+
     try:
-        args = docopt.docopt(__doc__, argv or sys.argv[1:],
+        args = docopt.docopt(__doc__, argv,
                              version='instaLooter {}'.format(__version__))
     except docopt.DocoptExit as de:
         print(de)
