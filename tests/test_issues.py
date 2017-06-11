@@ -1,5 +1,7 @@
 import os
 import six
+import sys
+import operator
 import unittest
 import tempfile
 import shutil
@@ -238,6 +240,21 @@ class TestResolvedIssues(unittest.TestCase):
         looter.download(media_count=10)
         for image in os.listdir(self.tmpdir):
             self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.(jpg|mp4)')
+
+
+    def test_issue_76(self):
+        """
+        Thanks to @zeshuaro for reporting this bug.
+
+        Check that when downloading hashtags, the downloader
+        actually stops.
+        """
+        looter = instaLooter.InstaLooter(self.tmpdir, hashtag="aliaime")
+        postcount = looter.__length_hint__() # operator.length_hint
+
+        for i, m in enumerate(looter.medias()):
+            if i > postcount:
+                self.fail("looter.medias() did not stop.")
 
 
 
