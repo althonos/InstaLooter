@@ -1,10 +1,12 @@
 import os
 import re
+import sys
 import glob
 import shutil
 import tempfile
 import unittest
 import warnings
+import operator
 import PIL.Image
 
 import instaLooter
@@ -130,6 +132,35 @@ class TestInstaLooterUtils(unittest.TestCase):
             self.looter = instaLooter.InstaLooter(
                 self.tmpdir, profile="instagram", url_generator=1
             )
+
+    @unittest.skipIf(sys.version_info < (3,4),
+                     "operator.length_hint is a 3.4+ feature.")
+    def test_length_hint_empty(self):
+
+        looter = instaLooter.InstaLooter(profile="jkshksjdhfjkhdkfhk")
+        self.assertEqual(operator.length_hint(looter), 0)
+
+        looter = instaLooter.InstaLooter(hashtag="jkshksjdhfjkhdkfhk")
+        self.assertEqual(operator.length_hint(looter), 0)
+
+    @unittest.skipIf(sys.version_info < (3,4),
+                     "operator.length_hint is a 3.4+ feature.")
+    def test_length_hint_empty(self):
+
+        looter = instaLooter.InstaLooter(self.tmpdir, profile="tide")
+        hint = operator.length_hint(looter)
+
+        # Check the post count is greater than 0
+        self.assertGreater(hint, 0)
+
+        # Download pictures and check if the count
+        # match (at most as many posts downloaded)
+        looter.download()
+        self.assertLessEqual(len(os.listdir(self.tmpdir)), hint)
+
+
+
+
 
 
 

@@ -156,6 +156,14 @@ class InstaLooter(object):
             for worker in self._workers:
                 worker.kill()
 
+    def __length_hint__(self):
+        try:
+            data = next(self.pages())['entry_data'][self._page_name][0]
+            length = data[self._section_name]['media']['count']
+        except (KeyError, StopIteration):
+            length = 0
+        return length
+
     def login(self, username, password):
         """Login with provided credentials.
 
