@@ -249,7 +249,7 @@ class TestResolvedIssues(unittest.TestCase):
         Check that when downloading hashtags, the downloader
         actually stops.
         """
-        looter = instaLooter.InstaLooter(self.tmpdir, hashtag="aliaime")
+        looter = instaLooter.InstaLooter(self.tmpdir, hashtag="oulianov")
         postcount = looter.__length_hint__() # operator.length_hint
 
         for i, m in enumerate(looter.medias()):
