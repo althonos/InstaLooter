@@ -320,7 +320,7 @@ class InstaLooter(object):
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 if media['id'] in seen:
-                    break
+                    return
                 yield media
                 seen.add(media['id'])
 
@@ -332,7 +332,7 @@ class InstaLooter(object):
                 media_date = datetime.date.fromtimestamp(media['date'])
                 if start_time >= media_date >= end_time:
                     if media['id'] in seen:
-                        break
+                        return
                     yield media
                     seen.add(media['id'])
                 elif media_date < end_time:
