@@ -10,7 +10,6 @@ import contextlib
 import threading
 import datetime
 import os
-import re
 import six
 
 try:

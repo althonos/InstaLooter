@@ -1,6 +1,5 @@
 import os
 import six
-import sys
 import operator
 import unittest
 import tempfile

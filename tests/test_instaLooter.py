@@ -145,7 +145,7 @@ class TestInstaLooterUtils(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info < (3,4),
                      "operator.length_hint is a 3.4+ feature.")
-    def test_length_hint_empty(self):
+    def test_length_hint(self):
 
         looter = instaLooter.InstaLooter(self.tmpdir, profile="tide")
         hint = operator.length_hint(looter)
