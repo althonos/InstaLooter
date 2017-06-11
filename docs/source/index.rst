@@ -84,9 +84,6 @@ Indices and tables
 .. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square&maxAge=3600
    :target: https://landscape.io/github/althonos/InstaLooter/master
 
-.. |grade| image:: https://img.shields.io/codacy/grade/9032223b2e104c31a66acd1e8c28757c.svg
-   :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
-
 .. |license| image:: https://img.shields.io/pypi/l/InstaLooter.svg?maxAge=3600&style=flat-square
    :target: https://choosealicense.com/licenses/gpl-3.0/
 
