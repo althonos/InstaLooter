@@ -308,17 +308,25 @@ class InstaLooter(object):
             return self._timed_medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe)
 
     def _timeless_medias(self, media_count=None, with_pbar=False):
+        seen = set()
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
+                if media['id'] in seen:
+                    break
                 yield media
+                seen.add(media['id'])
 
     def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
+        seen = set()
         start_time, end_time = get_times(timeframe)
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 media_date = datetime.date.fromtimestamp(media['date'])
                 if start_time >= media_date >= end_time:
+                    if media['id'] in seen:
+                        break
                     yield media
+                    seen.add(media['id'])
                 elif media_date < end_time:
                     return
 
