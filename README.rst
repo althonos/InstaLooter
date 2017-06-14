@@ -137,8 +137,8 @@ of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.
 .. |Source BeautifulSoup| image:: https://img.shields.io/badge/source-Launchpad-orange.svg?maxAge=3600&style=flat-square
    :target: https://launchpad.net/beautifulsoup
 
-.. |Source six| image:: https://img.shields.io/badge/source-Bitbucket-blue.svg?maxAge=3600&style=flat-square
-   :target: https://bitbucket.org/gutworth/six
+.. |Source six| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
+   :target: https://github.com/benjaminp/six
 
 .. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
    :target: https://github.com/WoLpH/python-progressbar
