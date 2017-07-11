@@ -471,6 +471,13 @@ class InstaLooter(object):
                 media
             )
 
+    def get_metadata(self):
+        if self._page_name == 'TagPage':
+            raise ValueError("Cannot get metadata of an hashtag !")
+        elif not self.metadata:
+            next(self.pages())
+        return self.metadata
+
     def get_post_info(self, code):
         """Get info about a single post referenced by its code
 
