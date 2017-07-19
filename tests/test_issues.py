@@ -240,7 +240,6 @@ class TestResolvedIssues(unittest.TestCase):
         for image in os.listdir(self.tmpdir):
             self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.(jpg|mp4)')
 
-
     def test_issue_76(self):
         """
         Thanks to @zeshuaro for reporting this bug.
@@ -255,9 +254,24 @@ class TestResolvedIssues(unittest.TestCase):
             if i > postcount:
                 self.fail("looter.medias() did not stop.")
 
+    def test_issue_82(self):
+        """
+        Thanks to @MohamedIM for reporting this bug.
 
+        Check that urls containing 'h-ak-igx' are not stripped from all
+        their parameters.
+        """
+        looter = instaLooter.InstaLooter(self.tmpdir, template='{code}')
+        info = looter.get_post_info('BWOYSYQDCo5')
 
+        info['display_url'] = \
+            'https://ig-s-c-a.akamaihd.net/h-ak-igx/19764472_1586345694718446_4011887281420894208_n.jpg'
+        looter.get_post_info = lambda code: info
 
+        looter.download_post('BWOYSYQDCo5')
+
+        with open(os.path.join(self.tmpdir, 'BWOYSYQDCo5.jpg'), 'rb') as f:
+            self.assertNotIn(b'5xx Server Error', f.read())
 
 
 def setUpModule():

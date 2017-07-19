@@ -15,13 +15,18 @@ __all__ = ["default", "resizer", "thumbnail"]
 
 
 DEFAULT_RX = re.compile(r'(https://.*?/.*?/).*(/.*\.jpg)')
+NEW_DEFAULT_RX = re.compile(r'(https://.*?/h-ak-igx/).*(/.*\.jpg)')
 RESIZER_RX = re.compile(r"(s[0-9x]*/)?(e[0-9]*)/")
 
 
 def default(media):
     """Generates a link to the default picture, without processing effects.
     """
-    return ''.join(DEFAULT_RX.search(media['display_src']).groups())
+    result = NEW_DEFAULT_RX.search(media['display_src'])
+
+    return 'anything'.join(result.groups()) \
+        if result is not None \
+      else ''.join(DEFAULT_RX.search(media['display_src']).groups())
 
 
 def resizer(size):
