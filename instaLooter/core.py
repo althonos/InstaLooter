@@ -285,16 +285,18 @@ class InstaLooter(object):
             yield data
 
             # Break if the page is private (no media to show) or if the last page was reached
-            if not media_info['page_info']['has_next_page']:
+            if not media_info['page_info']['has_next_page'] or not media_info['nodes']:
+
+                if not media_info['nodes']:
+                    if self._section_name == "tag":
+                        msg = "#{} has no medias to show.".format(self.target)
+                    elif not self.is_logged_in():
+                        msg = "Profile {} is private, retry after logging in.".format(self.target)
+                    else:
+                        msg = "Profile {} is private, and you are not following it.".format(self.target)
+                    warnings.warn(msg)
                 break
-            elif not media_info["nodes"]:
-                if self._section_name == "tag":
-                    warnings.warn("#{} has no medias to show.".format(self.target))
-                elif self.is_logged_in() is None:
-                    warnings.warn("Profile {} is private, retry after logging in.".format(self.target))
-                else:
-                    warnings.warn("Profile {} is private, and you are not following it.".format(self.target))
-                break
+
             else:
                 url = '{}?max_id={}'.format(self._base_url.format(self.target), media_info['page_info']["end_cursor"])
 
