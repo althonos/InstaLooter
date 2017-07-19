@@ -40,12 +40,11 @@ deploy:
       secure: tOxmKL2WfIajsSao4rVau9xLehIqfpKOm9SCwUlGREJas/D+yFYcltdamVa/kpc2PgHcmQBJxkZzEEDsAiZunm/435qWR2T01B2zB00JdtfWvnoCWEEzg/SEsy/0yS6m666P3vbdSvtfHByaavzPf5RE3ooBwsbKt3OKgS3fs91zFZwJZU6zATpBC6pzwhbt6PZeYzmZnk2AkRl8O2abPh8iHz1DGxJ3baY3ObG289W5Dp9a3sr9PVkXvLCMe04JeORTlPt43hnAy6PpnN8FSgKKLdTiMeqRcctZdH8Y90EIW8nWWoqaokNVLepxDDtf3ouy57DNyZu1FNZDlsQd7aYyUrydy7UIrMa33L7ai0hRcvKQI1ymRbO3W4opOPDcORulvYGUNLeVU886lvuLavlJ+otZClRBPV3EuO0k2eslAvwiTF8DBjB9HPuF3ZtkBgnDH7ubU1hoMi6MQvbjVThI0J7uyTVNmnS8r9/Yv02TsTl+IBHzhE3Sb8z2ZNF/Ip5UU5rbcmmvA/euShL2A+Eb0hhe/Fen3fVROl/cwcGIbkEXTurzc5xfyoLs76VOxr+HvYqA4DzxvDwhhvQSk0PTymO5T5WRj4PYbmkHeevVCsH8unva27u1CeKhVYIrWyvXwDhIK11mLzWKT2SAEVypil8YUcQpROR8vJP2yA4=
     distributions: sdist bdist_wheel
     on:
-      python: '3.5'
+      python: '3.6'
       tags: true
       repo: althonos/InstaLooter
     server: https://upload.pypi.org/legacy/
     skip_upload_docs: true
-    distributions: sdist bdist_whell
 
 notifications:
   email:
