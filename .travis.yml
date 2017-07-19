@@ -43,18 +43,9 @@ deploy:
       python: '3.5'
       tags: true
       repo: althonos/InstaLooter
-#  - provider: releases
-#    user: althonos
-#    password:
-#      secure: oI67iZW2mgiSSVsYKFpI/3u7st1ps22g1qfAKo5VsBTpZ6vSS65j3RwNB1EFCDv4nOD3PMz4xMbycGDgZUuNsVjVN6VhJPFRDSWDrvnv2n5+9MIt8ic8zAiYpS+VLC4cuIMxZvdaGsPWVgk99VXSY0o210bx3knES9zHa86G2MIVC6ajM8UaxBPbtYZkTnqO+d7GgDMbYAswxY/Nn0a3dJnDaXyDzgmpV28viNZMvii1sSGWpZXu+5+YV1Xg5Bv/RE5py2hm9DzdccEhZcG77MhBc+hNsxpYmWn+1hJQBb4iQEN1yg03AzhH8W4LnFPCo/d5lKbLzfFzQda60D0DrbWsXBZ668/dHJg60Td37IEEnpncpol0AVJH/24dYJYtmZa2MU17K8eOXrh7yzGwpGuYc9Okmg55Co04/rryxUoQiMvwAV/YmjCHO26EAgIV8RNPk/GMKKDld4uYafIk5KdUydr7X8IORJNKqh6+ECplZCJ3UjWuVNYDXU9ZxWLeKsjaaAE43L0Deg3yYKASC9zyLORP1plJfTo9c+sU0ljfx6vpuzM13ETmUtRBiSQHXx2IXRvN6r6V3HP8+hLSJo3VL5PaH0MRDWAff/PqK88o9fEKC5thKN9S4eVU0osv1XaSbheqdvPaFiIS9mvw9/rH419mVrwWBPeRneCOxWQ=
-#    files: dist/*
-#    file_glob: true
-#    skip_cleanup: true
-#    on:
-#      python: '3.5'
-#      condition: "$TEST_SUITE = doctests"
-#      tags: true
-#      repo: althonos/pronto
+    server: https://upload.pypi.org/legacy/
+    skip_upload_docs: true
+    distributions: sdist bdist_whell
 
 notifications:
   email:
