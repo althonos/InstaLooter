@@ -295,6 +295,7 @@ class InstaLooter(object):
                     else:
                         msg = "Profile {} is private, and you are not following it.".format(self.target)
                     warnings.warn(msg)
+
                 break
 
             else:

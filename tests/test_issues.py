@@ -273,6 +273,24 @@ class TestResolvedIssues(unittest.TestCase):
         with open(os.path.join(self.tmpdir, 'BWOYSYQDCo5.jpg'), 'rb') as f:
             self.assertNotIn(b'5xx Server Error', f.read())
 
+    def test_issue_84(self):
+        """
+        Thanks to @raphaelbernardino for reporting this bug.
+
+        Make sure private profiles with few pictures (less than a page worth)
+        raise the private warning as expected.
+        """
+
+        with warnings.catch_warnings(record=True) as registry:
+            warnings.simplefilter('always')
+            looter = instaLooter.InstaLooter(profile="raphaelbernardino")
+            list(looter.medias())
+
+        self.assertEqual(
+            six.text_type(registry[0].message),
+            u"Profile raphaelbernardino is private, retry after logging in."
+        )
+
 
 def setUpModule():
    warnings.simplefilter('ignore')
