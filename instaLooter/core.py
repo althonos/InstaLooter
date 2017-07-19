@@ -84,10 +84,13 @@ class InstaLooter(object):
             jobs (`bool`): the number of parallel threads to use to
                 download media (12 or more is advised to have a true parallel
                 download of media files) **[default: 16]**
+            template (`str`): a filename format, in Python new-style-formatting
+                format. See the the Template page of the documentation
+                for available keys. **[default: {id}]
             url_generator (`function`): a callable that takes a media
                 dictionnary as argument and returs the URL it should
                 download the picture from. The default tries to get
-                the best available size.
+                the best available size. **[default: `urlgen.default`]**
         """
         if profile is not None and hashtag is not None:
             raise ValueError("Give only a profile or an hashtag, not both !")
