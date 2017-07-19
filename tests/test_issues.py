@@ -28,7 +28,7 @@ class TestResolvedIssues(unittest.TestCase):
         shutil.rmtree(self.tmpdir)
         warnings.showwarning = warnings._showwarning
 
-    def test_issue_9(self):
+    def test_issue_09(self):
         """
         Thanks to @kurtmaia for reporting this bug.
 
@@ -76,7 +76,7 @@ class TestResolvedIssues(unittest.TestCase):
         for f in os.listdir(self.tmpdir):
             self.assertTrue(f.startswith('mysteryjets'))
 
-    def test_issue_6(self):
+    def test_issue_06(self):
         """
         Checks that instaLooter does not iterate forever on a private
         profile.
@@ -221,7 +221,7 @@ class TestResolvedIssues(unittest.TestCase):
             media = looter._medias_queue.get()
             for key in ('caption', 'code', 'date'):
                 self.assertIn(key, media)
-                self.assertIsNotNone(key, media[key])
+                self.assertIsNotNone(media[key])
 
     def test_issue_66(self):
         """
