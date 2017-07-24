@@ -61,25 +61,27 @@ class InstaDownloader(threading.Thread):
                     metadata.get('shortcode') or metadata['code']
                 )['full_name']
 
-
-            img = PIL.Image.open(path)
-
-            exif_dict = {"0th": {}, "Exif": {}, "GPS": {}, "1st":{}, "thumbnail": None}
+            exif_dict = {"GPS": {}, "thumbnail": None}
 
             exif_dict['0th'] = {
-                piexif.ImageIFD.Artist: "Image creator, {}".format(full_name).encode('utf-8'),
+                piexif.ImageIFD.Artist: \
+                    "Image creator, {}".format(full_name).encode('utf-8'),
             }
 
             exif_dict['1st'] = {
-                piexif.ImageIFD.Artist: "Image creator, {}".format(full_name).encode('utf-8'),
+                piexif.ImageIFD.Artist: \
+                    "Image creator, {}".format(full_name).encode('utf-8'),
             }
 
             exif_dict['Exif'] = {
-                piexif.ExifIFD.DateTimeOriginal: datetime.datetime.fromtimestamp(metadata['date']).isoformat(),
-                piexif.ExifIFD.UserComment: metadata.get('caption', '').encode('utf-8'),
+                piexif.ExifIFD.DateTimeOriginal: \
+                    datetime.datetime.fromtimestamp(metadata['date']).isoformat(),
+                piexif.ExifIFD.UserComment: \
+                    metadata.get('caption', '').encode('utf-8'),
             }
 
-            img.save(path, exif=piexif.dump(exif_dict))
+            with PIL.Image.open(path) as img:
+                img.save(path, exif=piexif.dump(exif_dict))
 
     def _download_photo(self, media):
         """Download a picture from a media dictionnary.

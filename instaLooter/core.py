@@ -10,6 +10,7 @@ import copy
 import json
 import os
 import datetime
+import contextlib
 import progressbar
 import random
 import re
@@ -198,22 +199,23 @@ class InstaLooter(object):
             'X-Requested-With': 'XMLHttpRequest',
         })
 
-        res = self.session.get(self.URL_HOME)
-        self.session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
+        with self.session.get(self.URL_HOME) as res:
+            self.session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
         time.sleep(5 * random.random()) # nosec
 
-        login = self.session.post(self.URL_LOGIN, data=login_post, allow_redirects=True)
-        self.session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
-        self.csrftoken = login.cookies['csrftoken']
-        # save_cookies(self.session, 'cookies.txt')
+        with self.session.post(self.URL_LOGIN,
+                data=login_post, allow_redirects=True) as login:
 
-        if login.status_code == 200:
-            r = self.session.get(self.URL_HOME)
-            if r.text.find(username) == -1:
+            self.session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
+            self.csrftoken = login.cookies['csrftoken']
+            # save_cookies(self.session, 'cookies.txt')
+            if not login.status_code == 200:
+                raise SystemError("Login error: check your connection")
+
+        with self.session.get(self.URL_HOME) as res:
+            if res.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
             save_cookies(self.session)
-        else:
-            raise SystemError("Login error: check your connection")
 
     def logout(self):
         """Log out from current session.
@@ -223,8 +225,8 @@ class InstaLooter(object):
             Code taken from LevPasha/instabot.py
         """
         logout_post = {'csrfmiddlewaretoken': self.csrftoken}
-        logout = self.session.post(self.URL_LOGOUT, data=logout_post)
-        self.csrftoken = None
+        with self.session.post(self.URL_LOGOUT, data=logout_post):
+            self.csrftoken = None
         if os.path.isfile(self.COOKIE_FILE):
             os.remove(self.COOKIE_FILE)
 
@@ -258,8 +260,8 @@ class InstaLooter(object):
         current_page = 0
         while True:
             current_page += 1
-            res = self.session.get(url)
-            data = self._get_shared_data(res)
+            with self.session.get(url) as res:
+                data = self._get_shared_data(res)
 
             try:
                 media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
@@ -390,8 +392,8 @@ class InstaLooter(object):
             `dict`: the owner metadata deserialised from JSON
         """
         url = "https://www.instagram.com/p/{}/".format(code)
-        res = self.session.get(url)
-        data = self._get_shared_data(res)
+        with self.session.get(url) as res:
+            data = self._get_shared_data(res)
         return data['entry_data']['PostPage'][0]['graphql']['shortcode_media']['owner']
 
     def download(self, **kwargs):
@@ -493,9 +495,10 @@ class InstaLooter(object):
                 at a specific media.
         """
         url = "https://www.instagram.com/p/{}/".format(code)
-        res = self.session.get(url)
+        with self.session.get(url) as res:
         # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
-        media = self._get_shared_data(res)['entry_data']['PostPage'][0]['graphql']['shortcode_media']
+            media = self._get_shared_data(res)['entry_data']['PostPage'][0]\
+                                              ['graphql']['shortcode_media']
         # Fix renaming of attributes
         media.setdefault('code', media.get('shortcode'))
         media.setdefault('date', media.get('taken_at_timestamp'))
