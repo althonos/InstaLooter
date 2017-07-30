@@ -11,6 +11,7 @@ import threading
 import datetime
 import os
 import six
+import json
 
 try:
     import PIL.Image
@@ -26,6 +27,7 @@ class InstaDownloader(threading.Thread):
         self.medias = owner._medias_queue
         self.directory = owner.directory
         self.add_metadata = owner.add_metadata
+        self.save_metadata = owner.save_metadata
         self.owner = owner
         self.session = requests.Session()
         self.session.cookies = self.owner.session.cookies
@@ -81,6 +83,13 @@ class InstaDownloader(threading.Thread):
 
             img.save(path, exif=piexif.dump(exif_dict))
 
+    @staticmethod
+    def _save_metadata(path, metadata):
+        """ save metadata to JSON file """
+        with open('%s.json'%path, 'w') as fp:
+            json.dump(metadata, fp, indent=4)
+
+
     def _download_photo(self, media):
         """Download a picture from a media dictionnary.
         """
@@ -97,6 +106,9 @@ class InstaDownloader(threading.Thread):
         # put info from Instagram post into image metadata
         if self.add_metadata:
             self._add_metadata(photo_name, media)
+
+        if self.save_metadata:
+            self._save_metadata(photo_name, media)
 
 
     def _download_video(self, media):
@@ -117,6 +129,9 @@ class InstaDownloader(threading.Thread):
 
         # save video
         self._dl(video_url, video_name)
+
+        if self.save_metadata:
+            self._save_metadata(video_name, media)
 
     def _dl(self, source, dest):
         """Download a file located at `source` to `dest`.

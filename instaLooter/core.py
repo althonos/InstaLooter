@@ -64,7 +64,7 @@ class InstaLooter(object):
     _OWNER_MAP = {}
 
     def __init__(self, directory=None, profile=None, hashtag=None,
-                add_metadata=False, get_videos=False, videos_only=False,
+                add_metadata=False, get_videos=False, save_metadata=False, videos_only=False,
                 jobs=16, template="{id}", url_generator=default):
         """Create a new looter instance.
 
@@ -77,6 +77,7 @@ class InstaLooter(object):
                 **[default: None]**
             add_metadata (`bool`): Add date and comment metadata to
                 the downloaded pictures. **[default: False]**
+            save_metadata (`bool`): Save metadata to JSON. **[default: False]**
             get_videos (`bool`): Also get the videos from the given
                 target **[default: False]**
             videos_only (`bool`): Only download videos (implies
@@ -121,6 +122,7 @@ class InstaLooter(object):
 
         self.directory = directory
         self.add_metadata = add_metadata
+        self.save_metadata = save_metadata
         self.get_videos = get_videos or videos_only
         self.videos_only = videos_only
         self.jobs = jobs
@@ -398,8 +400,8 @@ class InstaLooter(object):
         """Download all the medias from provided target.
 
         This method follwows the parameters given in the :obj:`__init__`
-        method (profile or hashtag, directory, get_videos, videos_only
-        and add_metadata).
+        method (profile or hashtag, directory, get_videos, videos_only,
+        add_metadata and save_metadata).
 
         Keyword Arguments:
             media_count (`int`): how many media to download before
@@ -471,11 +473,6 @@ class InstaLooter(object):
 
         self._poison_workers()
         self._join_workers()
-        if self.add_metadata and not media['is_video']:
-            self._add_metadata(
-                os.path.join(self.directory, self._make_filename(media)),
-                media
-            )
 
     def get_metadata(self):
         if self._page_name == 'TagPage':
