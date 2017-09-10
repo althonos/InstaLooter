@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import os
 import six
 import getpass
-import configparser
 
 from .core import InstaLooter
 
@@ -15,7 +14,7 @@ class BatchRunner(object):
     """
 
     def __init__(self, handle):
-        self.parser = configparser.ConfigParser()
+        self.parser = six.moves.configparser.ConfigParser()
         self.parser.read_file(handle)
 
     def runAll(self):
