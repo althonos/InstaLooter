@@ -146,13 +146,13 @@ def main(argv=None):
         return 1
 
     if args['logout']:
-        try:
-            os.remove(InstaLooter.COOKIE_FILE)
-            hues.success('Logged out.')
-            return 0
-        except Exception:
+        if not os.path.exists(InstaLooter.COOKIE_FILE):
             hues.error('Cookie file not found.')
             return 1
+        InstaLooter().logout()
+        looter.logout()
+        hues.success('Logged out.')
+        return 0
 
     elif args['login']:
         try:

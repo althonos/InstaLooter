@@ -44,8 +44,6 @@ developed by `@akurtovic <https://github.com/akurtovic>`_.
    :target: https://choosealicense.com/licenses/gpl-3.0/
 
 
-
-
 Requirements
 ------------
 
@@ -73,6 +71,9 @@ InstaLooter is available on PyPI to install with ``pip``. If you are not
 familiar with the package management of the Python ecosystem, please see the
 `Installation page <http://instalooter.readthedocs.io/en/latest/install.html>`_
 of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.html>`_.
+Yet, you will probably end up using the following command::
+
+  pip install --user instaLooter
 
 
 Usage
@@ -83,8 +84,24 @@ InstaLooter comes with its CLI:
 .. code-block:: console
 
     $ instaLooter <username> [<directory>] [options]
-    $ instaLooter hashtag <hashtag> <directory> [options]
+    $ instaLooter (hashtag <hashtag> <directory> [options]
     $ instaLooter post <post_token> <directory> [options]
+    $ instaLooter batch <batch_file>
+
+
+Logging in and out
+------------------
+There are two ways to login on Instagram through *instaLooter*:
+
+* use the `login` subcommand (``instaLooter login``) to interactively login
+  using your username and password.
+* give a ``--username`` (and, if you want, a ``--password``) argument to any of
+  the download commands.
+
+In both cases, a session cookie will be created in the system temporary folder.
+To delete it and close your session on the server, use the ``logout``
+subcommand.
+
 
 Examples
 --------
