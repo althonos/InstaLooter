@@ -9,7 +9,7 @@ import shutil
 import unittest
 import tempfile
 
-import instaLooter
+from instaLooter.cli import main
 from instaLooter.batch import BatchRunner
 
 
@@ -41,7 +41,7 @@ class TestBatchRunner(unittest.TestCase):
             batch_file.write(cfg)
 
         self.assertEqual(
-            instaLooter.main(["batch", os.path.join(self.tmpdir, 'batch.ini')]),
+            main(["batch", os.path.join(self.tmpdir, 'batch.ini')]),
             0
         )
 
