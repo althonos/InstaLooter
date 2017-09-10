@@ -1,3 +1,7 @@
+# coding: utf-8
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import six
 import operator
@@ -35,7 +39,7 @@ class TestResolvedIssues(unittest.TestCase):
         Checks that adding metadata to pictures downloaded from a hashtag
         works as well.
         """
-        instaLooter.main(["fluoxetine", self.tmpdir, "-n", "10", "-q", "--add-metadata"])
+        instaLooter.main(["fluoxetine", self.tmpdir, "-n", "10", "-q", "-m"])
         for f in os.listdir(self.tmpdir):
             exif = piexif.load(os.path.join(self.tmpdir, f))
             self.assertTrue(exif['Exif']) # Date & Caption

@@ -1,3 +1,7 @@
+# coding: utf-8
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import re
 import sys
@@ -12,9 +16,7 @@ import PIL.Image
 import instaLooter
 
 
-
-
-class TestInstaLooterProfileDownload(unittest.TestCase):
+class TestProfileDownload(unittest.TestCase):
 
     MOST_POPULAR = [
         'instagram', 'selenagomez', 'taylorswift',
@@ -55,7 +57,7 @@ class TestInstaLooterProfileDownload(unittest.TestCase):
         setattr(cls, "test_{}".format(profile), _test)
 
 
-class TestInstaLooterHashtagDownload(unittest.TestCase):
+class TestHashtagDownload(unittest.TestCase):
 
     MEDIA_COUNT = 30
 
@@ -71,7 +73,7 @@ class TestInstaLooterHashtagDownload(unittest.TestCase):
         self.assertEqual(len(os.listdir(self.tmpdir)), self.MEDIA_COUNT)
 
 
-class TestInstaLooterTemplate(unittest.TestCase):
+class TestTemplate(unittest.TestCase):
 
     MEDIA_COUNT = 30
 
@@ -92,7 +94,7 @@ class TestInstaLooterTemplate(unittest.TestCase):
             self.assertTrue(f.startswith(profile))
 
 
-class TestInstaLooterUtils(unittest.TestCase):
+class TestUtils(unittest.TestCase):
 
     MEDIA_COUNT = 30
 
@@ -159,22 +161,18 @@ class TestInstaLooterUtils(unittest.TestCase):
         self.assertLessEqual(len(os.listdir(self.tmpdir)), hint)
 
 
-
-
-
-
-
-
 def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
-    TestInstaLooterProfileDownload.register_tests()
-    suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterProfileDownload))
-    suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterHashtagDownload))
-    suite.addTests(loader.loadTestsFromTestCase(TestInstaLooterTemplate))
+    TestDownload.register_tests()
+    suite.addTests(loader.loadTestsFromTestCase(TestProfileDownload))
+    suite.addTests(loader.loadTestsFromTestCase(TestHashtagDownload))
+    suite.addTests(loader.loadTestsFromTestCase(TestTemplate))
     return suite
+
 
 def setUpModule():
    warnings.simplefilter('ignore')
+
 
 def tearDownModule():
    warnings.simplefilter(warnings.defaultaction)
