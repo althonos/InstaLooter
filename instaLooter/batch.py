@@ -15,7 +15,7 @@ class BatchRunner(object):
 
     def __init__(self, handle):
         self.parser = six.moves.configparser.ConfigParser()
-        self.parser.read_file(handle)
+        self.parser.readfp(handle) if six.PY2 else self.parser.read_file(handle)
 
     def runAll(self):
         """Run all the jobs specified in the configuration file.
