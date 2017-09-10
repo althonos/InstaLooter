@@ -4,19 +4,23 @@
 instaLooter - Another API-less Instagram pictures and videos downloader
 
 Usage:
+    instaLooter batch <batch_file>
+    instaLooter hashtag <hashtag> [<directory>] [options]
+    instaLooter post <post_token> [<directory>] [options]
     instaLooter <profile> [<directory>] [options]
-    instaLooter hashtag <hashtag> <directory> [options]
-    instaLooter post <post_token> <directory> [options]
     instaLooter (-h | --help | --version | --usage)
 
 Arguments:
     <profile>                    The username of the profile to download
                                  videos and pictures from
     <hashtag>                    A hashtag to download pictures and videos
-                                 from
+                                 from.
     <post_token>                 Either the url or the code of a single post
                                  to download the picture or video from.
     <directory>                  The directory in which to download files.
+    <batch_file>                 The path to the batch file containing batch
+                                 download instructions (see the online
+                                 documentation).
 
 Options - Credentials:
     -u USER, --username USER     The username to connect to Instagram with.
@@ -80,11 +84,12 @@ Time:
     Edges are included in the time frame, so if using the following value:
     `--time 2016-05-10:2016-04-03`, then all medias will be downloaded
     including the ones posted the 10th of May 2016 and the 3rd of April 2016.
+
+See more at http://instalooter.readthedocs.io/en/latest/usage.html
+
 """
-from __future__ import (
-    absolute_import,
-    unicode_literals,
-)
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import docopt
 import os
@@ -96,14 +101,14 @@ import traceback
 
 from . import __version__
 from .core import InstaLooter
+from .batch import BatchRunner
 from .utils import get_times_from_cli, console, wrap_warnings
 
 WARNING_ACTIONS = {'error', 'ignore', 'always',
                    'default', 'module', 'once'}
 
 def usage():
-    return next(section for section in __doc__.split("\n\n")
-                if section.startswith("Usage"))
+    return next(s for s in __doc__.split("\n\n") if s.startswith("Usage"))
 
 @wrap_warnings
 def main(argv=None):
@@ -127,6 +132,12 @@ def main(argv=None):
         print("Unknown warning action: {}".format(args['-W']))
         print("   available action: {}".format(', '.join(WARNING_ACTIONS)))
         return 1
+
+    if args['batch']:
+        with open(args['<batch_file>']) as batch_file:
+            batch_runner = BatchRunner(batch_file)
+        batch_runner.runAll()
+        return 0
 
     with warnings.catch_warnings():
         warnings.simplefilter(args['-W'])
@@ -188,11 +199,9 @@ def main(argv=None):
             console.error(e)
             if args["--traceback"]:
                traceback.print_exc()
-            looter.__del__()
             return 1
 
         except KeyboardInterrupt:
-            looter.__del__()
             return 1
 
         else:
