@@ -207,7 +207,6 @@ class InstaLooter(object):
                 data=login_post, allow_redirects=True) as login:
 
             self.session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
-            self.csrftoken = login.cookies['csrftoken']
             # save_cookies(self.session, 'cookies.txt')
             if not login.status_code == 200:
                 raise SystemError("Login error: check your connection")
@@ -224,9 +223,10 @@ class InstaLooter(object):
 
             Code taken from LevPasha/instabot.py
         """
-        logout_post = {'csrfmiddlewaretoken': self.csrftoken}
-        with self.session.post(self.URL_LOGOUT, data=logout_post):
-            self.csrftoken = None
+        logout_post = {'csrfmiddlewaretoken': self.session.cookies._cookies.get(
+            "www.instagram.com", {"/":{}})["/"].get("sessionid") is not None
+        }
+        self.session.post(self.URL_LOGOUT, data=logout_post)
         if os.path.isfile(self.COOKIE_FILE):
             os.remove(self.COOKIE_FILE)
 

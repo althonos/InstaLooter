@@ -150,7 +150,6 @@ def main(argv=None):
             hues.error('Cookie file not found.')
             return 1
         InstaLooter().logout()
-        looter.logout()
         hues.success('Logged out.')
         return 0
 
