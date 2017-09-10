@@ -53,6 +53,10 @@ Positional Arguments
   the directory in which to download pictures/videos. Optional for
   profile download, will then use current directory.
 
+``batch_file``               
+  the path to the batch file containing batch download instructions
+  (see the online documentation).
+
 
 Options - Credentials:
 ----------------------

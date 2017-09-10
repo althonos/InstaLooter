@@ -15,9 +15,10 @@ See more details about one of the following topics:
 .. toctree::
    :maxdepth: 1
 
-   Installation <install.rst>
-   Usage <usage>
-   Examples <examples>
+   Installation <install>
+   Command-line Usage <usage>
+   Batch mode <batch>
+   Library Examples <examples>
    API Reference <api>
 
 
