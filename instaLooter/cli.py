@@ -5,9 +5,9 @@ instaLooter - Another API-less Instagram pictures and videos downloader
 
 Usage:
     instaLooter batch <batch_file>
-    instaLooter hashtag <hashtag> [<directory>] [options]
-    instaLooter post <post_token> [<directory>] [options]
     instaLooter <profile> [<directory>] [options]
+    instaLooter hashtag <hashtag> <directory> [options]
+    instaLooter post <post_token> <directory> [options]
     instaLooter (-h | --help | --version | --usage)
 
 Arguments:
