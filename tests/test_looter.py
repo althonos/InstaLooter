@@ -163,7 +163,7 @@ class TestUtils(unittest.TestCase):
 
 def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
-    TestDownload.register_tests()
+    TestProfileDownload.register_tests()
     suite.addTests(loader.loadTestsFromTestCase(TestProfileDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestHashtagDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestTemplate))
