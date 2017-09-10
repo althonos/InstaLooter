@@ -4,10 +4,10 @@
 instaLooter - Another API-less Instagram pictures and videos downloader
 
 Usage:
+    instaLooter (login | logout)
     instaLooter batch <batch_file>
     instaLooter <profile> [<directory>] [options]
-    instaLooter hashtag <hashtag> <directory> [options]
-    instaLooter post <post_token> <directory> [options]
+    instaLooter (hashtag <hashtag> | post <post_token>) <directory> [options]
     instaLooter (-h | --help | --version | --usage)
 
 Arguments:
@@ -91,24 +91,41 @@ See more at http://instalooter.readthedocs.io/en/latest/usage.html
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import docopt
 import os
 import sys
 import getpass
-import hues
 import warnings
 import traceback
+
+import six
+import hues
+import docopt
 
 from . import __version__
 from .core import InstaLooter
 from .batch import BatchRunner
 from .utils import get_times_from_cli, console, wrap_warnings
 
-WARNING_ACTIONS = {'error', 'ignore', 'always',
-                   'default', 'module', 'once'}
+WARNING_ACTIONS = {
+    'error', 'ignore', 'always', 'default', 'module', 'once'
+}
+
 
 def usage():
     return next(s for s in __doc__.split("\n\n") if s.startswith("Usage"))
+
+
+def login(looter, args):
+    if args['--username']:
+        username = args['--username']
+        if not looter.is_logged_in():
+            password = args['--password'] or getpass.getpass()
+            looter.login(username, password)
+            if not args['--quiet']:
+                hues.success('Logged in.')
+        elif not args['--quiet']:
+            hues.success("Already logged in.")
+
 
 @wrap_warnings
 def main(argv=None):
@@ -127,6 +144,26 @@ def main(argv=None):
     if argv_positional[0] in ("post", "hashtag") and len(argv_positional) < 3:
         print(usage())
         return 1
+
+    if args['logout']:
+        try:
+            os.remove(InstaLooter.COOKIE_FILE)
+            hues.success('Logged out.')
+            return 0
+        except Exception:
+            hues.error('Cookie file not found.')
+            return 1
+
+    elif args['login']:
+        try:
+            args['--username'] = six.moves.input('Username: ')
+            login(InstaLooter(), args)
+            return 0
+        except ValueError as ve:
+            console.error(ve)
+            if args["--traceback"]:
+               traceback.print_exc()
+            return 1
 
     if args['-W'] not in WARNING_ACTIONS:
         print("Unknown warning action: {}".format(args['-W']))
@@ -158,23 +195,11 @@ def main(argv=None):
         )
 
         try:
-
-            if args['--username']:
-                username = args['--username']
-
-                if not looter.is_logged_in():
-                    password = args['--password'] or getpass.getpass()
-                    looter.login(username, password)
-                    if not args['--quiet']:
-                        hues.success('Logged in.')
-                elif not args['--quiet']:
-                    hues.success("Already logged in.")
-
+            login(looter, args)
             if args['--time']:
                 timeframe = get_times_from_cli(args['--time'])
             else:
                 timeframe = None
-
         except ValueError as ve:
             console.error(ve)
             if args["--traceback"]:
