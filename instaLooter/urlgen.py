@@ -46,4 +46,10 @@ def resizer(size):
 def thumbnail(media):
     """Generates a link to the thumbnail.
     """
-    return media['thumbnail_src']
+    try:
+        return media['thumbnail_src']
+    except KeyError:
+        url_parts = media['display_src'].split('/')
+        url_parts.insert(4, 'c121.0.669.669')
+        url_parts.insert(5, 's640x640')
+        return '/'.join(url_parts)
