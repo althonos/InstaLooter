@@ -17,10 +17,25 @@ class BatchRunner(object):
         self.parser = six.moves.configparser.ConfigParser()
         self.parser.readfp(handle) if six.PY2 else self.parser.read_file(handle)
 
+    def _getboolean(self, section_id, key, default=None):
+        if self.parser.has_option(section_id, key):
+            return self.parser.getboolean(section_id, key)
+        return default
+
+    def _getint(self, section_id, key, default=None):
+        if self.parser.has_option(section_id, key):
+            return self.parser.getint(section_id, key)
+        return default
+
+    def _get(self, section_id, key, default=None):
+        if self.parser.has_option(section_id, key):
+            return self.parser.get(section_id, key)
+        return default
+
     def runAll(self):
         """Run all the jobs specified in the configuration file.
         """
-        for section_id in six.iterkeys(self.parser):
+        for section_id in self.parser.sections():
             self.runJob(section_id)
 
     def runJob(self, section_id):
@@ -30,34 +45,35 @@ class BatchRunner(object):
             KeyError: when the section could not be found.
         """
 
-        section = self.parser[section_id]
+        if not self.parser.has_section(section_id):
+            raise KeyError('section not found: {}'.format(section_id))
 
         for target_name in ('users', 'hashtags'):
-            targets = self.getTargets(section.get(target_name))
+            targets = self.getTargets(self._get(section_id, target_name))
+
             for target, directory in six.iteritems(targets):
                 looter = InstaLooter(
                     directory=os.path.expanduser(directory),
                     profile=target if target_name=='users' else None,
                     hashtag=target if target_name=='hashtags' else None,
-                    add_metadata=section.getboolean('add-metadata', False),
-                    get_videos=section.getboolean('get_videos', False),
-                    videos_only=section.getboolean('videos-only', False),
-                    jobs=section.getint('jobs', 16),
-                    template=section.get('template', '{id}'),
+                    add_metadata=self._getboolean(section_id, 'add-metadata', False),
+                    get_videos=self._getboolean(section_id, 'get_videos', False),
+                    videos_only=self._getboolean(section_id, 'videos-only', False),
+                    jobs=self._getint(section_id, 'jobs', 16),
+                    template=self._get(section_id, 'template', '{id}'),
                 )
 
-                if 'username' in section:
+                if self.parser.has_option(section_id, 'username'):
                     looter.logout()
-                    username = section.get('username')
-                    password = section.get('password') or getpass.getpass(
-                       'Password for "{}": '.format(username)
-                    )
+                    username = self._get(section_id, 'username')
+                    password = self._get(section_id, 'password') or \
+                        getpass.getpass('Password for "{}": '.format(username))
                     looter.login(username, password)
 
                 looter.download(
-                    media_count=section.getint('num-to-dl'),
-                    with_pbar=not section.getboolean('quiet', False),
-                    new_only=section.getboolean('new', False)
+                    media_count=self._getint(section_id, 'num-to-dl'),
+                    with_pbar=not self._getboolean(section_id, 'quiet', False),
+                    new_only=self._getboolean(section_id, 'new', False),
                 )
 
     def getTargets(self, raw_string):
