@@ -19,6 +19,7 @@ See more details about one of the following topics:
    Usage <usage>
    Batch mode <batch>
    Library Examples <examples>
+   Periodic Downloads <cron>
    API Reference <api>
 
 
