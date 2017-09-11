@@ -36,6 +36,11 @@ Download pictures/videos from a single post:
 
    $ instaLooter post <post_token> <directory> [options]
 
+Download pictures/videos in :doc:`batch`:
+
+.. code-block:: console
+
+   $ instaLooter batch <batch_file>
 
 Positional Arguments
 --------------------
@@ -53,13 +58,13 @@ Positional Arguments
   the directory in which to download pictures/videos. Optional for
   profile download, will then use current directory.
 
-``batch_file``               
+``batch_file``
   the path to the batch file containing batch download instructions
-  (see the online documentation).
+  (see the :doc:`batch` page for the format specification).
 
 
-Options - Credentials:
-----------------------
+Options - Credentials
+---------------------
 
 ``-u USER, --username USER``
   The username to connect to Instagram with.
@@ -69,8 +74,8 @@ Options - Credentials:
   if the ``--username`` option was given without the corresponding
   ``--password``).
 
-Options - Files:
-----------------
+Options - Files
+---------------
 
 ``-n NUM, --num-to-dl NUM``
   Maximum number of new files to download
@@ -102,8 +107,8 @@ Options - Files:
   The time limit within which to download pictures and video
   (see :ref:`Time`)
 
-Options - Miscellaneous:
-------------------------
+Options - Miscellaneous
+-----------------------
 
 ``-q, --quiet``
   Do not produce any output

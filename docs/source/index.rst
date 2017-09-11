@@ -16,7 +16,7 @@ See more details about one of the following topics:
    :maxdepth: 1
 
    Installation <install>
-   Command-line Usage <usage>
+   Usage <usage>
    Batch mode <batch>
    Library Examples <examples>
    API Reference <api>
@@ -28,8 +28,8 @@ License |license|
 
 InstaLooter is released under the
 `GNU General Public License v3 <https://choosealicense.com/licenses/gpl-3.0/>`_,
-and is fully open-source. See the actual ``LICENSE`` file distributed
-with the software for a detail of the license.
+and is fully open-source. The ``COPYING`` file distributed with the software
+contains the complete license text.
 
 
 Issues |issues|
