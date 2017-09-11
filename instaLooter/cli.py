@@ -41,6 +41,8 @@ Options - Files:
                                  in the destination directory (faster)
     -m, --add-metadata           Add date and caption metadata to downloaded
                                  pictures (requires PIL/Pillow and piexif)
+    -d, --dump-json              Save metadata to a JSON file next to
+                                 downloaded videos/pictures.
     -t TIME, --time TIME         The time limit within which to download
                                  pictures and video (see *Time*)
 
@@ -188,9 +190,11 @@ def main(argv=None):
         looter = InstaLooter(
             directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
             profile=args['<profile>'],hashtag=args['<hashtag>'],
-            add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
+            add_metadata=args['--add-metadata'],
+            get_videos=args['--get-videos'],
             videos_only=args['--videos-only'], jobs=int(args['--jobs']),
-            template=args['--template']
+            template=args['--template'],
+            dump_json=args['--dump-json'],
         )
 
         try:
@@ -211,7 +215,8 @@ def main(argv=None):
                 media_count = int(args['--num-to-dl']) if args['--num-to-dl'] else None
                 looter.download(
                     media_count=media_count,
-                    with_pbar=not args['--quiet'], timeframe=timeframe,
+                    with_pbar=not args['--quiet'],
+                    timeframe=timeframe,
                     new_only=args['--new'],
                 )
             else:
