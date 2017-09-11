@@ -42,6 +42,14 @@ the current user instead:
    $ pip install instaLooter --user
 
 
+If you want to use the *exif* metadata features, install the ``metadata`` extras
+as well:
+
+.. code-block:: console
+
+   $ pip install instaLooter[metadata] --user
+
+
 GitHub |build|
 --------------
 
@@ -53,33 +61,21 @@ clone the remote repository and install instaLooter from source:
    $ git clone https://github.com/althonos/InstaLooter
    $ cd InstaLooter
 
-Then use ``pip`` to install the requirements (requires admin rights, or use
-with ``--user`` flag like shown before):
-
-.. code-block:: console
-
-  # pip install -r requirements.txt
-
-Or, if you also want the feature of adding Exif metadata to the downloaded
-files, type:
-
-.. code-block:: console
-
-  # pip install -r requirements-metadata.txt
-
-Once the dependencies are installed, either use the module in-place:
-
-.. code-block:: console
-
-  $ python -m instaLooter ...
-
-Or install it to have access to the ``instaLooter`` command everywhere:
+Then use pip to install the local version of the program and all the required
+dependencies:
 
 .. code-block:: console
 
   # pip install .
 
+To install development dependencies (to test the program and/or build the
+documentation), use the *test* and/or *doc* extras:
 
+.. code-block:: console
+
+  $ pip install --user ".[test]"    # install only test dependencies
+  $ pip install --user ".[doc]"     # install only doc dependencies
+  $ pip install --user ".[alldev]"  # install all dev dependencies
 
 
 .. |pypi| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
