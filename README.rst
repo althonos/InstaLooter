@@ -107,16 +107,20 @@ Examples
 --------
 
 Download all pictures from the *instagram* profile in the current directory::
+
     $ instaLooter instagram
 
 Download the latest 20 pictures or videos tagged with *python* to */tmp*::
+
     $ instaLooter hashtag python /tmp -n 20 -v -c MYLOGIN
 
 Download a single post from an url in the current directory::
+
     $ instaLooter post "https://www.instagram.com/p/BFB6znLg5s1/" .
 
-Use a configuration file to download from several account using custom parameters
+Use a configuration file to download from several account using custom parameters 
 (see `Batch mode <http://instalooter.readthedocs.io/en/latest/batch.html>`_)::
+
     $ instaLooter batch /path/to/a/config/file.ini
 
 See more on the `Usage page <http://instalooter.readthedocs.io/en/latest/usage.html>`_
