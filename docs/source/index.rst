@@ -58,7 +58,7 @@ Indices and tables
 * :ref:`search`
 
 
-.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600&style=flat-square
+.. |repo| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/althonos/InstaLooter
 
 .. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square

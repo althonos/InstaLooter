@@ -13,7 +13,7 @@ developed by `@akurtovic <https://github.com/akurtovic>`_.
 .. |Starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star&maxAge=3600
    :target: https://github.com/althonos/InstaLooter
 
-.. |repo| image:: https://img.shields.io/badge/source-GitHub-blue.svg?maxAge=3600&style=flat-square
+.. |repo| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/althonos/InstaLooter
 
 .. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
@@ -142,25 +142,25 @@ of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.
 .. |PyPI hues| image:: https://img.shields.io/pypi/v/hues.svg?maxAge=3600&style=flat-square
    :target: https://pypi.python.org/pypi/hues/
 
-.. |Source requests| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
+.. |Source requests| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/kennethreitz/requests
 
-.. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
+.. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/docopt/docopt
 
-.. |Source dateutil| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
+.. |Source dateutil| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/dateutil/dateutil/
 
 .. |Source BeautifulSoup| image:: https://img.shields.io/badge/source-Launchpad-orange.svg?maxAge=3600&style=flat-square
    :target: https://launchpad.net/beautifulsoup
 
-.. |Source six| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
+.. |Source six| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/benjaminp/six
 
-.. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
+.. |Source progressbar2| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/WoLpH/python-progressbar
 
-.. |Source hues| image:: https://img.shields.io/badge/source-GitHub-green.svg?maxAge=3600&style=flat-square
+.. |Source hues| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
    :target: https://github.com/prashnts/hues
 
 .. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?maxAge=3600&style=flat-square
