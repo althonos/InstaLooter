@@ -21,13 +21,10 @@ before_install:
   - pip install -U pip wheel setuptools
 
 install:
-  - pip install -r requirements-test.txt
-  - pip install .
+  - pip install -e .[test]
 
 script:
-  - coverage run --source=instaLooter -m unittest discover -v
-  - coverage combine
-  - coverage xml
+  - green
 
 after_success:
   - codecov

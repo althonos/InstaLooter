@@ -1,5 +1,0 @@
--r requirements-metadata.txt
-
-coverage
-codecov
-codacy-coverage
