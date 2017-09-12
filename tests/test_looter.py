@@ -6,17 +6,28 @@ import os
 import re
 import sys
 import glob
+import json
 import shutil
 import tempfile
 import unittest
 import warnings
 import operator
-import PIL.Image
+import itertools
 
 import instaLooter
 
 
-class TestProfileDownload(unittest.TestCase):
+
+class _TempTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
+
+class TestProfileDownload(_TempTestCase):
 
     MOST_POPULAR = [
         'instagram', 'selenagomez', 'taylorswift',
@@ -26,15 +37,8 @@ class TestProfileDownload(unittest.TestCase):
 
     MEDIA_COUNT = 30
 
-    def setUp(self):
-        self.tmpdir = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.tmpdir)
-
     @classmethod
     def register_tests(cls):
-
         for profile in cls.MOST_POPULAR:
             cls._register_test(profile)
 
@@ -57,15 +61,9 @@ class TestProfileDownload(unittest.TestCase):
         setattr(cls, "test_{}".format(profile), _test)
 
 
-class TestHashtagDownload(unittest.TestCase):
+class TestHashtagDownload(_TempTestCase):
 
     MEDIA_COUNT = 30
-
-    def setUp(self):
-        self.tmpdir = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.tmpdir)
 
     def test_hashtag_download(self):
         looter = instaLooter.InstaLooter(self.tmpdir, hashtag="python", get_videos=True)
@@ -73,15 +71,9 @@ class TestHashtagDownload(unittest.TestCase):
         self.assertEqual(len(os.listdir(self.tmpdir)), self.MEDIA_COUNT)
 
 
-class TestTemplate(unittest.TestCase):
+class TestTemplate(_TempTestCase):
 
     MEDIA_COUNT = 30
-
-    def setUp(self):
-        self.tmpdir = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.tmpdir)
 
     def test_template_1(self):
         profile = "therock"
@@ -94,16 +86,106 @@ class TestTemplate(unittest.TestCase):
             self.assertTrue(f.startswith(profile))
 
 
-class TestUtils(unittest.TestCase):
+class TestDump(_TempTestCase):
+
+    def assertMediaEqual(self, media, dump):
+        for key in ['__typename', 'date', 'dimensions', 'display_src',
+                    'is_video', 'media_preview']:
+            self.assertEqual(media[key], dump[key])
+
+        self.assertEqual(
+            media.get('code') or media['shortcode'],
+            dump.get('code' or dump['shortcode'])
+        )
+        self.assertEqual(
+            media['owner']['id'],
+            dump['owner']['id']
+        )
+        self.assertIn('likes', dump)
+        self.assertIn('comments', dump)
+
+    def test_dump_json(self):
+        looter = instaLooter.InstaLooter(
+            self.tmpdir,
+            profile="instagram",
+            dump_json=True,
+        )
+        test_medias = list(itertools.islice(
+            (m for m in looter.medias() if not m['is_video']), 3))
+        looter.download(media_count=3)
+
+        # Check all files were downloaded as expected
+        self.assertEqual(
+            sorted(os.listdir(self.tmpdir)),
+            sorted(f for media in test_medias for f in (
+                str("{}.jpg").format(media['id']),
+                str("{}.json").format(media['id']),
+            ))
+        )
+
+        # Check the metadata are OK
+        for media in test_medias:
+            with open(os.path.join(self.tmpdir, "{}.json").format(media['id'])) as f:
+                dump = json.load(f)
+            self.assertMediaEqual(media, dump)
+
+    def test_dump_only(self):
+        looter = instaLooter.InstaLooter(
+            self.tmpdir,
+            profile="instagram",
+            dump_only=True,
+        )
+        test_medias = list(itertools.islice(
+            (m for m in looter.medias() if not m['is_video']), 3))
+        looter.download(media_count=3)
+
+        # Check all files were downloaded as expected
+        self.assertEqual(
+            sorted(os.listdir(self.tmpdir)),
+            sorted(str("{}.json").format(media['id']) for media in test_medias)
+        )
+
+        # Check the metadata are OK
+        for media in test_medias:
+            with open(os.path.join(self.tmpdir, "{}.json").format(media['id'])) as f:
+                dump = json.load(f)
+            self.assertMediaEqual(media, dump)
+
+    def test_extended_dump(self):
+        looter = instaLooter.InstaLooter(
+            self.tmpdir,
+            profile="instagram",
+            dump_only=True,
+            extended_dump=True,
+        )
+        test_medias = list(itertools.islice(
+            (m for m in looter.medias() if not m['is_video']), 3))
+        looter.download(media_count=3)
+
+        # Check all files were downloaded as expected
+        self.assertEqual(
+            sorted(os.listdir(self.tmpdir)),
+            sorted(str("{}.json").format(media['id']) for media in test_medias)
+        )
+
+        # Check the metadata are OK
+        for media in test_medias:
+            with open(os.path.join(self.tmpdir, "{}.json").format(media['id'])) as f:
+                dump = json.load(f)
+            self.assertMediaEqual(media, dump)
+
+            # Check the dump was "extended"
+            self.assertIn('edge_media_to_comment', dump)
+            self.assertIn('edge_media_to_caption', dump)
+
+
+class TestUtils(_TempTestCase):
 
     MEDIA_COUNT = 30
 
     def setUp(self):
+        super(TestUtils, self).setUp()
         self.looter = instaLooter.InstaLooter()
-        self.tmpdir = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.tmpdir)
 
     def test_extract_post_code_from_url(self):
         url = "https://www.instagram.com/p/BFB6znLg5s1/"
