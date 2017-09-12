@@ -12,7 +12,7 @@ Usage:
 
 Arguments:
     <profile>                    The username of the profile to download
-                                 videos and pictures from
+                                 videos and pictures from.
     <hashtag>                    A hashtag to download pictures and videos
                                  from.
     <post_token>                 Either the url or the code of a single post
@@ -32,24 +32,31 @@ Options - Credentials:
 Options - Files:
     -n NUM, --num-to-dl NUM      Maximum number of new files to download
     -j JOBS, --jobs JOBS         Number of parallel threads to use to
-                                 download files [default: 16]
+                                 download files. [default: 16]
     -T TMPL, --template TMPL     A filename template to use to write the
                                  files (see *Template*). [default: {id}]
-    -v, --get-videos             Get videos as well as photos
-    -V, --videos-only            Get videos only
+    -v, --get-videos             Get videos as well as photos.
+    -V, --videos-only            Get videos only.
     -N, --new                    Only look for files newer than the ones
-                                 in the destination directory (faster)
-    -m, --add-metadata           Add date and caption metadata to downloaded
-                                 pictures (requires PIL/Pillow and piexif)
+                                 in the destination directory (faster).
     -t TIME, --time TIME         The time limit within which to download
-                                 pictures and video (see *Time*)
+                                 pictures and video (see *Time*).
+
+Options - Metadata:
+    -m, --add-metadata           Add date and caption metadata to downloaded
+                                 pictures (requires PIL/Pillow and piexif).
+    -d, --dump-json              Save metadata to a JSON file next to
+                                 downloaded videos/pictures.
+    -D, --dump-only              Save only the metadata and no video / picture.
+    -e, --extended-dump          Always dump the maximum amount of extracted
+                                 information, at the cost of more time.
 
 Options - Miscellaneous:
-    -q, --quiet                  Do not produce any output
-    -h, --help                   Display this message and quit
-    --version                    Show program version and quit
+    -q, --quiet                  Do not produce any output.
+    -h, --help                   Display this message and quit.
+    --version                    Show program version and quit.
     --traceback                  Print error traceback if any (debug).
-    -W WARNINGCTL                Change warning behaviour (same as python -W)
+    -W WARNINGCTL                Change warning behaviour (same as python -W).
                                  [default: default]
 
 Template:
@@ -188,9 +195,13 @@ def main(argv=None):
         looter = InstaLooter(
             directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
             profile=args['<profile>'],hashtag=args['<hashtag>'],
-            add_metadata=args['--add-metadata'], get_videos=args['--get-videos'],
+            add_metadata=args['--add-metadata'],
+            get_videos=args['--get-videos'],
             videos_only=args['--videos-only'], jobs=int(args['--jobs']),
-            template=args['--template']
+            template=args['--template'],
+            dump_json=args['--dump-json'],
+            dump_only=args['--dump-only'],
+            extended_dump=args['--extended-dump'],
         )
 
         try:
@@ -211,7 +222,8 @@ def main(argv=None):
                 media_count = int(args['--num-to-dl']) if args['--num-to-dl'] else None
                 looter.download(
                     media_count=media_count,
-                    with_pbar=not args['--quiet'], timeframe=timeframe,
+                    with_pbar=not args['--quiet'],
+                    timeframe=timeframe,
                     new_only=args['--new'],
                 )
             else:

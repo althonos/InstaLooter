@@ -72,7 +72,12 @@ Each section can be given the same parameters as the command line:
   set to *True* to only download new medias
 ``num-to-dl``
   the number of images to download
-
+``dump-jon``
+  set to *True* to dump metadata in JSON format
+``dump-only``
+  set to *True* to only dump metadata, not downloading anything.
+``extended-dump``
+  set to *True* to fetch additional information when dumping metadata.
 
 For instance, to download 3 new videos from ``#funny`` and ``#nsfw``:
 

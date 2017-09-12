@@ -66,7 +66,8 @@ class InstaLooter(object):
 
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
-                jobs=16, template="{id}", url_generator=default):
+                jobs=16, template="{id}", url_generator=default,
+                dump_json=False, dump_only=False, extended_dump=False):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -92,6 +93,14 @@ class InstaLooter(object):
                 dictionnary as argument and returs the URL it should
                 download the picture from. The default tries to get
                 the best available size. **[default: `urlgen.default`]**
+            dump_json (`bool`): Save each resource metadata to a
+                JSON file next to the actual image/video. **[default: False]**
+            dump_only (`bool`): Only save metadata and discard the actual
+                resource. **[default: False]**
+            extended_dump (`bool`): Attempt to fetch as much metadata as
+                possible, at the cost of more time. Set to `True` if, for
+                instance, you always want the top comments to be downloaded
+                in the dump. **[default: False]**
         """
         if profile is not None and hashtag is not None:
             raise ValueError("Give only a profile or an hashtag, not both !")
@@ -124,6 +133,9 @@ class InstaLooter(object):
         self.add_metadata = add_metadata
         self.get_videos = get_videos or videos_only
         self.videos_only = videos_only
+        self.dump_json = dump_json or dump_only
+        self.dump_only = dump_only
+        self.extended_dump = extended_dump
         self.jobs = jobs
 
         self.session = requests.Session()
@@ -400,8 +412,8 @@ class InstaLooter(object):
         """Download all the medias from provided target.
 
         This method follwows the parameters given in the :obj:`__init__`
-        method (profile or hashtag, directory, get_videos, videos_only
-        and add_metadata).
+        method (profile or hashtag, directory, get_videos, videos_only,
+        add_metadata and dump_json).
 
         Keyword Arguments:
             media_count (`int`): how many media to download before
@@ -473,11 +485,6 @@ class InstaLooter(object):
 
         self._poison_workers()
         self._join_workers()
-        if self.add_metadata and not media['is_video']:
-            self._add_metadata(
-                os.path.join(self.directory, self._make_filename(media)),
-                media
-            )
 
     def get_metadata(self):
         if self._page_name == 'TagPage':
@@ -534,6 +541,8 @@ class InstaLooter(object):
             return self._add_sidecars_to_queue(
                 media, condition, media_count, medias_queued, new_only)
         elif condition(media):
+            if self.extended_dump:
+                media = self.get_post_info(media.get('shortcode') or media['code'])
             media_basename = self._make_filename(media)
             if not os.path.exists(os.path.join(self.directory, media_basename)):
                 medias_queued += 1
