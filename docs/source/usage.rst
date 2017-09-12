@@ -97,15 +97,30 @@ Options - Files
   Only look for files newer than the ones in the destination directory
   (faster).
 
+``-t TIME, --time TIME``
+  The time limit within which to download pictures and video
+  (see :ref:`Time`)
+
+
+Options - Metadata
+------------------
+
+``-d, --dump-json``
+  Save metadata to a JSON file next to downloaded videos and pictures.
+
 ``-m, --add-metadata``
   Add date and caption metadata to downloaded pictures (requires
   `PIL <http://www.pythonware.com/products/pil/>`_ or
   `Pillow <https://python-pillow.org/>`_ as well as
   `piexif <https://pypi.python.org/pypi/piexif>`_).
 
-``-t TIME, --time TIME``
-  The time limit within which to download pictures and video
-  (see :ref:`Time`)
+``-D, --dump-only``
+  Save only the metadata and no video / picture.
+
+``-e, --extended-dump``
+  Always dump the maximum amount of extractable information, at the cost
+  of more time.
+
 
 Options - Miscellaneous
 -----------------------

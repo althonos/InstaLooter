@@ -39,6 +39,10 @@ Options - Files:
     -V, --videos-only            Get videos only.
     -N, --new                    Only look for files newer than the ones
                                  in the destination directory (faster).
+    -t TIME, --time TIME         The time limit within which to download
+                                 pictures and video (see *Time*).
+
+Options - Metadata:
     -m, --add-metadata           Add date and caption metadata to downloaded
                                  pictures (requires PIL/Pillow and piexif).
     -d, --dump-json              Save metadata to a JSON file next to
@@ -46,8 +50,6 @@ Options - Files:
     -D, --dump-only              Save only the metadata and no video / picture.
     -e, --extended-dump          Always dump the maximum amount of extracted
                                  information, at the cost of more time.
-    -t TIME, --time TIME         The time limit within which to download
-                                 pictures and video (see *Time*).
 
 Options - Miscellaneous:
     -q, --quiet                  Do not produce any output.
