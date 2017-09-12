@@ -7,41 +7,40 @@ python:
 - '3.4'
 - '3.5'
 - '3.6'
-- 'pypy'
-- 'pypy-5.4.1'
-
+- pypy
+- pypy-5.4.1
 matrix:
   allow_failures:
   - python: '3.3'
   - python: '3.4'
-  - python: 'pypy'
-  - python: 'pypy-5.4.1'
+  - python: pypy
+  - python: pypy-5.4.1
 
 before_install:
-  - pip install -U pip wheel setuptools
+- pip install -U pip wheel setuptools
 
 install:
-  - pip install -e .[test]
+- pip install -e .[test]
 
 script:
-  - green
+- green
 
 after_success:
-  - codecov
-  - python-codacy-coverage -r coverage.xml
+- codecov
+- python-codacy-coverage -r coverage.xml
 
 deploy:
-  - provider: pypi
-    user: althonos
-    password:
-      secure: tOxmKL2WfIajsSao4rVau9xLehIqfpKOm9SCwUlGREJas/D+yFYcltdamVa/kpc2PgHcmQBJxkZzEEDsAiZunm/435qWR2T01B2zB00JdtfWvnoCWEEzg/SEsy/0yS6m666P3vbdSvtfHByaavzPf5RE3ooBwsbKt3OKgS3fs91zFZwJZU6zATpBC6pzwhbt6PZeYzmZnk2AkRl8O2abPh8iHz1DGxJ3baY3ObG289W5Dp9a3sr9PVkXvLCMe04JeORTlPt43hnAy6PpnN8FSgKKLdTiMeqRcctZdH8Y90EIW8nWWoqaokNVLepxDDtf3ouy57DNyZu1FNZDlsQd7aYyUrydy7UIrMa33L7ai0hRcvKQI1ymRbO3W4opOPDcORulvYGUNLeVU886lvuLavlJ+otZClRBPV3EuO0k2eslAvwiTF8DBjB9HPuF3ZtkBgnDH7ubU1hoMi6MQvbjVThI0J7uyTVNmnS8r9/Yv02TsTl+IBHzhE3Sb8z2ZNF/Ip5UU5rbcmmvA/euShL2A+Eb0hhe/Fen3fVROl/cwcGIbkEXTurzc5xfyoLs76VOxr+HvYqA4DzxvDwhhvQSk0PTymO5T5WRj4PYbmkHeevVCsH8unva27u1CeKhVYIrWyvXwDhIK11mLzWKT2SAEVypil8YUcQpROR8vJP2yA4=
-    distributions: sdist bdist_wheel
-    on:
-      python: '3.6'
-      tags: true
-      repo: althonos/InstaLooter
-    server: https://upload.pypi.org/legacy/
-    skip_upload_docs: true
+  provider: pypi
+  distributions: sdist bdist_wheel
+  on:
+    python: '3.6'
+    tags: true
+    repo: althonos/InstaLooter
+  server: https://upload.pypi.org/legacy/
+  skip_upload_docs: true
+  user: althonos
+  password:
+    secure: ExaoUT+/7v8VJp/vsllDm9AsO3/6s7Nka5rf+0TVz8Z7pZ+azFXK5hZmQ6nTtvSRYpZCfGH8ecYLbE0ek02BFqLc25/VfMfPao+6eUh1v3MGvHxH9ml+/9aCwWIv5C/T5dGURVj0udXxXuuTsdJwzxrb+K9taVZSjBbk6Ti8Fdu8yRMhOvI4xoiG69tunk6IXnOZjDCQix8O3Cn0OfA/zeD0IX1n8SVlKwsS+dOgFAJCujP865VuUh+2kM63Xx3OEb3caBGc1HXaVxNRXdhGykFeWrT4Mzrzd0T458Odc3S+DJG+2WVZbNC+chGAUBMq77z8JVirdWzydhdnhzi0DNZohRO0itstz53DuyqAtyTZ04xLO3+06svU5grdwilZGwy2KNZ1S1wTRlUgpxBhRL6dwHEAfaq4JlKlijEJJnFBMq2O2TKB/h+CdIALfWKSRNfOUm2GdG4ZwZOOLczbe4ATYoxGsqGP/lqnH2/iCrJFtoYmdFR8QZxJtNNwcNvVLT3MNx7eze7OpGgHWQjJq/m5hHoKJx6yW6U5XiRSt5gEowiq7vNrdwHSDRLe5CZJVndkiwelQQN5womKtWHFb1w9DRgBFj0ZscgJuxrsRl9uLfqcLB77tyS9q4BpQKsMIDw0P2bVI/P50KUsG0OUjHkstxS4nl9DLsxVPb+NmiA=
 
 notifications:
   email:
