@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 __author__ = "althonos"
 __author_email__ = "martin.larralde@ens-cachan.fr"
-__version__ = "0.12.0"
+__version__ = "0.13.0"
 __license___ = "GPL-3+"
 
 try:

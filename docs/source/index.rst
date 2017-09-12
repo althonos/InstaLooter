@@ -49,6 +49,7 @@ Special thanks to the following contributors:
   * `Mohaned Magdy <https://github.com/mohan3d>`_
   * `Daniel Lee Harple <https://github.com/dlh>`_
   * `Bryan Massoth <https://github.com/bmass02>`_
+  * `AndCycle <https://github.com/AndCycle>`_
 
 
 Indices and tables
