@@ -35,6 +35,16 @@ class TestCLI(unittest.TestCase):
     def test_dump_json(self):
         instaLooter.main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '--dump-json'])
         self.assertIn("1308972728853756295.json", os.listdir(self.tmpdir))
+        self.assertIn("1308972728853756295.jpg", os.listdir(self.tmpdir))
+        with open(os.path.join(self.tmpdir, "1308972728853756295.json")) as fp:
+            json_metadata = json.load(fp)
+        self.assertEqual("1308972728853756295", json_metadata["id"])
+        self.assertEqual("BIqZ8L8AHmH", json_metadata["code"])
+
+    def test_dump_only(self):
+        instaLooter.main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '--dump-json'])
+        self.assertIn("1308972728853756295.json", os.listdir(self.tmpdir))
+        self.assertNotIn("1308972728853756295.jpg", os.listdir(self.tmpdir))
         with open(os.path.join(self.tmpdir, "1308972728853756295.json")) as fp:
             json_metadata = json.load(fp)
         self.assertEqual("1308972728853756295", json_metadata["id"])
