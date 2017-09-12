@@ -44,6 +44,8 @@ Options - Files:
     -d, --dump-json              Save metadata to a JSON file next to
                                  downloaded videos/pictures.
     -D, --dump-only              Save only the metadata and no video / picture.
+    -e, --extended-dump          Always dump the maximum amount of extracted
+                                 information, at the cost of more time.
     -t TIME, --time TIME         The time limit within which to download
                                  pictures and video (see *Time*).
 
@@ -197,6 +199,7 @@ def main(argv=None):
             template=args['--template'],
             dump_json=args['--dump-json'],
             dump_only=args['--dump-only'],
+            extended_dump=args['--extended-dump'],
         )
 
         try:

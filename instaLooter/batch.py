@@ -56,13 +56,18 @@ class BatchRunner(object):
                     directory=os.path.expanduser(directory),
                     profile=target if target_name=='users' else None,
                     hashtag=target if target_name=='hashtags' else None,
-                    add_metadata=self._getboolean(section_id, 'add-metadata', False),
-                    get_videos=self._getboolean(section_id, 'get-videos', False),
-                    videos_only=self._getboolean(section_id, 'videos-only', False),
+                    add_metadata=\
+                        self._getboolean(section_id, 'add-metadata', False),
+                    get_videos=\
+                        self._getboolean(section_id, 'get-videos', False),
+                    videos_only=\
+                        self._getboolean(section_id, 'videos-only', False),
                     jobs=self._getint(section_id, 'jobs', 16),
                     template=self._get(section_id, 'template', '{id}'),
                     dump_json=self._getboolean(section_id, 'dump-json', False),
                     dump_only=self._getboolean(section_id, 'dump-only', False),
+                    extended_dump=\
+                        self._getboolean(section_id, 'extended-dump', False),
                 )
 
                 if self.parser.has_option(section_id, 'username'):
