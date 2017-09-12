@@ -67,7 +67,7 @@ class InstaLooter(object):
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
                 jobs=16, template="{id}", url_generator=default,
-                dump_json=False):
+                dump_json=False, dump_only=False):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -79,7 +79,6 @@ class InstaLooter(object):
                 **[default: None]**
             add_metadata (`bool`): Add date and comment metadata to
                 the downloaded pictures. **[default: False]**
-            save_metadata (`bool`): Save metadata to JSON. **[default: False]**
             get_videos (`bool`): Also get the videos from the given
                 target **[default: False]**
             videos_only (`bool`): Only download videos (implies
@@ -94,6 +93,10 @@ class InstaLooter(object):
                 dictionnary as argument and returs the URL it should
                 download the picture from. The default tries to get
                 the best available size. **[default: `urlgen.default`]**
+            dump_json (`bool`): Save each resource metadata to a
+                JSON file next to the actual image/video. **[default: False]**
+            dump_only (`bool`): Only save metadata and discard the actual
+                resource. **[default: False]**
         """
         if profile is not None and hashtag is not None:
             raise ValueError("Give only a profile or an hashtag, not both !")
@@ -124,9 +127,10 @@ class InstaLooter(object):
 
         self.directory = directory
         self.add_metadata = add_metadata
-        self.dump_json = dump_json
         self.get_videos = get_videos or videos_only
         self.videos_only = videos_only
+        self.dump_json = dump_json or dump_only
+        self.dump_only = dump_only
         self.jobs = jobs
 
         self.session = requests.Session()

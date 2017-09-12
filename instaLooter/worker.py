@@ -29,13 +29,13 @@ class InstaDownloader(threading.Thread):
         self.directory = owner.directory
         self.add_metadata = owner.add_metadata
         self.dump_json = owner.dump_json
+        self.dump_only = owner.dump_only
         self.owner = owner
         self.session = requests.Session()
         self.session.cookies = self.owner.session.cookies
         self._killed = False
 
     def run(self):
-
         while not self._killed:
             try:
                 media = self.medias.get(timeout=1)
@@ -49,7 +49,6 @@ class InstaDownloader(threading.Thread):
                     self.owner.dl_count += 1
             except six.moves.queue.Empty:
                 pass
-
 
     def _add_metadata(self, path, metadata):
         """Add some metadata to the picture located at `path`.
@@ -88,12 +87,12 @@ class InstaDownloader(threading.Thread):
 
     @staticmethod
     def _save_metadata(path, metadata):
-        """ save metadata to JSON file """
-        # replace .jpg / .mp4 extension with .json path
+        """Save metadata in a JSON file named like the resource.
+        """
+        # replace .jpg / .mp4 extension with .json
         path = re.sub('\..{3}$', '.json', path)
         with open(path, 'w') as fp:
             json.dump(metadata, fp, indent=4, sort_keys=True)
-
 
     def _download_photo(self, media):
         """Download a picture from a media dictionnary.
@@ -106,7 +105,8 @@ class InstaDownloader(threading.Thread):
         photo_name = os.path.join(self.directory, self.owner._make_filename(media))
 
         # save full-resolution photo
-        self._dl(photo_url, photo_name)
+        if not self.dump_only:
+            self._dl(photo_url, photo_name)
 
         # put info from Instagram post into image metadata
         if self.add_metadata:
@@ -114,7 +114,6 @@ class InstaDownloader(threading.Thread):
 
         if self.dump_json:
             self._save_metadata(photo_name, media)
-
 
     def _download_video(self, media):
         """Download a video from a media dictionnary.
@@ -133,7 +132,8 @@ class InstaDownloader(threading.Thread):
         video_name = os.path.join(self.directory, self.owner._make_filename(data))
 
         # save video
-        self._dl(video_url, video_name)
+        if not self.dump_only:
+            self._dl(video_url, video_name)
 
         if self.dump_json:
             self._save_metadata(video_name, media)
