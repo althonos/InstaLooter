@@ -22,7 +22,6 @@ import sys
 sys.path.insert(0, os.path.abspath('../..'))
 
 import instaLooter
-from instaLooter import InstaLooter
 
 # -- General configuration ------------------------------------------------
 
