@@ -23,6 +23,26 @@ except ImportError:
 
 class InstaDownloader(threading.Thread):
 
+    @staticmethod
+    def _save_metadata(path, metadata):
+        """Save metadata in a JSON file named like the resource.
+        """
+        # replace .jpg / .mp4 extension with .json
+        path = re.sub('\..{3}$', '.json', path)
+        with open(path, 'w') as fp:
+            json.dump(metadata, fp, indent=4, sort_keys=True)
+
+    @staticmethod
+    def _get_caption(metadata):
+        try:
+            return metadata['caption']
+        except KeyError:
+            pass
+        try:
+            return metadata['edge_media_to_caption']['edges'][0]['node']['text']
+        except KeyError:
+            return ''
+
     def __init__(self, owner):
         super(InstaDownloader, self).__init__()
         self.medias = owner._medias_queue
@@ -79,20 +99,13 @@ class InstaDownloader(threading.Thread):
                 piexif.ExifIFD.DateTimeOriginal: \
                     datetime.datetime.fromtimestamp(metadata['date']).isoformat(),
                 piexif.ExifIFD.UserComment: \
-                    metadata.get('caption', '').encode('utf-8'),
+                    self._get_caption(metadata).encode('utf-8'),
             }
+
+            print(exif_dict)
 
             with PIL.Image.open(path) as img:
                 img.save(path, exif=piexif.dump(exif_dict))
-
-    @staticmethod
-    def _save_metadata(path, metadata):
-        """Save metadata in a JSON file named like the resource.
-        """
-        # replace .jpg / .mp4 extension with .json
-        path = re.sub('\..{3}$', '.json', path)
-        with open(path, 'w') as fp:
-            json.dump(metadata, fp, indent=4, sort_keys=True)
 
     def _download_photo(self, media):
         """Download a picture from a media dictionnary.

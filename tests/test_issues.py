@@ -295,6 +295,20 @@ class TestResolvedIssues(unittest.TestCase):
             u"Profile raphaelbernardino is private, retry after logging in."
         )
 
+    def test_issue_94(self):
+        """
+        Thanks to @jeanmarctst for raising this issue.
+
+        Make sure caption is properly extracted from images downloaded
+        from a post code and written to the metadata.
+        """
+        looter = instaLooter.InstaLooter(
+            self.tmpdir, add_metadata=True, template='{code}')
+        looter.download_post('BY77tSfBnRm')
+        metadata = piexif.load(
+            os.path.join(self.tmpdir, 'BY77tSfBnRm.jpg'), True)
+        self.assertTrue(metadata['Exif']['UserComment'])
+
 
 def setUpModule():
    warnings.simplefilter('ignore')
