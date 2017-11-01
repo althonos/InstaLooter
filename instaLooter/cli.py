@@ -58,6 +58,8 @@ Options - Miscellaneous:
     --traceback                  Print error traceback if any (debug).
     -W WARNINGCTL                Change warning behaviour (same as python -W).
                                  [default: default]
+    --try-count NUM, -c NUM      Do the login process NUM times
+                                 [default: 3]
 
 Template:
     The default filename of the pictures and videos on Instagram doesn't show
@@ -161,15 +163,19 @@ def main(argv=None):
         return 0
 
     elif args['login']:
-        try:
-            args['--username'] = six.moves.input('Username: ')
-            login(InstaLooter(), args)
-            return 0
-        except ValueError as ve:
-            console.error(ve)
-            if args["--traceback"]:
-               traceback.print_exc()
-            return 1
+        for i in range(int(args['--try-count'])):
+            try:
+                args['--username'] = six.moves.input('Username: ')
+                login(InstaLooter(), args)
+                return 0
+            except ValueError as ve:
+                if i != int(args['--try-count']) - 1:
+                    console.warn('Wrong Username or Password')
+                    continue
+                console.error(str(ve) + ', the number of tries exceeded')
+                if args["--traceback"]:
+                   traceback.print_exc()
+                return 1
 
     if args['-W'] not in WARNING_ACTIONS:
         print("Unknown warning action: {}".format(args['-W']))
@@ -204,17 +210,36 @@ def main(argv=None):
             extended_dump=args['--extended-dump'],
         )
 
-        try:
-            login(looter, args)
-            if args['--time']:
-                timeframe = get_times_from_cli(args['--time'])
-            else:
-                timeframe = None
-        except ValueError as ve:
-            console.error(ve)
-            if args["--traceback"]:
-               traceback.print_exc()
-            return 1
+        userEntered = False
+        passEntered = False
+        if args['--username'] != None:
+            userEntered = True
+        if args['--password'] != None:
+            passEntered = True
+        if userEntered and passEntered:
+            args['--try-count'] = 1
+
+        for i in range(int(args['--try-count'])):
+            try:
+                if not userEntered:
+                    args['--username'] = six.moves.input('Username: ')
+                login(looter, args)
+                if args['--time']:
+                    timeframe = get_times_from_cli(args['--time'])
+                else:
+                    timeframe = None
+            except ValueError as ve:
+                if i != int(args['--try-count']) - 1:
+                    console.warn('Wrong Username or Password')
+                    continue
+
+                if userEntered and passEntered:
+                    console.error(str(ve))
+                else:
+                    console.error(str(ve) + ', the number of tries exceeded')
+                if args["--traceback"]:
+                   traceback.print_exc()
+                return 1
 
         try:
             post_token = args['<post_token>']
