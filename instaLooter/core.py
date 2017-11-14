@@ -90,7 +90,7 @@ class InstaLooter(object):
                 format. See the the Template page of the documentation
                 for available keys. **[default: {id}]
             url_generator (`function`): a callable that takes a media
-                dictionnary as argument and returs the URL it should
+                dictionary as argument and returs the URL it should
                 download the picture from. The default tries to get
                 the best available size. **[default: `urlgen.default`]**
             dump_json (`bool`): Save each resource metadata to a
