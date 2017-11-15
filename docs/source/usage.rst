@@ -147,7 +147,7 @@ Template
 --------
 
 The default filename of the pictures and videos on Instagram doesn't show
-anything about the file you just downloaded. But using the ``-t`` argument
+anything about the file you just downloaded. But using the ``-T`` argument
 allows you to give instaLooter a filename template, using the following
 format with brackets-enclosed (``{}``) variable names among:
 
