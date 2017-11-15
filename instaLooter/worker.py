@@ -108,7 +108,7 @@ class InstaDownloader(threading.Thread):
                 img.save(path, exif=piexif.dump(exif_dict))
 
     def _download_photo(self, media):
-        """Download a picture from a media dictionnary.
+        """Download a picture from a media dictionary.
         """
         photo_url = self.owner.url_generator(media)
 
@@ -129,7 +129,7 @@ class InstaDownloader(threading.Thread):
             self._save_metadata(photo_name, media)
 
     def _download_video(self, media):
-        """Download a video from a media dictionnary.
+        """Download a video from a media dictionary.
         """
         url = "https://www.instagram.com/p/{}/".format(media.get('shortcode') or media['code'])
 
