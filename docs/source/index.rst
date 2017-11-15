@@ -78,7 +78,7 @@ Indices and tables
 .. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&maxAge=3600&style=flat-square
    :target: https://travis-ci.org/althonos/InstaLooter/
 
-.. |doc| image:: https://readthedocs.org/projects/instalooter/badge/?version=latest&maxAge=3600&style=flat-square
+.. |doc| image:: https://img.shields.io/readthedocs/instalooter.svg?style=flat-square&maxAge=3600
    :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
 
 .. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square&maxAge=3600
