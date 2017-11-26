@@ -109,7 +109,7 @@ class InstaLooter(object):
             raise ValueError("Give a profile or an hashtag or a location, not none !")
 
         if location and not re.match("\d+$", location):
-            raise ValueError("Location is invalid")
+            raise ValueError("Location ID is invalid")
 
         if profile is not None:
             self.target = profile

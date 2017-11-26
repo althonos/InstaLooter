@@ -7,13 +7,15 @@ Usage:
     instaLooter (login | logout)
     instaLooter batch <batch_file>
     instaLooter <profile> [<directory>] [options]
-    instaLooter (hashtag <hashtag> | post <post_token>) <directory> [options]
+    instaLooter (hashtag <hashtag> | location <location> | post <post_token>) <directory> [options]
     instaLooter (-h | --help | --version | --usage)
 
 Arguments:
     <profile>                    The username of the profile to download
                                  videos and pictures from.
     <hashtag>                    A hashtag to download pictures and videos
+                                 from.
+    <hashtag>                    A location ID to download pictures and videos
                                  from.
     <post_token>                 Either the url or the code of a single post
                                  to download the picture or video from.
@@ -148,7 +150,7 @@ def main(argv=None):
         return 1
 
     argv_positional = [param for param in argv if not param.startswith("-")]
-    if argv_positional[0] in ("post", "hashtag") and len(argv_positional) < 3:
+    if argv_positional[0] in ("post", "hashtag", "location") and len(argv_positional) < 3:
         print(usage())
         return 1
 
@@ -194,7 +196,9 @@ def main(argv=None):
 
         looter = InstaLooter(
             directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
-            profile=args['<profile>'],hashtag=args['<hashtag>'],
+            profile=args['<profile>'],
+            hashtag=args['<hashtag>'],
+            location=args['<location>'],
             add_metadata=args['--add-metadata'],
             get_videos=args['--get-videos'],
             videos_only=args['--videos-only'], jobs=int(args['--jobs']),
