@@ -76,6 +76,7 @@ class TestLocationDownload(_TempTestCase):
     MEDIA_COUNT = 30
 
     def test_location_download(self):
+        self.assertRaises(ValueError, instaLooter.InstaLooter(self.tmpdir, location="python", get_videos=True))
         looter = instaLooter.InstaLooter(self.tmpdir, location="212988663", get_videos=True)
         looter.download(media_count=self.MEDIA_COUNT)
         self.assertEqual(len(os.listdir(self.tmpdir)), self.MEDIA_COUNT)
@@ -251,6 +252,13 @@ class TestUtils(_TempTestCase):
         # match (at most as many posts downloaded)
         looter.download()
         self.assertLessEqual(len(os.listdir(self.tmpdir)), hint)
+
+    def test_find_location_info(self):
+        self.assertEqual(len(self.looter.find_location_info("python")), 0)
+        self.assertEqual(len(self.looter.find_location_info("new york")), 1)
+
+        self.assertRaises(ValueError, self.looter.find_location_info("new york", "abc"))
+        self.assertRaises(ValueError, self.looter.find_location_info("new york", 0))
 
 
 def load_tests(loader, tests, pattern):
