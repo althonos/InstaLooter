@@ -71,6 +71,16 @@ class TestHashtagDownload(_TempTestCase):
         self.assertEqual(len(os.listdir(self.tmpdir)), self.MEDIA_COUNT)
 
 
+class TestLocationDownload(_TempTestCase):
+
+    MEDIA_COUNT = 30
+
+    def test_location_download(self):
+        looter = instaLooter.InstaLooter(self.tmpdir, location="212988663", get_videos=True)
+        looter.download(media_count=self.MEDIA_COUNT)
+        self.assertEqual(len(os.listdir(self.tmpdir)), self.MEDIA_COUNT)
+
+
 class TestTemplate(_TempTestCase):
 
     MEDIA_COUNT = 30
