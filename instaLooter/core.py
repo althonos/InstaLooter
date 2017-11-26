@@ -64,7 +64,7 @@ class InstaLooter(object):
 
     _OWNER_MAP = {}
 
-    def __init__(self, directory=None, profile=None, hashtag=None,
+    def __init__(self, directory=None, profile=None, hashtag=None, location=None,
                 add_metadata=False, get_videos=False, videos_only=False,
                 jobs=16, template="{id}", url_generator=default,
                 dump_json=False, dump_only=False, extended_dump=False):
@@ -76,6 +76,8 @@ class InstaLooter(object):
             profile (`str`): a profile to download media from
                 **[default: None]**
             hashtag (`str`): a hashtag to download media from
+                **[default: None]**
+            location (`str`): a location ID to download media from
                 **[default: None]**
             add_metadata (`bool`): Add date and comment metadata to
                 the downloaded pictures. **[default: False]**
@@ -102,8 +104,11 @@ class InstaLooter(object):
                 instance, you always want the top comments to be downloaded
                 in the dump. **[default: False]**
         """
-        if profile is not None and hashtag is not None:
-            raise ValueError("Give only a profile or an hashtag, not both !")
+        if profile is None and hashtag is None and location is None:
+            raise ValueError("Give a profile or an hashtag or a location, not none !")
+
+        if location and not re.match("\d+$", location):
+            raise ValueError("Location is invalid")
 
         if profile is not None:
             self.target = profile
@@ -115,6 +120,11 @@ class InstaLooter(object):
             self._page_name = 'TagPage'
             self._section_name = 'tag'
             self._base_url = "https://www.instagram.com/explore/tags/{}/"
+        elif location is not None:
+            self.target = location
+            self._page_name = 'LocationsPage'
+            self._section_name = 'location'
+            self._base_url = 'https://www.instagram.com/explore/locations/{}/'
         else:
             self.target = None
 
