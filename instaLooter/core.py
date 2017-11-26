@@ -105,8 +105,9 @@ class InstaLooter(object):
                 instance, you always want the top comments to be downloaded
                 in the dump. **[default: False]**
         """
-        if profile is None and hashtag is None and location is None:
-            raise ValueError("Give a profile or an hashtag or a location, not none !")
+        if (profile is not None and hashtag is not None) or (profile is not None and location is not None) or \
+                (hashtag is not None and location is not None):
+            raise ValueError("Give only a profile or an hashtag or a location, not all !")
 
         if location and not re.match("\d+$", location):
             raise ValueError("Location ID is invalid")
