@@ -702,8 +702,7 @@ class InstaLooter(object):
             place_dict = {
                 "id": place["location"]["pk"],
                 "title": place["title"],
-                "subtitle": place["subtitle"],
-                "city": place["location"]["city"],
+                "address": place["subtitle"],
                 "lat": place["location"]["lat"],
                 "lng": place["location"]["lng"]
             }

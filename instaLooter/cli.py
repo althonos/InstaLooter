@@ -6,8 +6,9 @@ instaLooter - Another API-less Instagram pictures and videos downloader
 Usage:
     instaLooter (login | logout)
     instaLooter batch <batch_file>
+    instaLooter find_location <location_name> [options]
     instaLooter <profile> [<directory>] [options]
-    instaLooter (hashtag <hashtag> | location <location> | post <post_token>) <directory> [options]
+    instaLooter (hashtag <hashtag> | location <location_id> | post <post_token>) <directory> [options]
     instaLooter (-h | --help | --version | --usage)
 
 Arguments:
@@ -15,8 +16,9 @@ Arguments:
                                  videos and pictures from.
     <hashtag>                    A hashtag to download pictures and videos
                                  from.
-    <hashtag>                    A location ID to download pictures and videos
+    <location_id>                A location ID to download pictures and videos
                                  from.
+    <location_name>              The location name to search for.
     <post_token>                 Either the url or the code of a single post
                                  to download the picture or video from.
     <directory>                  The directory in which to download files.
@@ -32,7 +34,8 @@ Options - Credentials:
                                   `--password`).
 
 Options - Files:
-    -n NUM, --num-to-dl NUM      Maximum number of new files to download
+    -n NUM, --num-to-dl NUM      Maximum number of new files to download,
+                                 or to limit the results from finding locations
     -j JOBS, --jobs JOBS         Number of parallel threads to use to
                                  download files. [default: 16]
     -T TMPL, --template TMPL     A filename template to use to write the
@@ -183,6 +186,16 @@ def main(argv=None):
             batch_runner = BatchRunner(batch_file)
         batch_runner.runAll()
         return 0
+    elif args["find_location"]:
+        results = InstaLooter.find_location_info(args["<location_name>"], args['--num-to-dl'])
+        for result in results:
+            print("ID: {id}, Title: {title}, Address: {address}, Lat: {lat}, Lng: {lng}".format(
+                id=result["id"],
+                title=result["title"],
+                address=result["address"] if result["address"] else "N/A",
+                lat=result["lat"],
+                lng=result["lng"]))
+        return 0
 
     with warnings.catch_warnings():
         warnings.simplefilter(args['-W'])
@@ -198,7 +211,7 @@ def main(argv=None):
             directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
             profile=args['<profile>'],
             hashtag=args['<hashtag>'],
-            location=args['<location>'],
+            location=args['<location_id>'],
             add_metadata=args['--add-metadata'],
             get_videos=args['--get-videos'],
             videos_only=args['--videos-only'], jobs=int(args['--jobs']),
