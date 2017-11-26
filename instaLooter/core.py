@@ -695,7 +695,8 @@ class InstaLooter(object):
             return places
 
         sorted_places = sorted(results["places"], key=operator.itemgetter("position"))
-        sorted_places = sorted_places[:result_count] if result_count else sorted_places
+        if result_count:
+            sorted_places = sorted_places[:result_count]
 
         for item in sorted_places:
             place = item["place"]
