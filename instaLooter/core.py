@@ -678,6 +678,13 @@ class InstaLooter(object):
 
     @staticmethod
     def find_location_info(location, result_count=None):
+        """
+        Find location info with a given location name,
+        location info contains its ID, title, address, latitude and longitude
+        :param location: the location name to search for
+        :param result_count: the number of results to return
+        :return: a list of dict of location info
+        """
         if result_count:
             try:
                 result_count = int(result_count)
