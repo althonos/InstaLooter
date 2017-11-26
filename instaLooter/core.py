@@ -21,6 +21,7 @@ import six
 import time
 import tempfile
 import bs4 as bs
+import operator
 
 from .urlgen import default
 from .worker import InstaDownloader
@@ -64,7 +65,7 @@ class InstaLooter(object):
 
     _OWNER_MAP = {}
 
-    def __init__(self, directory=None, profile=None, hashtag=None,
+    def __init__(self, directory=None, profile=None, hashtag=None, location=None,
                 add_metadata=False, get_videos=False, videos_only=False,
                 jobs=16, template="{id}", url_generator=default,
                 dump_json=False, dump_only=False, extended_dump=False):
@@ -76,6 +77,8 @@ class InstaLooter(object):
             profile (`str`): a profile to download media from
                 **[default: None]**
             hashtag (`str`): a hashtag to download media from
+                **[default: None]**
+            location (`str`): a location ID to download media from
                 **[default: None]**
             add_metadata (`bool`): Add date and comment metadata to
                 the downloaded pictures. **[default: False]**
@@ -102,8 +105,12 @@ class InstaLooter(object):
                 instance, you always want the top comments to be downloaded
                 in the dump. **[default: False]**
         """
-        if profile is not None and hashtag is not None:
-            raise ValueError("Give only a profile or an hashtag, not both !")
+        if (profile is not None and hashtag is not None) or (profile is not None and location is not None) or \
+                (hashtag is not None and location is not None):
+            raise ValueError("Give only a profile or an hashtag or a location, not all !")
+
+        if location and not re.match("\d+$", location):
+            raise ValueError("Location ID is invalid")
 
         if profile is not None:
             self.target = profile
@@ -115,6 +122,11 @@ class InstaLooter(object):
             self._page_name = 'TagPage'
             self._section_name = 'tag'
             self._base_url = "https://www.instagram.com/explore/tags/{}/"
+        elif location is not None:
+            self.target = location
+            self._page_name = 'LocationsPage'
+            self._section_name = 'location'
+            self._base_url = 'https://www.instagram.com/explore/locations/{}/'
         else:
             self.target = None
 
@@ -663,3 +675,46 @@ class InstaLooter(object):
         """
         return self.session.cookies._cookies.get(
             "www.instagram.com", {"/":{}})["/"].get("sessionid") is not None
+
+    @staticmethod
+    def find_location_info(location, result_count=None):
+        """
+        Find location info with a given location name,
+        location info contains its ID, title, address, latitude and longitude
+        :param location: the location name to search for
+        :param result_count: the number of results to return
+        :return: a list of dict of location info
+        """
+        if result_count:
+            try:
+                result_count = int(result_count)
+                if result_count <= 0:
+                    raise ValueError("result_count must be greater than 0")
+            except ValueError:
+                raise ValueError("result_count must be an integer")
+
+        search_url = "https://www.instagram.com/web/search/topsearch/?context=blended&query={}".format(location)
+        places = []
+
+        with requests.get(search_url) as res:
+            results = json.loads(res.text)
+
+        if len(results["places"]) == 0:
+            return places
+
+        sorted_places = sorted(results["places"], key=operator.itemgetter("position"))
+        if result_count:
+            sorted_places = sorted_places[:result_count]
+
+        for item in sorted_places:
+            place = item["place"]
+            place_dict = {
+                "id": place["location"]["pk"],
+                "title": place["title"],
+                "address": place["subtitle"],
+                "lat": place["location"]["lat"],
+                "lng": place["location"]["lng"]
+            }
+            places.append(place_dict)
+
+        return places
