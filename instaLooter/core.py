@@ -21,6 +21,7 @@ import six
 import time
 import tempfile
 import bs4 as bs
+import operator
 
 from .urlgen import default
 from .worker import InstaDownloader
@@ -673,3 +674,39 @@ class InstaLooter(object):
         """
         return self.session.cookies._cookies.get(
             "www.instagram.com", {"/":{}})["/"].get("sessionid") is not None
+
+    @staticmethod
+    def find_location_info(location, result_count=None):
+        if result_count:
+            try:
+                result_count = int(result_count)
+                if result_count <= 0:
+                    raise ValueError("result_count must be greater than 0")
+            except ValueError:
+                raise ValueError("result_count must be an integer")
+
+        search_url = "https://www.instagram.com/web/search/topsearch/?context=blended&query={}".format(location)
+        places = []
+
+        with requests.get(search_url) as res:
+            results = json.loads(res.text)
+
+        if len(results["places"]) == 0:
+            return places
+
+        sorted_places = sorted(results["places"], key=operator.itemgetter("position"))
+        sorted_places = sorted_places[:result_count] if result_count else sorted_places
+
+        for item in sorted_places:
+            place = item["place"]
+            place_dict = {
+                "id": place["location"]["pk"],
+                "title": place["title"],
+                "subtitle": place["subtitle"],
+                "city": place["location"]["city"],
+                "lat": place["location"]["lat"],
+                "lng": place["location"]["lng"]
+            }
+            places.append(place_dict)
+
+        return places
