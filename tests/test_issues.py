@@ -23,7 +23,6 @@ class TestResolvedIssues(unittest.TestCase):
     if six.PY2:
         assertRegex = unittest.TestCase.assertRegexpMatches
 
-
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
         warnings._showwarning = warnings.showwarning
@@ -308,6 +307,46 @@ class TestResolvedIssues(unittest.TestCase):
         metadata = piexif.load(
             os.path.join(self.tmpdir, 'BY77tSfBnRm.jpg'), True)
         self.assertTrue(metadata['Exif']['UserComment'])
+
+
+
+class TestPullRequests(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        warnings._showwarning = warnings.showwarning
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+        warnings.showwarning = warnings._showwarning
+
+    def test_pr_122(self):
+        """
+        Feature implemented by @susundberg.
+
+        Set the access time and modification time of a downloaded media
+        according to its IG date.
+        """
+        looter = instaLooter.InstaLooter(
+            self.tmpdir, profile='franz_ferdinand', template='{code}')
+        # Test download_post
+        info = looter.get_post_info('BY77tSfBnRm')
+        looter.download_post('BY77tSfBnRm')
+        stat = os.stat(os.path.join(self.tmpdir, 'BY77tSfBnRm.jpg'))
+        self.assertEqual(stat.st_atime, info['date'])
+        self.assertEqual(stat.st_mtime, info['date'])
+        # Test download_pictures
+        pic = next(m for m in looter.medias() if not m['is_video'])
+        looter.download_pictures(media_count=1)
+        stat = os.stat(os.path.join(self.tmpdir, '{}.jpg'.format(pic['code'])))
+        self.assertEqual(stat.st_atime, pic['date'])
+        self.assertEqual(stat.st_mtime, pic['date'])
+        # Test download_videos
+        vid = next(m for m in looter.medias() if m['is_video'])
+        looter.download_videos(media_count=1)
+        stat = os.stat(os.path.join(self.tmpdir, '{}.mp4'.format(vid['code'])))
+        self.assertEqual(stat.st_atime, vid['date'])
+        self.assertEqual(stat.st_mtime, vid['date'])
 
 
 def setUpModule():
