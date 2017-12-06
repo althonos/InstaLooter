@@ -31,6 +31,8 @@ class InstaDownloader(threading.Thread):
         path = re.sub('\..{3}$', '.json', path)
         with open(path, 'w') as fp:
             json.dump(metadata, fp, indent=4, sort_keys=True)
+        # set file modification and access time to be the ones when posting to instagram
+        os.utime( path, (metadata["date"], metadata["date"]))  
 
     @staticmethod
     def _get_caption(metadata):
@@ -120,6 +122,8 @@ class InstaDownloader(threading.Thread):
         # save full-resolution photo
         if not self.dump_only:
             self._dl(photo_url, photo_name)
+            # set file modification and access time to be the ones when posting to instagram
+            os.utime( photo_name, (media["date"], media["date"]))  
 
         # put info from Instagram post into image metadata
         if self.add_metadata:
@@ -127,6 +131,8 @@ class InstaDownloader(threading.Thread):
 
         if self.dump_json:
             self._save_metadata(photo_name, media)
+
+
 
     def _download_video(self, media):
         """Download a video from a media dictionary.
@@ -147,6 +153,9 @@ class InstaDownloader(threading.Thread):
         # save video
         if not self.dump_only:
             self._dl(video_url, video_name)
+            # set file modification and access time to be the ones when posting to instagram
+            os.utime( video_name, (media["date"], media["date"]))  
+
 
         if self.dump_json:
             self._save_metadata(video_name, media)
