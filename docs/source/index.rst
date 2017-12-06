@@ -50,6 +50,7 @@ Special thanks to the following contributors:
   * `Daniel Lee Harple <https://github.com/dlh>`_
   * `Bryan Massoth <https://github.com/bmass02>`_
   * `AndCycle <https://github.com/AndCycle>`_
+  * `Pauli Salmenrinne <https://github.com/susundberg>`
 
 
 Indices and tables
