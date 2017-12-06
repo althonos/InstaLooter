@@ -154,7 +154,7 @@ class InstaDownloader(threading.Thread):
         if not self.dump_only:
             self._dl(video_url, video_name)
             # set file modification and access time to be the ones when posting to instagram
-            os.utime( photo_name, (media["date"], media["date"]))  
+            os.utime( video_name, (media["date"], media["date"]))  
 
 
         if self.dump_json:
