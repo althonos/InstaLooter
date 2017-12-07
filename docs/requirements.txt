@@ -1,4 +1,4 @@
 instaLooter
-setuptools ~= 30.3
+setuptools >= 30.3
 sphinx
 sphinxjp.themes.basicstrap
