@@ -104,7 +104,7 @@ class InstaDownloader(threading.Thread):
                     self._get_caption(metadata).encode('utf-8'),
             }
 
-            print(exif_dict)
+            #print(exif_dict)
 
             with PIL.Image.open(path) as img:
                 img.save(path, exif=piexif.dump(exif_dict))
