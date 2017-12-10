@@ -6,6 +6,7 @@ import os
 import six
 import operator
 import unittest
+import textwrap
 import tempfile
 import shutil
 import glob
@@ -15,7 +16,7 @@ import piexif
 import PIL.Image
 
 import instaLooter
-
+import instaLooter.batch
 
 
 class TestResolvedIssues(unittest.TestCase):
@@ -307,6 +308,27 @@ class TestResolvedIssues(unittest.TestCase):
         metadata = piexif.load(
             os.path.join(self.tmpdir, 'BY77tSfBnRm.jpg'), True)
         self.assertTrue(metadata['Exif']['UserComment'])
+
+    def test_issue_125(self):
+        """
+        Thanks to @applepanda for reporting this bug.
+
+        Make sure colons in path do not cause issue in batch mode.
+        """
+        configfile = six.StringIO(textwrap.dedent(
+            """
+            [Family]
+            users =
+            	instagram: D:\\Instagram\\Profiles\\instagram
+            	therock: D:\\Instagram\\Profiles\\therock
+            """
+        ))
+        runner = instaLooter.batch.BatchRunner(configfile)
+        self.assertEqual(
+            runner.getTargets(runner._get('Family', 'users')),
+            {'instagram': 'D:\\Instagram\\Profiles\\instagram',
+             'therock': 'D:\\Instagram\\Profiles\\therock'}
+        )
 
 
 

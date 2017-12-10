@@ -90,6 +90,6 @@ class BatchRunner(object):
         if raw_string is not None:
             for line in raw_string.splitlines():
                 if line:
-                    target, directory = line.split(':')
+                    target, directory = line.split(':', 1)
                     targets[target.strip()] = directory.strip()
         return targets
