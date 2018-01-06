@@ -265,48 +265,55 @@ class InstaLooter(object):
         transformed_data = data
         page_data = {}
 
-        # Shift tag index
-        transformed_data['entry_data'][self._page_name][0][self._section_name] = \
-            transformed_data['entry_data'][self._page_name][0]['graphql']['hashtag']
-        del transformed_data['entry_data'][self._page_name][0]['graphql'] # cleanup
+        try:
+            # Shift tag index
+            transformed_data['entry_data'][self._page_name][0][self._section_name] = \
+                transformed_data['entry_data'][self._page_name][0]['graphql']['hashtag']
+            del transformed_data['entry_data'][self._page_name][0]['graphql'] # cleanup
 
-        # Shift media index
-        transformed_data['entry_data'][self._page_name][0][self._section_name]['media'] =\
-            transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media']
-        del transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media'] # cleanup
+            # Shift media index
+            transformed_data['entry_data'][self._page_name][0][self._section_name]['media'] =\
+                transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media']
+            del transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media'] # cleanup
 
-        # Note: this is an approximation of what is available from the profile json structure (may be missing
-        # some details as I've never seen the original hashtag json structure)
-        nodes = []
-        for node_data in transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges']:
+            # Note: this is an approximation of what is available from the profile json structure (may be missing
+            # some details as I've never seen the original hashtag json structure)
+            nodes = []
+            for node_data in transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges']:
 
-            transformed_node = {}
-            node = node_data['node'] # pull out the node from edge list
+                transformed_node = {}
+                node = node_data['node'] # pull out the node from edge list
 
-            # Restructure the data
-            transformed_node['__typename'] = 'GraphImage' # Just use a default here for now
-            transformed_node['id'] = node['id']
-            transformed_node['comments_disabled'] = False
-            transformed_node['dimensions'] = node['dimensions']
-            transformed_node['gating_info'] = None
-            transformed_node['media_preview'] = None
-            transformed_node['owner'] = node['owner']
-            transformed_node['thumbnail_src'] = node['thumbnail_src']
-            transformed_node['thumbnail_resources'] = node['thumbnail_resources']
-            transformed_node['is_video'] = node['is_video']
-            transformed_node['code'] = None
-            transformed_node['date'] = node['taken_at_timestamp']
-            transformed_node['display_src'] = node['display_url']
-            transformed_node['caption'] = node['edge_media_to_caption']['edges'][0]['node']['text']
-            transformed_node['comments'] = None
-            transformed_node['likes'] = node['edge_liked_by']
+                # Restructure the data
+                transformed_node['__typename'] = 'GraphImage' # Just use a default here for now
+                transformed_node['id'] = node['id']
+                transformed_node['comments_disabled'] = False
+                transformed_node['dimensions'] = node['dimensions']
+                transformed_node['gating_info'] = None
+                transformed_node['media_preview'] = None
+                transformed_node['owner'] = node['owner']
+                transformed_node['thumbnail_src'] = node['thumbnail_src']
+                transformed_node['thumbnail_resources'] = node['thumbnail_resources']
+                transformed_node['is_video'] = node['is_video']
+                transformed_node['code'] = None
+                transformed_node['date'] = node['taken_at_timestamp']
+                transformed_node['display_src'] = node['display_url']
+                transformed_node['caption'] = node['edge_media_to_caption']['edges'][0]['node']['text']
+                transformed_node['comments'] = None
+                transformed_node['likes'] = node['edge_liked_by']
 
-            nodes.append(transformed_node)
+                nodes.append(transformed_node)
 
-        transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes
-        del transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges'] #cleanup
+            transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes
+            del transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges'] #cleanup
 
-        return transformed_data
+            return transformed_data
+
+        except KeyError:
+            warnings.warn("There was a KeyError transforming json from page: {}".format(self.target), stacklevel=1)
+            return
+
+
 
     def pages(self, media_count=None, with_pbar=False):
         """An iterator over the shared data of a profile or hashtag.
