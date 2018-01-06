@@ -281,20 +281,17 @@ class InstaLooter(object):
             for node_data in transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges']:
 
                 transformed_node = {}
-                node = node_data['node'] # pull out the node from edge list
+                node = node_data['node']  # pull out the node from edge list
 
                 # Restructure the data
-                transformed_node['__typename'] = 'GraphImage'  # default
                 transformed_node['id'] = node['id']
-                transformed_node['comments_disabled'] = False  # default
+                transformed_node['comments_disabled'] = node['comments_disabled']
                 transformed_node['dimensions'] = node['dimensions']
-                transformed_node['gating_info'] = None  # default
-                transformed_node['media_preview'] = None  # doesn't seem to have an equivalent
                 transformed_node['owner'] = node['owner']
                 transformed_node['thumbnail_src'] = node['thumbnail_src']
                 transformed_node['thumbnail_resources'] = node['thumbnail_resources']
                 transformed_node['is_video'] = node['is_video']
-                transformed_node['code'] = None  # doesn't seem to have an equivalent
+                transformed_node['code'] = node['shortcode']
                 transformed_node['date'] = node['taken_at_timestamp']
                 transformed_node['display_src'] = node['display_url']
 
@@ -304,7 +301,7 @@ class InstaLooter(object):
                 else:
                     transformed_node['caption'] = ""
 
-                transformed_node['comments'] = None
+                transformed_node['comments'] = node['edge_media_to_comment']
                 transformed_node['likes'] = node['edge_liked_by']
 
                 nodes.append(transformed_node)
