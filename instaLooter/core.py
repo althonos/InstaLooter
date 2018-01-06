@@ -110,11 +110,13 @@ class InstaLooter(object):
             self._page_name = 'ProfilePage'
             self._section_name = 'user'
             self._base_url = "https://www.instagram.com/{}/"
+            self._target_type = 'profile'
         elif hashtag is not None:
             self.target = hashtag
             self._page_name = 'TagPage'
             self._section_name = 'tag'
             self._base_url = "https://www.instagram.com/explore/tags/{}/"
+            self._target_type = 'hashtag'
         else:
             self.target = None
 
@@ -253,6 +255,69 @@ class InstaLooter(object):
             worker.start()
             self._workers.append(worker)
 
+    def _transform_hashtag_page(self, data):
+        """
+        This function does a transformation of the entry_data from a hashtag page into the format expected by the rest
+        of the application (due to IG changing the JSON format for hashtag pages)
+        :param entry_data:
+        :return:
+        """
+        transformed_data = data
+
+        try:
+            # Shift tag index
+            transformed_data['entry_data'][self._page_name][0][self._section_name] = \
+                transformed_data['entry_data'][self._page_name][0]['graphql']['hashtag']
+            del transformed_data['entry_data'][self._page_name][0]['graphql'] # cleanup
+
+            # Shift media index
+            transformed_data['entry_data'][self._page_name][0][self._section_name]['media'] =\
+                transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media']
+            del transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media']
+
+            # Note: this is an approximation of what is available from the profile json structure (may be missing
+            # some details as I've never seen the original hashtag json structure)
+            nodes = []
+            for node_data in transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges']:
+
+                transformed_node = {}
+                node = node_data['node']  # pull out the node from edge list
+
+                # Restructure the data
+                transformed_node['id'] = node['id']
+                transformed_node['comments_disabled'] = node['comments_disabled']
+                transformed_node['dimensions'] = node['dimensions']
+                transformed_node['owner'] = node['owner']
+                transformed_node['thumbnail_src'] = node['thumbnail_src']
+                transformed_node['thumbnail_resources'] = node['thumbnail_resources']
+                transformed_node['is_video'] = node['is_video']
+                transformed_node['code'] = node['shortcode']
+                transformed_node['date'] = node['taken_at_timestamp']
+                transformed_node['display_src'] = node['display_url']
+
+                # Sometimes there are no captions, check if there are any.
+                if len(node['edge_media_to_caption']['edges']) > 0:
+                    transformed_node['caption'] = node['edge_media_to_caption']['edges'][0]['node']['text']
+                else:
+                    transformed_node['caption'] = ""
+
+                transformed_node['comments'] = node['edge_media_to_comment']
+                transformed_node['likes'] = node['edge_liked_by']
+
+                nodes.append(transformed_node)
+
+            transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes
+            del transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges']
+
+            return transformed_data
+
+        except KeyError:
+            warnings.warn("There was a KeyError transforming json from page: {}".format(self.target), stacklevel=1)
+            return {}
+        except Exception as e:  # Catch-all random garbage
+            warnings.warn('Unexpected exception in JSON transformation ' + str(e), stacklevel=1)
+            return {}
+
     def pages(self, media_count=None, with_pbar=False):
         """An iterator over the shared data of a profile or hashtag.
 
@@ -274,6 +339,11 @@ class InstaLooter(object):
             current_page += 1
             with self.session.get(url) as res:
                 data = self._get_shared_data(res)
+
+                if self._target_type == 'hashtag':
+                    data = self._transform_hashtag_page(data)
+                else:
+                    pass
 
             try:
                 media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
@@ -503,7 +573,7 @@ class InstaLooter(object):
         """
         url = "https://www.instagram.com/p/{}/".format(code)
         with self.session.get(url) as res:
-        # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+            # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
             media = self._get_shared_data(res)['entry_data']['PostPage'][0]\
                                               ['graphql']['shortcode_media']
         # Fix renaming of attributes
