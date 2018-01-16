@@ -58,6 +58,13 @@ Options - Miscellaneous:
     --traceback                  Print error traceback if any (debug).
     -W WARNINGCTL                Change warning behaviour (same as python -W).
                                  [default: default]
+                                 
+Options - Tor:
+    --socks_port PORT            SOCKS port for tor instance.
+    --control_port PORT          Control port for tor instance. Can be ommited,
+                                 thus control port will be `socks_port + 1`.
+    --change_ip_after N          Number of requests after which tor instance
+                                 will change IP adress. [default: 10]
 
 Template:
     The default filename of the pictures and videos on Instagram doesn't show
@@ -192,6 +199,15 @@ def main(argv=None):
         if args['<post_token>'] is not None:
             args['--get-videos'] = True
 
+        if args['--socks_port'] is not None:
+            args['--socks_port'] = int(args['--socks_port'])
+
+        if args['--control_port'] is not None:
+            args['--control_port'] = int(args['--control_port'])
+
+        if args['--change_ip_after'] is not None:
+            args['--change_ip_after'] = int(args['--change_ip_after'])
+
         looter = InstaLooter(
             directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
             profile=args['<profile>'],hashtag=args['<hashtag>'],
@@ -202,6 +218,9 @@ def main(argv=None):
             dump_json=args['--dump-json'],
             dump_only=args['--dump-only'],
             extended_dump=args['--extended-dump'],
+            socks_port=args['--socks_port'],
+            control_port=args['--control_port'],
+            change_ip_after=args['--change_ip_after'],
         )
 
         try:

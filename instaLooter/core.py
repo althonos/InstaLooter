@@ -25,9 +25,9 @@ import bs4 as bs
 from .urlgen import default
 from .worker import InstaDownloader
 from .utils import get_times, save_cookies, load_cookies
+from .tor_manager import TorManager
 
 PARSER = 'html.parser'
-
 
 class InstaLooter(object):
     """A brutal Instagram looter that raids without API tokens.
@@ -67,7 +67,8 @@ class InstaLooter(object):
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
                 jobs=16, template="{id}", url_generator=default,
-                dump_json=False, dump_only=False, extended_dump=False):
+                dump_json=False, dump_only=False, extended_dump=False,
+                socks_port=None, control_port=None, change_ip_after=10):
         """Create a new looter instance.
 
         Keyword Arguments:
@@ -101,6 +102,12 @@ class InstaLooter(object):
                 possible, at the cost of more time. Set to `True` if, for
                 instance, you always want the top comments to be downloaded
                 in the dump. **[default: False]**
+            socks_port (`int`): SOCKS port for tor instance. 
+                **[default: None]**
+            control_port (`int`): Control port for tor instance. 
+                **[default: None]**
+            change_ip_after (`int`): Number of requests that needs for 
+                change IP adress via tor. **[default: 10]**
         """
         if profile is not None and hashtag is not None:
             raise ValueError("Give only a profile or an hashtag, not both !")
@@ -137,8 +144,18 @@ class InstaLooter(object):
         self.dump_only = dump_only
         self.extended_dump = extended_dump
         self.jobs = jobs
+        self.socks_port = socks_port
+        self.control_port = control_port
+        self.change_ip_after = change_ip_after
+        
+        if self.socks_port:
+            self.control_port = self.control_port if self.control_port else (self.socks_port + 1) % 10 ** 4
+            self.tor_manager = TorManager(self.socks_port, self.control_port, self.change_ip_after)
 
         self.session = requests.Session()
+        if hasattr(self, 'tor_manager'):
+            self.session.proxies.update(self.tor_manager.proxies)
+            self.session.hooks.update({'response': self.tor_manager.call_for_new_ip})
         self.session.cookies = six.moves.http_cookiejar.LWPCookieJar(self.COOKIE_FILE)
         load_cookies(self.session)
 
@@ -170,8 +187,8 @@ class InstaLooter(object):
                 pass
         if hasattr(self, "_workers"):
             for worker in self._workers:
-                worker.kill()
-
+                worker.kill()      
+                
     def __length_hint__(self):
         try:
             data = next(self.pages())['entry_data'][self._page_name][0]

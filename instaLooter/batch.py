@@ -68,6 +68,9 @@ class BatchRunner(object):
                     dump_only=self._getboolean(section_id, 'dump-only', False),
                     extended_dump=\
                         self._getboolean(section_id, 'extended-dump', False),
+                    socks_port=self._getint(section_id, 'socks_port', None),
+                    control_port=self._getint(section_id, 'control_port', None),
+                    change_ip_after=self._getint(section_id, 'change_ip_after', 10),
                 )
 
                 if self.parser.has_option(section_id, 'username'):

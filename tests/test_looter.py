@@ -241,6 +241,28 @@ class TestUtils(_TempTestCase):
         # match (at most as many posts downloaded)
         looter.download()
         self.assertLessEqual(len(os.listdir(self.tmpdir)), hint)
+        
+        
+class TestTorManager(_TempTestCase):
+
+    def test_proxy_setup(self):
+        looter = instaLooter.InstaLooter(socks_port=9090)
+        self.assertTrue(hasattr(looter, 'tor_manager'))
+        self.assertTrue(str(looter.session.proxies) == str(looter.tor_manager.proxies))
+        self.assertTrue(isinstance(looter.session.hooks.get('response', None), type(looter.tor_manager.call_for_new_ip)))
+        
+    def test_ip_changeability(self):
+        def get_ip(proxies):
+            r = requests.get('https://api.ipify.org?format=json', proxies=proxies)
+            return json.loads(r.text)['ip']
+            
+        looter = instaLooter.InstaLooter(socks_port=9090, change_ip_after=1)
+        old_ip = get_ip(looter.tor_manager.proxies)
+        
+        looter.session.get('https://www.instagram.com/')
+        new_ip = get_ip(looter.tor_manager.proxies)
+        
+        self.assertTrue(old_ip != new_ip)
 
 
 def load_tests(loader, tests, pattern):
@@ -249,6 +271,7 @@ def load_tests(loader, tests, pattern):
     suite.addTests(loader.loadTestsFromTestCase(TestProfileDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestHashtagDownload))
     suite.addTests(loader.loadTestsFromTestCase(TestTemplate))
+    suite.addTests(loader.loadTestsFromTestCase(TestTorManager))
     return suite
 
 
