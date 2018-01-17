@@ -48,3 +48,34 @@ class TestBatchRunner(unittest.TestCase):
         self.assertEqual(
             len(glob.glob(os.path.join(self.tmpdir, '*.jpg'))), 6
         )
+        
+    def test_tor(self):
+
+        cfg = textwrap.dedent(
+            """
+            [my job]
+
+            socks_port = 9090
+            control_port = 9091
+            change_ip_after = 10
+            
+            num-to-dl = 3
+            quiet = true
+
+            users:
+                therock: {self.tmpdir}
+                squareenix: {self.tmpdir}
+            """
+        ).format(self=self)
+
+        with open(os.path.join(self.tmpdir, 'batch.ini'), 'w') as batch_file:
+            batch_file.write(cfg)
+
+        self.assertEqual(
+            main(["batch", os.path.join(self.tmpdir, 'batch.ini')]),
+            0
+        )
+
+        self.assertEqual(
+            len(glob.glob(os.path.join(self.tmpdir, '*.jpg'))), 6
+        )

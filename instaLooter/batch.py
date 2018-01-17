@@ -68,20 +68,31 @@ class BatchRunner(object):
                     dump_only=self._getboolean(section_id, 'dump-only', False),
                     extended_dump=\
                         self._getboolean(section_id, 'extended-dump', False),
+                    socks_port=self._getint(section_id, 'socks_port', None),
+                    control_port=self._getint(section_id, 'control_port', None),
+                    change_ip_after=self._getint(section_id, 'change_ip_after', 10),
                 )
-
-                if self.parser.has_option(section_id, 'username'):
-                    looter.logout()
-                    username = self._get(section_id, 'username')
-                    password = self._get(section_id, 'password') or \
-                        getpass.getpass('Password for "{}": '.format(username))
-                    looter.login(username, password)
-
-                looter.download(
-                    media_count=self._getint(section_id, 'num-to-dl'),
-                    with_pbar=not self._getboolean(section_id, 'quiet', False),
-                    new_only=self._getboolean(section_id, 'new', False),
-                )
+                
+                try:
+                    if self.parser.has_option(section_id, 'username'):
+                        looter.logout()
+                        username = self._get(section_id, 'username')
+                        password = self._get(section_id, 'password') or \
+                            getpass.getpass('Password for "{}": '.format(username))
+                        looter.login(username, password)
+                except Exception as ex:
+                    print(ex)
+                    continue
+                
+                try:
+                    looter.download(
+                        media_count=self._getint(section_id, 'num-to-dl'),
+                        with_pbar=not self._getboolean(section_id, 'quiet', False),
+                        new_only=self._getboolean(section_id, 'new', False),
+                    )
+                except Exception as ex:
+                    print(ex)
+                    continue
 
     def getTargets(self, raw_string):
         """Extract targets from a string in 'key: value' format.

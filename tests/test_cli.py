@@ -31,6 +31,12 @@ class TestCLI(unittest.TestCase):
 
         instaLooter.main(["post", "BIqZ8L8AHmH", self.tmpdir])
         self.assertIn("1308972728853756295.jpg", os.listdir(self.tmpdir))
+        
+    def test_single_post_with_tor(self):
+        instaLooter.main(
+            ["post", "BIqZ8L8AHmH", self.tmpdir, "-q", "--socks_port", "9090"]
+        )
+        self.assertIn("1308972728853756295.jpg", os.listdir(self.tmpdir))
 
     def test_dump_json(self):
         instaLooter.main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '--dump-json'])
