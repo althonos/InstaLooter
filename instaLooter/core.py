@@ -269,6 +269,18 @@ class InstaLooter(object):
             worker = InstaDownloader(self)
             worker.start()
             self._workers.append(worker)
+            
+    def _get_data(self, url, patience=3):
+        try:
+            with self.session.get(url) as res:
+                data = self._get_shared_data(res)
+        except (requests.ConnectionError, AttributeError):
+            if hasattr(self, 'tor_manager') and patience > 0:
+                self.tor_manager.new_identity()
+                return self._get_data(url, patience - 1)
+            raise
+        
+        return data
 
     def pages(self, media_count=None, with_pbar=False):
         """An iterator over the shared data of a profile or hashtag.
@@ -289,8 +301,7 @@ class InstaLooter(object):
         current_page = 0
         while True:
             current_page += 1
-            with self.session.get(url) as res:
-                data = self._get_shared_data(res)
+            data = self._get_data(url)
 
             try:
                 media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
@@ -421,8 +432,7 @@ class InstaLooter(object):
             `dict`: the owner metadata deserialised from JSON
         """
         url = "https://www.instagram.com/p/{}/".format(code)
-        with self.session.get(url) as res:
-            data = self._get_shared_data(res)
+        data = self._get_data(url)
         return data['entry_data']['PostPage'][0]['graphql']['shortcode_media']['owner']
 
     def download(self, **kwargs):
@@ -519,10 +529,10 @@ class InstaLooter(object):
                 at a specific media.
         """
         url = "https://www.instagram.com/p/{}/".format(code)
-        with self.session.get(url) as res:
+        data = self._get_data(url)
         # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
-            media = self._get_shared_data(res)['entry_data']['PostPage'][0]\
-                                              ['graphql']['shortcode_media']
+        media = data['entry_data']['PostPage'][0]['graphql']['shortcode_media']
+                                              
         # Fix renaming of attributes
         media.setdefault('code', media.get('shortcode'))
         media.setdefault('date', media.get('taken_at_timestamp'))

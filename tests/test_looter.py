@@ -8,6 +8,7 @@ import sys
 import glob
 import json
 import shutil
+import requests
 import tempfile
 import unittest
 import warnings

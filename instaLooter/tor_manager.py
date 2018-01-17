@@ -13,7 +13,7 @@ class TorManager(object):
         self.control_port = control_port
         self.calls_to_change = calls_to_change
         
-        self.tor_process = self._create_tor_process(self.socks_port, self.control_port)
+        self.tor_process = self._create_tor_process()
         self.calls_counter = 0
 
     def __del__(self):
@@ -24,7 +24,7 @@ class TorManager(object):
             self.tor_process.terminate()
             self.tor_process.wait()
 
-    def _new_identity(self, control_port):
+    def new_identity(self):
         with Controller.from_port(port=self.control_port) as controller:
             controller.authenticate()
             controller.signal(Signal.NEWNYM)
@@ -33,13 +33,13 @@ class TorManager(object):
         if "Bootstrapped " in line:
             print(term.format(line, term.Color.BLUE))
 
-    def _create_tor_process(self, socks_port, control_port):
+    def _create_tor_process(self):
         try:
             tor_process = stem.process.launch_tor_with_config(
                 config = {
-                    'SocksPort': str(socks_port),
-                    'ControlPort': str(control_port),
-                    'DataDirectory': '/tmp/tor'+str(socks_port),
+                    'SocksPort': str(self.socks_port),
+                    'ControlPort': str(self.control_port),
+                    'DataDirectory': '/tmp/tor'+str(self.socks_port),
                 },
                 init_msg_handler = self._print_bootstrap_lines,
                 )
@@ -53,14 +53,14 @@ class TorManager(object):
                     for conns in proc.connections(kind='inet'):
                         if conns.laddr[1] == self.socks_port:
                             proc.send_signal(SIGTERM)
-                            return self._create_tor_process(self.socks_port, self.control_port)
+                            return self._create_tor_process()
 
             raise
         
     def call_for_new_ip(self, *args, **kwargs):
         self.calls_counter += 1
         if self.calls_counter % self.calls_to_change == 0:
-            self._new_identity(self.control_port)
+            self.new_identity()
     
     @property
     def proxies(self):
