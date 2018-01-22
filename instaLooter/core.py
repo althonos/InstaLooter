@@ -110,13 +110,11 @@ class InstaLooter(object):
             self._page_name = 'ProfilePage'
             self._section_name = 'user'
             self._base_url = "https://www.instagram.com/{}/"
-            self._target_type = 'profile'
         elif hashtag is not None:
             self.target = hashtag
             self._page_name = 'TagPage'
             self._section_name = 'tag'
             self._base_url = "https://www.instagram.com/explore/tags/{}/"
-            self._target_type = 'hashtag'
         else:
             self.target = None
 
@@ -340,10 +338,8 @@ class InstaLooter(object):
             with self.session.get(url) as res:
                 data = self._get_shared_data(res)
 
-                if self._target_type == 'hashtag':
+                if self._section_name == 'tag':
                     data = self._transform_hashtag_page(data)
-                else:
-                    pass
 
             try:
                 media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
