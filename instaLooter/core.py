@@ -64,6 +64,17 @@ class InstaLooter(object):
 
     _OWNER_MAP = {}
 
+    _HASHTAG_MAP = {
+        'id': 'id', 'comments_disabled': 'comments_disabled',
+        'dimensions': 'dimensions', 'owner': 'owner',
+        'thumbnail_src': 'thumbnail_src', 'is_video': 'is_video',
+        'thumbnail_resources': 'thumbnail_resources',
+        'code': 'shortcode', 'date': 'taken_at_timestamp',
+        'display_src': 'display_url', 'likes': 'edge_liked_by',
+        'comments': 'edge_media_to_comment',
+    }
+
+
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
                 jobs=16, template="{id}", url_generator=default,
@@ -253,6 +264,60 @@ class InstaLooter(object):
             worker.start()
             self._workers.append(worker)
 
+    def _transform_hashtag_page(self, data):
+        """
+        This function does a transformation of the entry_data from a hashtag page into the format expected by the rest
+        of the application (due to IG changing the JSON format for hashtag pages)
+
+        Arguments:
+            data (`dict`): a GraphQL style JSON dictionary holding hashtag data
+
+        Returns:
+            `dict`: an old-style dictionary holding hashtag data, usable by the
+                looter instance.
+
+        Note:
+            Implementation thanks to Geoff (@gffde3).
+        """
+
+        try:
+            # Shift tag index
+            data['entry_data'][self._page_name][0][self._section_name] = \
+                data['entry_data'][self._page_name][0].pop('graphql')['hashtag']
+
+            # Shift media index
+            data['entry_data'][self._page_name][0][self._section_name]['media'] =\
+                data['entry_data'][self._page_name][0][self._section_name].pop('edge_hashtag_to_media')
+
+            # Note: this is an approximation of what is available from the profile json structure (may be missing
+            # some details as I've never seen the original hashtag json structure)
+            data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes = []
+            for node_data in data['entry_data'][self._page_name][0][self._section_name]['media'].pop('edges'):
+
+                node = node_data['node']  # pull out the node from edge list
+
+                # Restructure the data
+                transformed_node = {
+                    dst: node[src] for dst, src in six.iteritems(self._HASHTAG_MAP)
+                }
+
+                # Sometimes there are no captions, check if there are any.
+                if node['edge_media_to_caption']['edges']:
+                    transformed_node['caption'] = node['edge_media_to_caption']['edges'][0]['node']['text']
+                else:
+                    transformed_node['caption'] = ""
+
+                nodes.append(transformed_node)
+
+            return data
+
+        except KeyError:
+            warnings.warn("There was a KeyError transforming json from page: {}".format(self.target), stacklevel=1)
+            return {}
+        except Exception as e:  # Catch-all random garbage
+            warnings.warn('Unexpected exception in JSON transformation: {}'.format(e), stacklevel=1)
+            return {}
+
     def pages(self, media_count=None, with_pbar=False):
         """An iterator over the shared data of a profile or hashtag.
 
@@ -274,6 +339,9 @@ class InstaLooter(object):
             current_page += 1
             with self.session.get(url) as res:
                 data = self._get_shared_data(res)
+
+                if self._section_name == 'tag':
+                    data = self._transform_hashtag_page(data)
 
             try:
                 media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
@@ -503,7 +571,7 @@ class InstaLooter(object):
         """
         url = "https://www.instagram.com/p/{}/".format(code)
         with self.session.get(url) as res:
-        # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
+            # media = self._get_shared_data(res)['entry_data']['PostPage'][0]['media']
             media = self._get_shared_data(res)['entry_data']['PostPage'][0]\
                                               ['graphql']['shortcode_media']
         # Fix renaming of attributes
