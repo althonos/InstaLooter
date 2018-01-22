@@ -64,6 +64,17 @@ class InstaLooter(object):
 
     _OWNER_MAP = {}
 
+    _HASHTAG_MAP = {
+        'id': 'id', 'comments_disabled': 'comments_disabled',
+        'dimensions': 'dimensions', 'owner': 'owner',
+        'thumbnail_src': 'thumbnail_src', 'is_video': 'is_video',
+        'thumbnail_resources': 'thumbnail_resources',
+        'code': 'shortcode', 'date': 'taken_at_timestamp',
+        'display_src': 'display_url', 'likes': 'edge_liked_by',
+        'comments': 'edge_media_to_comment',
+    }
+
+
     def __init__(self, directory=None, profile=None, hashtag=None,
                 add_metadata=False, get_videos=False, videos_only=False,
                 jobs=16, template="{id}", url_generator=default,
@@ -257,63 +268,54 @@ class InstaLooter(object):
         """
         This function does a transformation of the entry_data from a hashtag page into the format expected by the rest
         of the application (due to IG changing the JSON format for hashtag pages)
-        :param entry_data:
-        :return:
+
+        Arguments:
+            data (`dict`): a GraphQL style JSON dictionary holding hashtag data
+
+        Returns:
+            `dict`: an old-style dictionary holding hashtag data, usable by the
+                looter instance.
+
+        Note:
+            Implementation thanks to Geoff (@gffde3).
         """
-        transformed_data = data
 
         try:
             # Shift tag index
-            transformed_data['entry_data'][self._page_name][0][self._section_name] = \
-                transformed_data['entry_data'][self._page_name][0]['graphql']['hashtag']
-            del transformed_data['entry_data'][self._page_name][0]['graphql'] # cleanup
+            data['entry_data'][self._page_name][0][self._section_name] = \
+                data['entry_data'][self._page_name][0].pop('graphql')['hashtag']
 
             # Shift media index
-            transformed_data['entry_data'][self._page_name][0][self._section_name]['media'] =\
-                transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media']
-            del transformed_data['entry_data'][self._page_name][0][self._section_name]['edge_hashtag_to_media']
+            data['entry_data'][self._page_name][0][self._section_name]['media'] =\
+                data['entry_data'][self._page_name][0][self._section_name].pop('edge_hashtag_to_media')
 
             # Note: this is an approximation of what is available from the profile json structure (may be missing
             # some details as I've never seen the original hashtag json structure)
-            nodes = []
-            for node_data in transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges']:
+            data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes = []
+            for node_data in data['entry_data'][self._page_name][0][self._section_name]['media'].pop('edges'):
 
-                transformed_node = {}
                 node = node_data['node']  # pull out the node from edge list
 
                 # Restructure the data
-                transformed_node['id'] = node['id']
-                transformed_node['comments_disabled'] = node['comments_disabled']
-                transformed_node['dimensions'] = node['dimensions']
-                transformed_node['owner'] = node['owner']
-                transformed_node['thumbnail_src'] = node['thumbnail_src']
-                transformed_node['thumbnail_resources'] = node['thumbnail_resources']
-                transformed_node['is_video'] = node['is_video']
-                transformed_node['code'] = node['shortcode']
-                transformed_node['date'] = node['taken_at_timestamp']
-                transformed_node['display_src'] = node['display_url']
+                transformed_node = {
+                    dst: node[src] for dst, src in six.iteritems(self._HASHTAG_MAP)
+                }
 
                 # Sometimes there are no captions, check if there are any.
-                if len(node['edge_media_to_caption']['edges']) > 0:
+                if node['edge_media_to_caption']['edges']:
                     transformed_node['caption'] = node['edge_media_to_caption']['edges'][0]['node']['text']
                 else:
                     transformed_node['caption'] = ""
 
-                transformed_node['comments'] = node['edge_media_to_comment']
-                transformed_node['likes'] = node['edge_liked_by']
-
                 nodes.append(transformed_node)
 
-            transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes
-            del transformed_data['entry_data'][self._page_name][0][self._section_name]['media']['edges']
-
-            return transformed_data
+            return data
 
         except KeyError:
             warnings.warn("There was a KeyError transforming json from page: {}".format(self.target), stacklevel=1)
             return {}
         except Exception as e:  # Catch-all random garbage
-            warnings.warn('Unexpected exception in JSON transformation ' + str(e), stacklevel=1)
+            warnings.warn('Unexpected exception in JSON transformation: {}'.format(e), stacklevel=1)
             return {}
 
     def pages(self, media_count=None, with_pbar=False):
