@@ -23,6 +23,7 @@ class TestURLGen(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
 
+    @unittest.expectedFailure
     def test_resizer(self):
         self.looter = instaLooter.InstaLooter(
             self.tmpdir, url_generator=resizer(320), profile="instagram"
@@ -34,6 +35,7 @@ class TestURLGen(unittest.TestCase):
                 width, height = img.size
                 self.assertEqual(max(width, height), 320)
 
+    @unittest.expectedFailure
     def test_thumbnail(self):
         self.looter = instaLooter.InstaLooter(
             self.tmpdir, url_generator=thumbnail, profile="therock"

@@ -10,6 +10,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import re
+import warnings
 
 __all__ = ["default", "resizer", "thumbnail"]
 
@@ -36,6 +37,7 @@ def resizer(size):
     dimensions of the picture will equal to ``size`` once it
     is transformed.
     """
+    warnings.warn("`resizer` is not supported anymore", DeprecationWarning)
     target = 's{0}x{0}/'.format(size)
     def resize(media):
         return RESIZER_RX.sub(target, media['display_src'])
@@ -46,6 +48,7 @@ def resizer(size):
 def thumbnail(media):
     """Generates a link to the thumbnail.
     """
+    warnings.warn("`thumbnail` is not supported anymore", DeprecationWarning)
     try:
         return media['thumbnail_src']
     except KeyError:
