@@ -23,7 +23,7 @@ install:
 - pip install -e .[test]
 
 script:
-- green
+- green -T
 
 after_success:
 - codecov
