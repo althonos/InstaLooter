@@ -403,28 +403,36 @@ class InstaLooter(object):
         else:
             return self._timed_medias(media_count=media_count, with_pbar=with_pbar, timeframe=timeframe)
 
-    def _timeless_medias(self, media_count=None, with_pbar=False):
+       def _timeless_medias(self, media_count=None, with_pbar=False):
         seen = set()
+        n_medias = 0
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
+                n_medias += 1
                 if media['id'] in seen:
                     return
-                yield media
-                seen.add(media['id'])
+                if n_medias <= media_count: 
+                    yield media
+                    seen.add(media['id'])
+                elif n_medias > media_count:
+                    return
 
     def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
         seen = set()
         start_time, end_time = get_times(timeframe)
+        n_medias = 0
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
+                n_medias += 1
                 media_date = datetime.date.fromtimestamp(media['date'])
-                if start_time >= media_date >= end_time:
+                if start_time <= media_date <= end_time and n_medias <= media_count:
                     if media['id'] in seen:
                         return
                     yield media
                     seen.add(media['id'])
-                elif media_date < end_time:
+                elif media_date < end_time or n_medias > media_count:
                     return
+
 
     def download_pictures(self, **kwargs):#media_count=None, with_pbar=False, timeframe=None, new_only=False):
         """Download all the pictures from provided target.
