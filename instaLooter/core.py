@@ -765,7 +765,6 @@ class InstaLooter(object):
 
         sidecar['likes'] = media['edge_media_preview_like']
         sidecar['comments'] = media['edge_media_to_comment']
-        # sidecar['display_src'] = sidecar['display_url']
         sidecar['code'] = sidecar['shortcode']
         sidecar['date'] = media['taken_at_timestamp']
         return sidecar

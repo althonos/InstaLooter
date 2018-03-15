@@ -223,9 +223,10 @@ class TestResolvedIssues(unittest.TestCase):
 
         while not looter._medias_queue.empty():
             media = looter._medias_queue.get()
-            for key in ('caption', 'code', 'date'):
-                self.assertIn(key, media)
-                self.assertIsNotNone(media[key])
+            if media['__typename'] == "GraphSidecar":
+                for key in ('caption', 'code', 'date'):
+                    self.assertIn(key, media)
+                    self.assertIsNotNone(media[key])
 
     def test_issue_66(self):
         """
