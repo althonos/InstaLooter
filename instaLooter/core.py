@@ -291,7 +291,7 @@ class InstaLooter(object):
                 except KeyError:
                     warnings.warn("Could not find page of user: {}".format(self.target), stacklevel=1)
                     return
-                    
+
             self.metadata = self._parse_metadata_from_profile_page(data)
 
             def makeurl(end_cursor):
@@ -335,11 +335,7 @@ class InstaLooter(object):
                 if not 'data' in data:
                     time.sleep(10)
                     continue
-
-                from pprint import pprint
-                pprint(data['data'][self._section_name].keys())
                 media_info = getinfo(data)
-
 
             current_page += 1
 
