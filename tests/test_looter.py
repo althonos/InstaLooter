@@ -206,10 +206,10 @@ class TestUtils(_TempTestCase):
         self.assertEqual(therock['id'], '232192182')
         self.assertFalse(therock['is_private'])
 
-        squareenix = self.looter.get_owner_info("BS9UVpcjfCZ")
-        self.assertEqual(squareenix['username'], 'squareenix')
-        self.assertEqual(squareenix['id'], '2117884847')
-        self.assertFalse(squareenix['is_private'])
+        gearbox = self.looter.get_owner_info("BfMWE3aFsEh")
+        self.assertEqual(gearbox['username'], 'gearboxsoftware')
+        self.assertEqual(gearbox['id'], '1409542965')
+        self.assertFalse(gearbox['is_private'])
 
     def test_url_generator_nocallable(self):
         with self.assertRaises(ValueError):
