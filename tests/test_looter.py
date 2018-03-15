@@ -52,9 +52,10 @@ class TestProfileDownload(_TempTestCase):
             # We have to use GreaterEqual since multi media posts
             # are counted as 1 but will download more than one
             # picture / video
+            media_count = looter.metadata['edge_owner_to_timeline_media']['count']
             self.assertGreaterEqual(
                 len(os.listdir(self.tmpdir)),
-                min(cls.MEDIA_COUNT, int(looter.metadata['media']['count']))
+                min(cls.MEDIA_COUNT, media_count)
             )
             self.assertEqual(profile, looter.metadata['username'])
 
