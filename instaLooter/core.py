@@ -40,6 +40,7 @@ class InstaLooter(object):
     URL_HOME = "https://www.instagram.com/"
     URL_LOGIN = "https://www.instagram.com/accounts/login/ajax/"
     URL_LOGOUT = "https://www.instagram.com/accounts/logout/"
+    URL_GRAPHQL = "https://www.instagram.com/graphql/query/"
 
     COOKIE_FILE = os.path.join(tempfile.gettempdir(), "instaLooter", "cookies.txt")
 
@@ -58,7 +59,7 @@ class InstaLooter(object):
         'height': lambda m: m.get('dimensions', dict()).get('height'),
         'likescount': lambda m: m.get('likes', dict()).get('count'),
         'commentscount': lambda m: m.get('comments', dict()).get('count'),
-        'display_src': lambda m: m.get('display_src'),
+        'display_url': lambda m: m.get('display_url'),
         'video_url': lambda m: m.get('video_url'),
     }
 
@@ -264,59 +265,84 @@ class InstaLooter(object):
             worker.start()
             self._workers.append(worker)
 
-    def _transform_hashtag_page(self, data):
-        """
-        This function does a transformation of the entry_data from a hashtag page into the format expected by the rest
-        of the application (due to IG changing the JSON format for hashtag pages)
+    # def _transform_hashtag_page(self, data):
+    #     """Convert the new-style hashtag page into data usable by InstaLooter.
+    #
+    #     This function does a transformation of the entry_data from a hashtag
+    #     page into the format expected by the rest of the application (due to
+    #     IG changing the JSON format for hashtag pages in 2017~2018).
+    #
+    #     Arguments:
+    #         data (`dict`): a GraphQL style JSON dictionary holding hashtag data
+    #
+    #     Returns:
+    #         `dict`: an old-style dictionary holding hashtag data, usable by the
+    #             looter instance.
+    #
+    #     Note:
+    #         Implementation thanks to Geoff (@gffde3).
+    #     """
+    #
+    #     try:
+    #         # Shift tag index
+    #         data['entry_data'][self._page_name][0][self._section_name] = \
+    #             data['entry_data'][self._page_name][0].pop('graphql')['hashtag']
+    #
+    #         # Shift media index
+    #         data['entry_data'][self._page_name][0][self._section_name]['media'] =\
+    #             data['entry_data'][self._page_name][0][self._section_name].pop('edge_hashtag_to_media')
+    #
+    #         # Note: this is an approximation of what is available from the profile json structure (may be missing
+    #         # some details as I've never seen the original hashtag json structure)
+    #         data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes = []
+    #         for node_data in data['entry_data'][self._page_name][0][self._section_name]['media'].pop('edges'):
+    #
+    #             node = node_data['node']  # pull out the node from edge list
+    #
+    #             # Restructure the data
+    #             transformed_node = {
+    #                 dst: node[src] for dst, src in six.iteritems(self._HASHTAG_MAP)
+    #             }
+    #
+    #             # Sometimes there are no captions, check if there are any.
+    #             if node['edge_media_to_caption']['edges']:
+    #                 transformed_node['caption'] = node['edge_media_to_caption']['edges'][0]['node']['text']
+    #             else:
+    #                 transformed_node['caption'] = ""
+    #
+    #             nodes.append(transformed_node)
+    #
+    #         return data
+    #
+    #     except KeyError:
+    #         warnings.warn("There was a KeyError transforming json from page: {}".format(self.target), stacklevel=1)
+    #         return {}
+    #     except Exception as e:  # Catch-all random garbage
+    #         warnings.warn('Unexpected exception in JSON transformation: {}'.format(e), stacklevel=1)
+    #         return {}
 
-        Arguments:
-            data (`dict`): a GraphQL style JSON dictionary holding hashtag data
-
-        Returns:
-            `dict`: an old-style dictionary holding hashtag data, usable by the
-                looter instance.
-
-        Note:
-            Implementation thanks to Geoff (@gffde3).
-        """
-
-        try:
-            # Shift tag index
-            data['entry_data'][self._page_name][0][self._section_name] = \
-                data['entry_data'][self._page_name][0].pop('graphql')['hashtag']
-
-            # Shift media index
-            data['entry_data'][self._page_name][0][self._section_name]['media'] =\
-                data['entry_data'][self._page_name][0][self._section_name].pop('edge_hashtag_to_media')
-
-            # Note: this is an approximation of what is available from the profile json structure (may be missing
-            # some details as I've never seen the original hashtag json structure)
-            data['entry_data'][self._page_name][0][self._section_name]['media']['nodes'] = nodes = []
-            for node_data in data['entry_data'][self._page_name][0][self._section_name]['media'].pop('edges'):
-
-                node = node_data['node']  # pull out the node from edge list
-
-                # Restructure the data
-                transformed_node = {
-                    dst: node[src] for dst, src in six.iteritems(self._HASHTAG_MAP)
-                }
-
-                # Sometimes there are no captions, check if there are any.
-                if node['edge_media_to_caption']['edges']:
-                    transformed_node['caption'] = node['edge_media_to_caption']['edges'][0]['node']['text']
-                else:
-                    transformed_node['caption'] = ""
-
-                nodes.append(transformed_node)
-
-            return data
-
-        except KeyError:
-            warnings.warn("There was a KeyError transforming json from page: {}".format(self.target), stacklevel=1)
-            return {}
-        except Exception as e:  # Catch-all random garbage
-            warnings.warn('Unexpected exception in JSON transformation: {}'.format(e), stacklevel=1)
-            return {}
+    # def _transform_user_page(self, data):
+    #     """Convert the new-style user page into data usable by InstaLooter.
+    #
+    #     Arguments:
+    #         data (`dict`): a GraphQL style JSON dictionary holding hashtag data
+    #
+    #     Returns:
+    #         `dict`: an old-style dictionary holding hashtag data, usable by the
+    #             looter instance.
+    #     """
+    #     gq = data['entry_data'][self._page_name][0].pop('graphql')
+    #     media = gq[self._section_name]['edge_owner_to_timeline_media']
+    #
+    #     data['entry_data'][self._page_name][0][self._section_name] = {
+    #         'media': {
+    #             'count': media['count'],
+    #             'page_info': media['page_info'],
+    #             'nodes': [edge['node'] for edge in media['edges']]
+    #         }
+    #     }
+    #
+    #     return data
 
     def pages(self, media_count=None, with_pbar=False):
         """An iterator over the shared data of a profile or hashtag.
@@ -333,43 +359,61 @@ class InstaLooter(object):
         Yields:
             `dict`: the page content deserialised from JSON
         """
-        url = self._base_url.format(self.target)
+        # Get owner id and user metadata
+        with self.session.get(self._base_url.format(self.target)) as res:
+            data = self._get_shared_data(res)
+            ownerid = data['entry_data'][self._page_name][0]['graphql'][self._section_name]['id']
+        self.metadata = self._parse_metadata_from_profile_page(data)
+
+        def makeurl(end_cursor):
+            return "{base}?query_hash={hash}&variables={vars}".format(
+                base=self.URL_GRAPHQL,
+                hash="472f257a40c653c64c666ce877d59d2b",
+                vars=json.dumps({
+                    "id": ownerid,
+                    "first": 12,
+                    "after": end_cursor
+                })
+            )
+
+        end_cursor = None
         current_page = 0
         while True:
+
+            with self.session.get(makeurl(end_cursor)) as res:
+                # data = self._get_shared_data(res)
+                data = json.loads(res.text)
+                if not 'data' in data:
+                    time.sleep(10)
+                    continue
+                media_info = data['data'][self._section_name]['edge_owner_to_timeline_media']
+
+
             current_page += 1
-            with self.session.get(url) as res:
-                data = self._get_shared_data(res)
 
-                if self._section_name == 'tag':
-                    data = self._transform_hashtag_page(data)
-
-            try:
-                media_info = data['entry_data'][self._page_name][0][self._section_name]['media']
-            except KeyError:
-                warnings.warn("Could not find page of user: {}".format(self.target), stacklevel=1)
-                return
+            # try:
+            #     media_info = data['entry_data'][self._page_name][0]['graphql']\
+            #         [self._section_name]['edge_owner_to_timeline_media']
+            # except KeyError:
+            #     warnings.warn("Could not find page of user: {}".format(self.target), stacklevel=1)
+            #     return
 
             if media_count is None:
-                media_count = data['entry_data'][self._page_name][0][self._section_name]['media']['count']
+                media_count = media_info['count']
 
-            if with_pbar and media_info['page_info']['has_next_page'] and media_info["nodes"]:
-                if 'max_id' not in url:  # First page: init pbar
+            if with_pbar and media_info['page_info']['has_next_page'] and media_info["edges"]:
+                if current_page == 1:  # First page: init pbar
                     self._init_pbar(1, media_count//12 + 1, 'Loading pages |')
                 else:  # Other pages: update pbar
                     if self._pbar.value  == self._pbar.max_value:
                         self._pbar.max_value += 1
                     self._pbar.update(self._pbar.value+1)
 
-            # First page: if user page, get metadata
-            if 'max_id' not in url and self._section_name=="user":
-                self.metadata = self._parse_metadata_from_profile_page(data)
-
-            yield data
+            yield data['data'][self._section_name]
 
             # Break if the page is private (no media to show) or if the last page was reached
-            if not media_info['page_info']['has_next_page'] or not media_info['nodes']:
-
-                if not media_info['nodes']:
+            if not media_info['page_info']['has_next_page'] or not media_info['edges']:
+                if not media_info['edges']:
                     if self._section_name == "tag":
                         msg = "#{} has no medias to show.".format(self.target)
                     elif not self.is_logged_in():
@@ -377,11 +421,11 @@ class InstaLooter(object):
                     else:
                         msg = "Profile {} is private, and you are not following it.".format(self.target)
                     warnings.warn(msg)
-
                 break
 
             else:
-                url = '{}?max_id={}'.format(self._base_url.format(self.target), media_info['page_info']["end_cursor"])
+                end_cursor = media_info['page_info']['end_cursor']
+
 
     def medias(self, media_count=None, with_pbar=False, timeframe=None):
         """An iterator over the media nodes of a profile or hashtag.
@@ -406,23 +450,26 @@ class InstaLooter(object):
     def _timeless_medias(self, media_count=None, with_pbar=False):
         seen = set()
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
-            for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
-                if media['id'] in seen:
+            # data = page['entry_data'][self._page_name][0]['graphql'][self._section_name]
+            for media in page['edge_owner_to_timeline_media']['edges']:
+                if media['node']['id'] in seen:
                     return
-                yield media
-                seen.add(media['id'])
+                yield media['node']
+                seen.add(media['node']['id'])
 
     def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
         seen = set()
         start_time, end_time = get_times(timeframe)
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
-            for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
-                media_date = datetime.date.fromtimestamp(media['date'])
+            # data = page['entry_data'][self._page_name][0]['graphql'][self._section_name]
+            for media in page['edge_owner_to_timeline_media']['edges']:
+                timestamp = media['node'].get('taken_at_timestamp') or media['node']['date']
+                media_date = datetime.date.fromtimestamp(timestamp)
                 if start_time >= media_date >= end_time:
-                    if media['id'] in seen:
+                    if media['node']['id'] in seen:
                         return
-                    yield media
-                    seen.add(media['id'])
+                    yield media['node']
+                    seen.add(media['node']['id'])
                 elif media_date < end_time:
                     return
 
@@ -610,7 +657,7 @@ class InstaLooter(object):
                 media, condition, media_count, medias_queued, new_only)
         elif condition(media):
             if self.extended_dump:
-                media = self.get_post_info(media.get('shortcode') or media['code'])
+                media = self.get_post_info(media['shortcode'])
             media_basename = self._make_filename(media)
             if not os.path.exists(os.path.join(self.directory, media_basename)):
                 medias_queued += 1
@@ -624,7 +671,7 @@ class InstaLooter(object):
         return medias_queued, False
 
     def _add_sidecars_to_queue(self, media, condition, media_count, medias_queued, new_only):
-        media = self.get_post_info(media.get('shortcode') or media['code'])
+        media = self.get_post_info(media['shortcode'])
         for index, sidecar in enumerate(media['edge_sidecar_to_children']['edges']):
             sidecar = self._sidecar_to_media(sidecar['node'], media, index)
             medias_queued, stop = self._add_media_to_queue(
@@ -644,7 +691,7 @@ class InstaLooter(object):
         if media['is_video']:
             required_template_keys.append('video_url')
         else:
-            required_template_keys.append('display_src')
+            required_template_keys.append('display_url')
 
         try:
             template_values = {}
@@ -659,7 +706,7 @@ class InstaLooter(object):
             self._OWNER_MAP[media['owner']['id']] = media['owner']
 
         extension = os.path.splitext(os.path.basename(
-            media.get('video_url') or media['display_src']
+            media.get('video_url') or media['display_url']
         ).split('?')[0])[1]
 
         return "".join([self.template.format(**template_values), extension])
@@ -694,13 +741,13 @@ class InstaLooter(object):
             self._medias_queue.put(None)
 
     def _parse_metadata_from_profile_page(self, data):
-        user = data["entry_data"][self._page_name][0]["user"]
+        user = data["entry_data"][self._page_name][0]['graphql']["user"]
         metadata = {}
         for k, v in six.iteritems(user):
             metadata[k] = copy.copy(v)
-        metadata['follows'] = metadata['follows']['count']
-        metadata['followed_by'] = metadata['followed_by']['count']
-        del metadata['media']['nodes']
+        metadata['follows'] = metadata['edge_follow']['count']
+        metadata['followed_by'] = metadata['edge_followed_by']['count']
+        del metadata['edge_owner_to_timeline_media']['edges']
         return metadata
 
     @staticmethod
@@ -718,7 +765,7 @@ class InstaLooter(object):
 
         sidecar['likes'] = media['edge_media_preview_like']
         sidecar['comments'] = media['edge_media_to_comment']
-        sidecar['display_src'] = sidecar['display_url']
+        # sidecar['display_src'] = sidecar['display_url']
         sidecar['code'] = sidecar['shortcode']
         sidecar['date'] = media['taken_at_timestamp']
         return sidecar

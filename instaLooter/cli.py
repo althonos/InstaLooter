@@ -194,10 +194,12 @@ def main(argv=None):
 
         looter = InstaLooter(
             directory=os.path.expanduser(args.get('<directory>') or os.getcwd()),
-            profile=args['<profile>'],hashtag=args['<hashtag>'],
+            profile=args['<profile>'],
+            hashtag=args['<hashtag>'],
             add_metadata=args['--add-metadata'],
             get_videos=args['--get-videos'],
-            videos_only=args['--videos-only'], jobs=int(args['--jobs']),
+            videos_only=args['--videos-only'],
+            jobs=int(args['--jobs']),
             template=args['--template'],
             dump_json=args['--dump-json'],
             dump_only=args['--dump-only'],

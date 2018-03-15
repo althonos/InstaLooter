@@ -23,11 +23,11 @@ RESIZER_RX = re.compile(r"(s[0-9x]*/)?(e[0-9]*)/")
 def default(media):
     """Generates a link to the default picture, without processing effects.
     """
-    result = NEW_DEFAULT_RX.search(media['display_src'])
+    result = NEW_DEFAULT_RX.search(media['display_url'])
 
     return 'anything'.join(result.groups()) \
         if result is not None \
-      else ''.join(DEFAULT_RX.search(media['display_src']).groups())
+      else ''.join(DEFAULT_RX.search(media['display_url']).groups())
 
 
 def resizer(size):
@@ -40,7 +40,7 @@ def resizer(size):
     warnings.warn("`resizer` is not supported anymore", DeprecationWarning)
     target = 's{0}x{0}/'.format(size)
     def resize(media):
-        return RESIZER_RX.sub(target, media['display_src'])
+        return RESIZER_RX.sub(target, media['display_url'])
     resize.__doc__ = "Generates a link to a picture {} pixels large.".format(size)
     return resize
 
@@ -52,7 +52,7 @@ def thumbnail(media):
     try:
         return media['thumbnail_src']
     except KeyError:
-        url_parts = media['display_src'].split('/')
+        url_parts = media['display_url'].split('/')
         url_parts.insert(4, 'c121.0.669.669')
         url_parts.insert(5, 's640x640')
         return '/'.join(url_parts)

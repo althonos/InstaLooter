@@ -32,7 +32,8 @@ class InstaDownloader(threading.Thread):
         with open(path, 'w') as fp:
             json.dump(metadata, fp, indent=4, sort_keys=True)
         # set file modification and access time to be the ones when posting to instagram
-        os.utime(path, (metadata["date"], metadata["date"]))
+        timestamp = metadata.get("taken_at_timestamp") or metadata['date']
+        os.utime(path, (timestamp, timestamp))
 
     @staticmethod
     def _get_caption(metadata):
@@ -98,8 +99,9 @@ class InstaDownloader(threading.Thread):
             }
 
             exif_dict['Exif'] = {
-                piexif.ExifIFD.DateTimeOriginal: \
-                    datetime.datetime.fromtimestamp(metadata['date']).isoformat(),
+                piexif.ExifIFD.DateTimeOriginal: datetime.datetime.fromtimestamp(
+                    metadata.get('taken_at_timestamp') or metadata['date']
+                ).isoformat(),
                 piexif.ExifIFD.UserComment: \
                     self._get_caption(metadata).encode('utf-8'),
             }
@@ -123,7 +125,8 @@ class InstaDownloader(threading.Thread):
         if not self.dump_only:
             self._dl(photo_url, photo_name)
             # set file modification and access time to be the ones when posting to instagram
-            os.utime(photo_name, (media["date"], media["date"]))
+            timestamp = media.get("taken_at_timestamp") or media["date"]
+            os.utime(photo_name, (timestamp, timestamp))
 
         # put info from Instagram post into image metadata
         if self.add_metadata:
@@ -152,7 +155,8 @@ class InstaDownloader(threading.Thread):
         if not self.dump_only:
             self._dl(video_url, video_name)
             # set file modification and access time to be the ones when posting to instagram
-            os.utime(video_name, (media["date"], media["date"]))
+            timestamp = media.get("taken_at_timestamp") or media["date"]
+            os.utime(video_name, (timestamp, timestamp))
 
         if self.dump_json:
             self._save_metadata(video_name, media)
