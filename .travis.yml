@@ -20,10 +20,10 @@ before_install:
 - pip install -U pip wheel setuptools
 
 install:
-- pip install -e .[test]
+- pip install -e .[dev]
 
 script:
-- green -T
+- green -t
 
 after_success:
 - codecov

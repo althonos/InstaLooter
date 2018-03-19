@@ -1,182 +1,130 @@
-#!/usr/bin/env python
 # coding: utf-8
-from __future__ import (
-    absolute_import,
-    unicode_literals,
-)
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import atexit
+import io
+import json
+import operator
+import threading
+import time
 
 import requests
-import contextlib
-import threading
-import datetime
-import os
-import re
 import six
-import json
 
-try:
-    import PIL.Image
-    import piexif
-except ImportError:
-    PIL = None
+from ._utils.libs import PIL, piexif, json
+from ._utils.contexts import on_exception
 
 
 class InstaDownloader(threading.Thread):
 
-    @staticmethod
-    def _save_metadata(path, metadata):
-        """Save metadata in a JSON file named like the resource.
-        """
-        # replace .jpg / .mp4 extension with .json
-        path = re.sub('\..{3}$', '.json', path)
-        with open(path, 'w') as fp:
-            json.dump(metadata, fp, indent=4, sort_keys=True)
-        # set file modification and access time to be the ones when posting to instagram
-        timestamp = metadata.get("taken_at_timestamp") or metadata['date']
-        os.utime(path, (timestamp, timestamp))
+    def __init__(self,
+                 queue,
+                 destination,
+                 namegen,
+                 add_metadata=False,
+                 dump_json=False,
+                 dump_only=False,
+                 pbar=None,
+                 session=None):
 
-    @staticmethod
-    def _get_caption(metadata):
-        try:
-            return metadata['caption']
-        except KeyError:
-            pass
-        try:
-            return metadata['edge_media_to_caption']['edges'][0]['node']['text']
-        except KeyError:
-            return ''
-
-    def __init__(self, owner):
         super(InstaDownloader, self).__init__()
-        self.medias = owner._medias_queue
-        self.directory = owner.directory
-        self.add_metadata = owner.add_metadata
-        self.dump_json = owner.dump_json
-        self.dump_only = owner.dump_only
-        self.owner = owner
-        self.session = requests.Session()
-        self.session.cookies = self.owner.session.cookies
+
+        self.queue = queue
+        self.destination = destination
+        self.namegen = namegen
+        self.session = session or requests.Session()
+        self.pbar = pbar
+
+        self.dump_only = dump_only
+        self.dump_json = dump_json or dump_only
+        self.add_metadata = add_metadata
+
         self._killed = False
+        self._downloading = None
+
+        self._DOWNLOAD_METHODS = {
+            "GraphImage": self._download_image,
+            "GraphVideo": self._download_video,
+            "GraphSidecar": self._download_sidecar,
+        }
+
+    def _download_image(self, media):
+        url = media['display_url']
+        filename = self.namegen.file(media)
+
+        if self.destination.exists(filename):
+            return
+
+        # FIXME: find a way to remove failed temporary downloads
+        # with on_exception(self.destination.remove, filename):
+        with self.destination.open(filename, "wb") as f:
+            with self.session.get(url) as res:
+                f.write(res.content)
+
+        self._set_time(media, filename)
+
+    def _download_video(self, media):
+        url = media['video_url']
+        filename = self.namegen.file(media)
+
+        if self.destination.exists(filename):
+            return
+
+        # FIXME: find a way to remove failed temporary downloads
+        with on_exception(self.destination.remove, filename):
+            with self.destination.open(filename, "wb") as f:
+                with self.session.get(url) as res:
+                    for chunk in res.iter_content(io.DEFAULT_BUFFER_SIZE):
+                        f.write(chunk)
+
+        self._set_time(media, filename)
+
+    def _download_sidecar(self, media):
+        edges = media.pop('edge_sidecar_to_children')['edges']
+        for edge in map(operator.itemgetter('node'), edges):
+            for key, value in six.iteritems(media):
+                edge.setdefault(key, value)
+            self._DOWNLOAD_METHODS[edge['__typename']](edge)
+
+    def _set_time(self, media, filename):
+        details = {}
+        details["modified"] = details["accessed"] = details["created"] = \
+            media.get('taken_at_timestamp') or media['date']
+        self.destination.setinfo(filename, {"details": details})
+
+    def _dump(self, media):
+        basename = self.namegen.base(media)
+        filename = "{}.json".format(basename)
+
+        with self.destination.open(filename, "w") as f:
+            json.dump(media, f, indent=4, sort_keys=True)
 
     def run(self):
         while not self._killed:
             try:
-                media = self.medias.get(timeout=1)
+                media = self.queue.get_nowait()
+
+                # Received a poison pill: break the loop
                 if media is None:
-                    break
-                elif media.get('is_video'):
-                    self._download_video(media)
+                    self._killed = True
+
                 else:
-                    self._download_photo(media)
-                with self.owner.dl_count_lock:
-                    self.owner.dl_count += 1
+                    # Download media
+                    if not self.dump_only:
+                        self._DOWNLOAD_METHODS[media["__typename"]](media)
+                    # Dump JSON metadata if needed
+                    if self.dump_json:
+                        self._dump(media)
+                    # Update progress bar if any
+                    if self.pbar is not None and not self._killed:
+                        with self.pbar.lock():
+                            self.pbar.update()
+
+                self.queue.task_done()
+
             except six.moves.queue.Empty:
-                pass
+                time.sleep(1)
 
-    def _add_metadata(self, path, metadata):
-        """Add some metadata to the picture located at `path`.
-        """
-
-        if PIL is not None:
-
-            try:
-                full_name = self.owner.metadata['full_name']
-            except KeyError:
-                full_name = self.owner.get_owner_info(
-                    metadata.get('shortcode') or metadata['code']
-                )['full_name']
-
-            exif_dict = {"GPS": {}, "thumbnail": None}
-
-            exif_dict['0th'] = {
-                piexif.ImageIFD.Artist: \
-                    "Image creator, {}".format(full_name).encode('utf-8'),
-            }
-
-            exif_dict['1st'] = {
-                piexif.ImageIFD.Artist: \
-                    "Image creator, {}".format(full_name).encode('utf-8'),
-            }
-
-            exif_dict['Exif'] = {
-                piexif.ExifIFD.DateTimeOriginal: datetime.datetime.fromtimestamp(
-                    metadata.get('taken_at_timestamp') or metadata['date']
-                ).isoformat(),
-                piexif.ExifIFD.UserComment: \
-                    self._get_caption(metadata).encode('utf-8'),
-            }
-
-            #print(exif_dict)
-
-            with PIL.Image.open(path) as img:
-                img.save(path, exif=piexif.dump(exif_dict))
-
-    def _download_photo(self, media):
-        """Download a picture from a media dictionary.
-        """
-        photo_url = self.owner.url_generator(media)
-
-        if not isinstance(photo_url, six.string_types):
-            raise RuntimeError('The "custom_photo_url" option must return a string !')
-
-        photo_name = os.path.join(self.directory, self.owner._make_filename(media))
-
-        # save full-resolution photo
-        if not self.dump_only:
-            self._dl(photo_url, photo_name)
-            # set file modification and access time to be the ones when posting to instagram
-            timestamp = media.get("taken_at_timestamp") or media["date"]
-            os.utime(photo_name, (timestamp, timestamp))
-
-        # put info from Instagram post into image metadata
-        if self.add_metadata:
-            self._add_metadata(photo_name, media)
-
-        if self.dump_json:
-            self._save_metadata(photo_name, media)
-
-    def _download_video(self, media):
-        """Download a video from a media dictionary.
-        """
-        url = "https://www.instagram.com/p/{}/".format(media.get('shortcode') or media['code'])
-
-        if "video_url" not in media:
-            with contextlib.closing(self.session.get(url)) as res:
-                # data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['media']
-                data = self.owner._get_shared_data(res)['entry_data']['PostPage'][0]['graphql']['shortcode_media']
-        else:
-            data = media
-
-        video_url = data["video_url"]
-        #video_basename = os.path.basename(video_url.split('?')[0])
-        video_name = os.path.join(self.directory, self.owner._make_filename(data))
-
-        # save video
-        if not self.dump_only:
-            self._dl(video_url, video_name)
-            # set file modification and access time to be the ones when posting to instagram
-            timestamp = media.get("taken_at_timestamp") or media["date"]
-            os.utime(video_name, (timestamp, timestamp))
-
-        if self.dump_json:
-            self._save_metadata(video_name, media)
-
-    def _dl(self, source, dest):
-        """Download a file located at `source` to `dest`.
-        """
-        self.session.headers['Accept'] = '*/*'
-        with contextlib.closing(self.session.get(source)) as res:
-            with open(dest, 'wb') as dest_file:
-                for block in res.iter_content(1024):
-                    if block:
-                        dest_file.write(block)
-
-    def kill(self):
-        """Kill the Thread.
-
-        This method actually performs a soft kill, it just
-        forces the Thread to break the infinite loop. If the Thread
-        is currently downloading a file, it will first finish the
-        download before exiting.
-        """
+    def terminate(self):
         self._killed = True
