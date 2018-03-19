@@ -10,3 +10,6 @@ def threads_force_join():
         if isinstance(t, InstaDownloader):
             t.terminate()
             t.join()
+
+def threads_count():
+    return sum(isinstance(t, InstaDownloader) for t in threading.enumerate())

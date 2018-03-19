@@ -28,6 +28,8 @@ HELP = textwrap.dedent(
         <post_token>                 Either the url or the code of a post to
                                      download the picture or video from.
         <directory>                  The directory in which to download files.
+                                     Can actually be a Pyfilesystem2 FS URL
+                                     (see http://pyfilesystem2.rtfd.io).
         <batch_file>                 The path to the batch file containing
                                      batch download instructions (see the
                                      online documentation).
@@ -35,9 +37,9 @@ HELP = textwrap.dedent(
     Options - Credentials:
         -u USER, --username USER     The username to connect to Instagram with.
         -p PASS, --password PASS     The password to connect to Instagram with
-                                     (will be asked in the shell if the `--username`
-                                      option was given without the corresponding
-                                      `--password`).
+                                     (will be asked in the shell if the
+                                     `--username`  option was given without
+                                     the corresponding `--password`).
 
     Options - Files:
         -n NUM, --num-to-dl NUM      Maximum number of new files to download
@@ -46,7 +48,7 @@ HELP = textwrap.dedent(
         -T TMPL, --template TMPL     A filename template to use to write the
                                      files (see *Template*). [default: {id}]
         -v, --get-videos             Get videos as well as photos.
-        -V, --videos-only            Get videos only.
+        -V, --videos-only            Get videos only. Implies `--get-videos`.
         -N, --new                    Only look for files newer than the ones
                                      in the destination directory (faster).
         -t TIME, --time TIME         The time limit within which to download
@@ -57,17 +59,22 @@ HELP = textwrap.dedent(
                                      pictures (requires PIL/Pillow and piexif).
         -d, --dump-json              Save metadata to a JSON file next to
                                      downloaded videos/pictures.
-        -D, --dump-only              Save only the metadata and no video / picture.
+        -D, --dump-only              Save only the metadata and no video/picture.
+                                     Implies `--dump-json`.
         -e, --extended-dump          Always dump the maximum amount of extracted
                                      information, at the cost of more time.
 
     Options - Miscellaneous:
-        -q, --quiet                  Do not produce any output.
+        -l LEVEL, --loglevel LEVEL   The level of log to produce, as an
+                                     integer or a level name. [default: INFO]
+        -q, --quiet                  Do not display any output or progress
+                                     bar. Implies `--loglevel 100`.
         -h, --help                   Display this message and quit.
         --version                    Show program version and quit.
-        --traceback                  Print error traceback if any (debug).
-        -W WARNINGCTL                Change warning behaviour (same as python -W).
-                                     [default: default]
+        --traceback                  Print error traceback if any (use when
+                                     reporting an issue on GitHub, please!).
+        -W WARNINGCTL                Change warning behaviour (same as the
+                                     Python `-W` flag). [default: default]
 
     Template:
         The default filename of the pictures and videos on Instagram doesn't
@@ -106,5 +113,6 @@ HELP = textwrap.dedent(
 
     """
 )
+
 
 USAGE = next(s for s in HELP.split("\n\n") if s.startswith("Usage"))

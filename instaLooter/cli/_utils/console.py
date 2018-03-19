@@ -5,40 +5,37 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import functools
-import hues
-import os
-import sys
+import logging
 import warnings
 
+logging.SPAM = 5
+logging.NOTICE = 25
+logging.SUCCESS = 35
 
-console = hues.SimpleConsole(stdout=sys.stderr)
+
+def warn_logging(logger):
+    def showwarning(message, category, filename, lineno, file=None, line=None):
+        logger.warning(message)
+    return showwarning
 
 
-def warn_with_hues(message, category, filename, lineno, file=None, line=None):
-    """Use `hues` to log warnings.
+def wrap_warnings(logger):
+    """Have the function patch `warnings.showwarning` with the given logger.
+
+    Arguments:
+        logger: a `~logging.Logger` instance.
+
+    Returns:
+        `function`: a decorator function.
     """
-    console.warn(message)
-
-
-def warn_windows(message, category, filename, lineno, file=None, line=None):
-    """Use a `hues`-like format to log warnings without color.
-    """
-    print(("{d.hour}:{d.minute}:{d.second} - WARNING - "
-          "{msg}").format(d=datetime.datetime.now(), msg=message), file=sys.stderr)
-
-
-def wrap_warnings(func):
-    """Have the function patch `warnings.showwarning` when it is called.
-    """
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        showwarning = warnings.showwarning
-        if os.name == 'posix':
-            warnings.showwarning = warn_with_hues
-        else:
-            warnings.showwarning = warn_windows
-        try:
-            return func(*args, **kwargs)
-        finally:
-            warnings.showwarning = showwarning
-    return new_func
+    def decorator(func):
+        @functools.wraps(func)
+        def new_func(*args, **kwargs):
+            showwarning = warnings.showwarning
+            warnings.showwarning = warn_logging(logger)
+            try:
+                return func(*args, **kwargs)
+            finally:
+                warnings.showwarning = showwarning
+        return new_func
+    return decorator
