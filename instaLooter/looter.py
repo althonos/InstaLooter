@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 import abc
 import atexit
-import functools
 import itertools
 import operator
 import os
@@ -320,11 +319,13 @@ class PostLooter(InstaLooter):
     def __init__(self, code, **kwargs):
         super(PostLooter, self).__init__(**kwargs)
         self.code = code
+        self._info = None
 
     @property
-    @functools.lru_cache(1)
-    def _info(self):
-        return self.get_post_info(self.code)
+    def info(self):
+        if self._info is None:
+            self._info = self.get_post_info(self.code)
+        return self._info
 
     def pages(self):
         yield {"edge_owner_to_timeline_media": {
@@ -334,12 +335,12 @@ class PostLooter(InstaLooter):
                 "end_cursor": None,
             },
             "edges": [
-                {"node": self._info}
+                {"node": self.info}
             ],
         }}
 
     def medias(self, timeframe=None):
-        info = self._info
+        info = self.info
         if timeframe is not None:
             start, end = TimedMediasIterator.get_times(timeframe)
             timestamp = info.get("taken_at_timestamp") or info["media"]
