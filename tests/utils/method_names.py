@@ -1,6 +1,5 @@
 # coding: utf-8
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 def signature(func, param_num, params):
     args = ','.join("{!r}".format(a) for a in params.args)
