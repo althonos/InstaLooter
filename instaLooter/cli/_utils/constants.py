@@ -17,19 +17,20 @@ HELP = textwrap.dedent(
         instaLooter batch <batch_file> [<directory>] [options]
         instaLooter hashtag <hashtag> [<directory>] [options]
         instaLooter user <profile> [<directory>] [options]
+        instaLooter post <post_token> [<directory>] [options]
         instaLooter (-h | --help | --version | --usage)
 
     Arguments:
         <profile>                    The username of the profile to download
                                      videos and pictures from.
-        <hashtag>                    A hashtag to download pictures and videos
-                                     from.
-        <post_token>                 Either the url or the code of a single post
-                                     to download the picture or video from.
+        <hashtag>                    A hashtag to download pictures and
+                                     videos from.
+        <post_token>                 Either the url or the code of a post to
+                                     download the picture or video from.
         <directory>                  The directory in which to download files.
-        <batch_file>                 The path to the batch file containing batch
-                                     download instructions (see the online
-                                     documentation).
+        <batch_file>                 The path to the batch file containing
+                                     batch download instructions (see the
+                                     online documentation).
 
     Options - Credentials:
         -u USER, --username USER     The username to connect to Instagram with.
@@ -71,7 +72,7 @@ HELP = textwrap.dedent(
     Template:
         The default filename of the pictures and videos on Instagram doesn't
         show anything about the file you just downloaded. But using the -T
-        argument allows you to give instaLooter a filename template, using
+        argument allows you to give instaLooter a filename template, using the
         the following format with brackets-enclosed ({}) variable names among:
         - ``id``*² and ``code``*² of the instagram id of the media
         - ``ownerid``*, ``username`` and ``fullname`` of the owner

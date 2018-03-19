@@ -14,7 +14,7 @@ import fs
 import six
 
 from .. import __version__
-from ..looter import ProfileLooter, HashtagLooter
+from ..looter import HashtagLooter, ProfileLooter, PostLooter
 from ..pbar import TqdmProgressBar
 # from ..batch import BatchRunner
 
@@ -81,18 +81,17 @@ def main(argv=None):
     with warnings.catch_warnings():
         warnings.simplefilter(args['-W'])
 
-        # if args['<post_token>'] is not None:
-        #     args['--get-videos'] = True
-
         if args['user']:
             looter_cls = ProfileLooter
             target = args['<profile>']
         elif args['hashtag']:
             looter_cls = HashtagLooter
             target = args['<hashtag>']
+        elif args['post']:
+            looter_cls = PostLooter
+            target = args['<post_token>']
         else:
             raise NotImplementedError("TODO")
-
 
         looter = looter_cls(
             target,
@@ -137,21 +136,8 @@ def main(argv=None):
             )
 
             if n:
-                console.success("Downloaded {} files !".format(n))
-
-            # post_token = args['<post_token>']
-            # if post_token is None:
-            #     media_count = int(args['--num-to-dl']) if args['--num-to-dl'] else None
-            #     looter.download(
-            #         media_count=media_count,
-            #         with_pbar=not args['--quiet'],
-            #         timeframe=timeframe,
-            #         new_only=args['--new'],
-            #     )
-            # else:
-            #     if 'insta' in post_token:
-            #         post_token = looter._extract_code_from_url(post_token)
-            #     looter.download_post(post_token)
+                console.success("Downloaded {} media{} !".format(
+                    n, "s" if n > 1 else ""))
 
         except (Exception, KeyboardInterrupt) as e:
             from ._utils.threadutils import threads_force_join

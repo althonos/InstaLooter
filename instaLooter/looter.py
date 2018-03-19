@@ -82,6 +82,42 @@ class InstaLooter(object):
         with self.session.get(url) as res:
             return res.json()['graphql']['shortcode_media']
 
+    def download_pictures(self,
+                          destination,
+                          media_count=None,
+                          timeframe=None,
+                          new_only=False,
+                          pgpbar_cls=None,
+                          dlpbar_cls=None):
+
+        self.download(
+            destination,
+            condition=lambda media: not media["is_video"],
+            media_count=media_count,
+            timeframe=timeframe,
+            new_only=new_only,
+            pgpbar_cls=pgpbar_cls,
+            dlpbar_cls=dlpbar_cls,
+        )
+
+    def download_videos(self,
+                          destination,
+                          media_count=None,
+                          timeframe=None,
+                          new_only=False,
+                          pgpbar_cls=None,
+                          dlpbar_cls=None):
+
+        self.download(
+            destination,
+            condition=operator.itemgetter("is_video"),
+            media_count=media_count,
+            timeframe=timeframe,
+            new_only=new_only,
+            pgpbar_cls=pgpbar_cls,
+            dlpbar_cls=dlpbar_cls,
+        )
+
     def download(self,
                  destination,
                  condition=None,
@@ -92,14 +128,7 @@ class InstaLooter(object):
                  dlpbar_cls=None):
 
         # Open the destination filesystem
-        close_destination = False
-        if isinstance(destination, six.binary_type):
-            destination = destination.decode('utf-8')
-        if isinstance(destination, six.text_type):
-            destination = fs.open_fs(destination)
-            close_destination = True
-        if not isinstance(destination, FS):
-            raise TypeError("<destination> must be a FS URL or FS instance.")
+        destination, close_destination = self._init_destfs(destination)
 
         # Create an iterator over the pages with an optional progress bar
         pages_iterator = self.pages()
@@ -158,6 +187,17 @@ class InstaLooter(object):
             pbar.set_maximum(maximum)
             pbar.set_lock(threading.RLock())
         return it
+
+    def _init_destfs(self, destination, create=True):
+        close_destination = False
+        if isinstance(destination, six.binary_type):
+            destination = destination.decode('utf-8')
+        if isinstance(destination, six.text_type):
+            destination = fs.open_fs(destination, create=create)
+            close_destination = True
+        if not isinstance(destination, FS):
+            raise TypeError("<destination> must be a FS URL or FS instance.")
+        return destination, close_destination
 
     def _fill_media_queue(self,
                           queue,
@@ -272,3 +312,67 @@ class HashtagLooter(InstaLooter):
 
     def pages(self):
         return HashtagIterator(self._hashtag, self.session)
+
+
+
+class PostLooter(InstaLooter):
+
+    def __init__(self, code, **kwargs):
+        super(PostLooter, self).__init__(**kwargs)
+        self.code = code
+
+    @property
+    @functools.lru_cache(1)
+    def _info(self):
+        return self.get_post_info(self.code)
+
+    def pages(self):
+        yield {"edge_owner_to_timeline_media": {
+            "count": 1,
+            "page_info": {
+                "has_next_page": False,
+                "end_cursor": None,
+            },
+            "edges": [
+                {"node": self._info}
+            ],
+        }}
+
+    def medias(self, timeframe=None):
+        info = self._info
+        if timeframe is not None:
+            start, end = TimedMediasIterator.get_times(timeframe)
+            timestamp = info.get("taken_at_timestamp") or info["media"]
+            if not (start >= media_date >= end):
+                raise StopIteration
+        yield info
+
+    def download(self,
+                 destination,
+                 condition=None,
+                 media_count=None,
+                 timeframe=None,
+                 new_only=False,
+                 pgpbar_cls=None,
+                 dlpbar_cls=None):
+
+        destination, close_destination = self._init_destfs(destination)
+
+        queue = six.moves.queue.Queue()
+        medias_queued = self._fill_media_queue(
+            queue, destination, iter(self.medias()), media_count,
+            new_only, condition)
+        queue.put(None)
+
+        worker = InstaDownloader(
+            queue=queue,
+            destination=destination,
+            namegen=self.namegen,
+            add_metadata=self.add_metadata,
+            dump_json=self.dump_json,
+            dump_only=self.dump_only,
+            pbar=None,
+            session=self.session)
+        worker.run()
+
+        return medias_queued
