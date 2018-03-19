@@ -96,7 +96,7 @@ class InstaLooter(object):
         if isinstance(destination, six.binary_type):
             destination = destination.decode('utf-8')
         if isinstance(destination, six.text_type):
-            destination = destination.open_fs(destination)
+            destination = fs.open_fs(destination)
             close_destination = True
         if not isinstance(destination, FS):
             raise TypeError("<destination> must be a FS URL or FS instance.")
@@ -179,7 +179,7 @@ class InstaLooter(object):
         # Queue all media filling the condition
         medias_queued = 0
         media_count = media_count or float('inf')
-        for media in filter(condition, medias_iterator):
+        for media in six.moves.filter(condition, medias_iterator):
 
             # Check if the whole post info is required
             if self.namegen.needs_extended(media) or media["__typename"] != "GraphImage":

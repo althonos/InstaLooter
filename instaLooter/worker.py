@@ -82,7 +82,7 @@ class InstaDownloader(threading.Thread):
 
     def _download_sidecar(self, media):
         edges = media.pop('edge_sidecar_to_children')['edges']
-        for edge in map(operator.itemgetter('node'), edges):
+        for edge in six.moves.map(operator.itemgetter('node'), edges):
             for key, value in six.iteritems(media):
                 edge.setdefault(key, value)
             self._DOWNLOAD_METHODS[edge['__typename']](edge)
