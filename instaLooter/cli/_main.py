@@ -154,7 +154,7 @@ def main(argv=None):
             #     looter.download_post(post_token)
 
         except (Exception, KeyboardInterrupt) as e:
-            from .threadutils import threads_force_join
+            from ._utils.threadutils import threads_force_join
 
             # Show error traceback if any
             if not isinstance(e, KeyboardInterrupt):

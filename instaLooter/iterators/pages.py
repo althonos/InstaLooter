@@ -61,7 +61,7 @@ class PageIterator(collections.Iterator):
             try:
                 data = next(self._data_it, None)
                 c = data[self.section_generic][self.section_media]['count']
-                self._total = math.ceil(c / self.PAGE_SIZE)
+                self._total = int(math.ceil(c / self.PAGE_SIZE))
             except TypeError:
                 self._total = 0
         return self._total - self._done

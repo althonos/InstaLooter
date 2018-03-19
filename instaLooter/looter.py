@@ -22,7 +22,7 @@ from fs.base import FS
 from . import __author__, __name__ as __appname__, __version__
 from .iterators.pages import ProfileIterator, HashtagIterator
 from .iterators.medias import TimedMediasIterator, MediasIterator
-from .pbar import TqdmProgressBar
+from .pbar import ProgressBar
 from .worker import InstaDownloader
 
 from ._utils.libs import length_hint
@@ -188,7 +188,7 @@ class InstaLooter(object):
             # Check that sidecar children fit the condition
             if media['__typename'] == "GraphSidecar":
                 # Check that each node fits the condition
-                for sidecar in media['edge_sidecar_to_children']['edges'].copy():
+                for sidecar in media['edge_sidecar_to_children']['edges'][:]:
                     if not condition(sidecar['node']):
                         media['edge_sidecar_to_children']['edges'].remove(sidecar)
 
