@@ -21,7 +21,7 @@ Store the links to the pictures and videos of a profile into a file
            if media['is_video']:
                url = looter.get_post_info(media['code'])['video_url']
            else:
-               url = media['display_src']
+               url = media['display_url']
            output.write("{}\n".format(url))
 
 
