@@ -55,7 +55,7 @@ def main(argv=None, stream=None):
         return 1
 
     if args['--usage']:
-        _print(USAGE, file=sys.stderr)
+        _print(USAGE)
         return 0
 
     level = "100" if args['--quiet'] else args.get("--loglevel", "INFO")

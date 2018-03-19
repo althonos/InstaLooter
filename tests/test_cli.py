@@ -6,8 +6,10 @@ import unittest
 import json
 
 import fs
+import six
 
 import instaLooter.cli
+from instaLooter.cli._utils.constants import USAGE
 
 
 class TestCLI(unittest.TestCase):
@@ -52,6 +54,11 @@ class TestCLI(unittest.TestCase):
 
         self.assertEqual("1308972728853756295", json_metadata["id"])
         self.assertEqual("BIqZ8L8AHmH", json_metadata["shortcode"])
+
+    def test_usage(self):
+        handle = six.moves.StringIO()
+        instaLooter.cli.main(["--usage"], stream=handle)
+        self.assertEqual(handle.getvalue().strip(), USAGE.strip())
 
     @unittest.expectedFailure
     def test_single_post_from_url(self):
