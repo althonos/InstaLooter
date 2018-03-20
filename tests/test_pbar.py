@@ -14,13 +14,6 @@ from instalooter.pbar import ProgressBar, TqdmProgressBar
 
 class TestProgressBar(unittest.TestCase):
 
-    # def setUp(self):
-    #     self.destfs = fs.open_fs("temp://")
-    #     self.tmpdir = self.destfs.getsyspath("/")
-    #
-    # def tearDown(self):
-    #     self.destfs.close()
-
     def test_derived_progress_bar(self):
 
         class MyProgressBar(ProgressBar):
@@ -50,7 +43,6 @@ class TestProgressBar(unittest.TestCase):
         pb.set_lock(lock)
         self.assertIs(pb.get_lock(), lock)
 
-
     def test_tqdm_progress_bar(self):
 
         fh = six.moves.StringIO()
@@ -74,8 +66,6 @@ class TestProgressBar(unittest.TestCase):
         lock = threading.RLock()
         pb.set_lock(lock)
         self.assertIs(pb.get_lock(), lock)
-
-
 
 
 def setUpModule():

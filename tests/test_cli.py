@@ -6,13 +6,25 @@ import unittest
 import json
 
 import fs
+import requests
 import six
 
 import instalooter.cli
 from instalooter.cli._utils.constants import USAGE
 
+from .utils import mock
 
+
+@mock.patch('instalooter.looter.requests.Session', lambda: TestCLI.session)
 class TestCLI(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.session = requests.Session()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.session.close()
 
     def setUp(self):
         self.destfs = fs.open_fs("temp://")
