@@ -25,7 +25,7 @@ class BatchRunner(object):
         'hashtag': HashtagLooter,
     }
 
-    def __init__(self, handle):
+    def __init__(self, handle, args=None):
 
         close_handle = False
         if isinstance(handle, six.binary_type):
@@ -35,6 +35,7 @@ class BatchRunner(object):
             close_handle = True
 
         try:
+            self.args = args or {}
             self.parser = six.moves.configparser.ConfigParser()
             getattr(self.parser, "readfp" if six.PY2 else "read_file")(handle)
         finally:
@@ -81,7 +82,8 @@ class BatchRunner(object):
         for name, looter_cls in six.iteritems(self._CLS_MAP):
 
             targets = self.getTargets(self._get(section_id, name))
-            quiet = self._getboolean(section_id, "quiet")
+            quiet = self._getboolean(
+                section_id, "quiet", self.args.get("--quiet", False))
 
             if targets:
                 logger.info("Launching {} job for section {}".format(name, section_id))

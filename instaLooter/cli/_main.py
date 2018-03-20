@@ -58,7 +58,7 @@ def main(argv=None, stream=None):
         _print(USAGE)
         return 0
 
-    level = "100" if args['--quiet'] else args.get("--loglevel", "INFO")
+    level = "ERROR" if args['--quiet'] else args.get("--loglevel", "INFO")
     coloredlogs.install(
         level=int(level) if level.isdigit() else level,
         stream=stream,
@@ -90,7 +90,7 @@ def main(argv=None, stream=None):
 
     if args['batch']:
         with open(args['<batch_file>']) as batch_file:
-            batch_runner = BatchRunner(batch_file)
+            batch_runner = BatchRunner(batch_file, args)
         batch_runner.runAll()
         return 0
 
@@ -140,7 +140,7 @@ def main(argv=None, stream=None):
             dest_url = args.get('<directory>') or os.getcwd()
             dest_fs = fs.open_fs(dest_url, create=True)
 
-            logger.info("Starting download of `{}`".format(target))
+            logger.log(logging.NOTICE, "Starting download of `{}`".format(target))
             n = looter.download(
                 destination=dest_fs,
                 media_count=media_count,
@@ -167,7 +167,7 @@ def main(argv=None, stream=None):
             # Close remaining threads spawned by InstaLooter.download
             count = threads_count()
             if count:
-                logger.info("Terminating {} remaining workers...".format(count))
+                logger.log(logging.NOTICE, "Terminating {} remaining workers...".format(count))
                 threads_force_join()
 
             # Return the error number if any

@@ -68,7 +68,7 @@ HELP = textwrap.dedent(
         -l LEVEL, --loglevel LEVEL   The level of log to produce, as an
                                      integer or a level name. [default: INFO]
         -q, --quiet                  Do not display any output or progress
-                                     bar. Implies `--loglevel 100`.
+                                     bar. Implies `--loglevel ERROR`.
         -h, --help                   Display this message and quit.
         --version                    Show program version and quit.
         --traceback                  Print error traceback if any (use when
