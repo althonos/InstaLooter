@@ -18,6 +18,16 @@ logging.addLevelName(logging.SUCCESS, "SUCCESS")
 
 
 def warn_logging(logger):
+    """Create a `showwarning` function that uses the given logger.
+
+    Arguments:
+        logger (`~logging.Logger`): a Logger instance.
+
+    Returns:
+        function: a function that can be used as the `warnings.showwarning`
+            callback.
+
+    """
     def showwarning(message, category, filename, lineno, file=None, line=None):
         logger.warning(message)
     return showwarning
@@ -31,6 +41,7 @@ def wrap_warnings(logger):
 
     Returns:
         `function`: a decorator function.
+        
     """
     def decorator(func):
         @functools.wraps(func)

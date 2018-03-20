@@ -25,7 +25,7 @@ from . import __author__, __name__ as __appname__, __version__
 
 from ._impl import length_hint
 from ._utils import NameGenerator
-from .pages import ProfileIterator, HashtagIterator
+from .pages import PageIterator, ProfileIterator, HashtagIterator
 from .medias import TimedMediasIterator, MediasIterator
 from .pbar import ProgressBar
 from .worker import InstaDownloader
@@ -62,6 +62,16 @@ class InstaLooter(object):
 
     @classmethod
     def _init_session(cls, session=None):
+        """Initialise the given session and load class cookies to its jar.
+
+        Arguments:
+            session (`~requests.Session`, *optional*): a `requests` session,
+                or `None` to create a new one.
+
+        Returns:
+            `~requests.Session`: an initialised session instance.
+
+        """
         if session is None:
             session = requests.Session()
         session.cookies = six.moves.http_cookiejar.LWPCookieJar(
@@ -76,16 +86,18 @@ class InstaLooter(object):
     @classmethod
     def _login(cls, username, password, session=None):
         # type: (str, str, Optional[requests.Session]) -> None
-        """Login with provided credentials.
+        """Login with provided credentials and session.
 
         Arguments:
-            username (`str`): the username to log in with
-            password (`str`): the password to log in with
+            username (`str`): the username to log in with.
+            password (`str`): the password to log in with.
+            session (`~requests.Session`, *optional*): the session to use,
+                or `None` to create a new session.
 
         Note:
             Code taken from LevPasha/instabot.py
-        """
 
+        """
         if session is None:
             session = requests.Session()
 
@@ -122,13 +134,19 @@ class InstaLooter(object):
         # type: (Optional[requests.Session]) -> None
         """Log out from current session.
 
+        Also deletes the eventual cookie file left in the cache directory,
+        to prevent new connections from using the old session ID.
+
+        Arguments:
+            session (`~requests.Session`, *optional*): the session to use,
+                or `None` to create a new session.
+
         Note:
             Code taken from LevPasha/instabot.py
-        """
 
+        """
         if session is None:
             session = requests.Session()
-
 
         sessionid = cls._sessionid(session)
         if sessionid is not None:
@@ -140,12 +158,33 @@ class InstaLooter(object):
 
     @classmethod
     def _logged_in(cls, session=None):
+        # type: (Optional[requests.Session]) -> bool
+        """Check if there is an open Instagram session.
+
+        Arguments:
+            session (`~requests.Session`, *optional*): the session to use,
+                or `None` to create a new session.
+
+        Returns:
+            bool: `True` if there's an active session, `False` otherwise.
+
+        """
         return cls._sessionid(session) is not None
 
     @classmethod
     def _sessionid(cls, session=None):
         # type: (Optional[requests.Session]) -> None
+        """Get the ID of the currently opened Instagram session.
 
+        Arguments:
+            session (`~requests.Session`, *optional*): the session to use,
+                or `None` to create a new session.
+
+        Returns:
+            `str` or `None`: the session ID, or `None` if there's no
+                open session.
+
+        """
         session = cls._init_session(session)
         return next((ck.value for ck in session.cookies
                      if ck.domain == "www.instagram.com"
@@ -164,7 +203,33 @@ class InstaLooter(object):
                  session=None           # type: Optional[requests.Session]
                  ):
         # type: (...) -> None
+        """Create a new looter instance.
 
+        Arguments:
+            add_metadata (`bool`): Add date and comment metadata to
+                the downloaded pictures. **[default: False]**
+            get_videos (`bool`): Also get the videos from the given
+                target **[default: False]**
+            videos_only (`bool`): Only download videos (implies
+                ``get_videos=True``). **[default: False]**
+            jobs (`bool`): the number of parallel threads to use to
+                download media (12 or more is advised to have a true parallel
+                download of media files) **[default: 16]**
+            template (`str`): a filename format, in Python new-style-formatting
+                format. See the the Template page of the documentation
+                for available keys. **[default: {id}]**
+            dump_json (`bool`): Save each resource metadata to a
+                JSON file next to the actual image/video. **[default: False]**
+            dump_only (`bool`): Only save metadata and discard the actual
+                resource. **[default: False]**
+            extended_dump (`bool`): Attempt to fetch as much metadata as
+                possible, at the cost of more time. Set to `True` if, for
+                instance, you always want the top comments to be downloaded
+                in the dump. **[default: False]**
+            session (`~requests.Session`, optional): a `requests` session,
+                or `None` to create a new one.
+
+        """
         self.add_metadata = add_metadata
         self.get_videos = get_videos or videos_only
         self.videos_only = videos_only
@@ -173,27 +238,65 @@ class InstaLooter(object):
         self.dump_only = dump_only
         self.dump_json = dump_json or dump_only
         self.extended_dump = extended_dump
-
         self.session = self._init_session(session)
         atexit.register(self.session.close)
 
     @abc.abstractmethod
     def pages(self):
-        # type: () -> Iterable[dict]
+        # type: () -> PageIterator
+        """Obtain an iterator over Instagram post pages.
+
+        Returns:
+            `PageIterator`: an iterator over the instagram post pages.
+
+        """
         return NotImplemented
 
     def _medias(self, pages_iterator, timeframe=None):
         # type: (Iterable[dict], Optional[_Timeframe]) -> MediasIterator
+        """Obtain an iterator over the medias of the given pages iterator.
+
+        Arguments:
+            pages_iterator (`Iterator`): an iterator over the Instagram
+                pages, returned by `InstaLooter.pages`
+
+        Returns:
+            MediasIterator: an iterator over the Instagram medias in
+                all pages.
+
+        """
         if timeframe is not None:
             return TimedMediasIterator(pages_iterator, timeframe)
         return MediasIterator(pages_iterator)
 
     def medias(self, timeframe=None):
         # type: (Optional[_Timeframe]) -> MediasIterator
+        """Obtain an iterator over the Instagram medias.
+
+        Wraps the iterator returned by `InstaLooter.pages` to seamlessly
+        iterate over the medias of all the pages.
+
+        Returns:
+            MediasIterator: an iterator over the Instagram medias in
+                all pages.
+
+        """
         return self._medias(self.pages(), timeframe)
 
     def get_post_info(self, code):
         # type: (str) -> dict
+        """Get media information from a given post code.
+
+        Arguments:
+            code (`str`): the code of the post (can be obtained either
+                from the `shortcode` attribute of media dictionaries, or
+                from a post URL: ``https://www.instagram.com/p/<code>/``)
+
+        Returns:
+            dict: a media dictionaries, in the format insternally
+                used by Instagram.
+
+        """
         url = "https://www.instagram.com/p/{}/?__a=1".format(code)
         with self.session.get(url) as res:
             return res.json()['graphql']['shortcode_media']
@@ -207,7 +310,12 @@ class InstaLooter(object):
                           dlpbar_cls=None    # type: Optional[Type[ProgressBar]]
                           ):
         # type: (...) -> int
+        """Download all the pictures to the provided destination.
 
+        Actually a shortcut for `InstaLooter.download` with ``condition`` set
+        to accept only images.
+
+        """
         return self.download(
             destination,
             condition=lambda media: not media["is_video"],
@@ -227,7 +335,12 @@ class InstaLooter(object):
                         dlpbar_cls=None,   # type: Optional[Type[ProgressBar]]
                         ):
         # type: (...) -> int
+        """Download all videos to the destination.
 
+        Actually a shortcut for `InstaLooter.download` with ``condition`` set
+        to accept only videos.
+
+        """
         return self.download(
             destination,
             condition=operator.itemgetter("is_video"),
@@ -248,7 +361,36 @@ class InstaLooter(object):
                  dlpbar_cls=None,       # type: Optional[Type[ProgressBar]]
                  ):
         # type: (...) -> int
+        """Download all medias passing ``condition`` to destination.
 
+        Arguments:
+            destination (`FS` or FS URL): the filesystem where to store
+                the downloaded files.
+            condition (`Callable`, *optional*): the condition to filter the
+                medias with. If `None` is given, a function is created using
+                the ``get_videos`` and ``videos_only`` passed at object
+                initialisation. **[default: None]**
+            media_count (`int`, *optional*): the maximum number of medias
+                to download. Leave to ``None`` to download everything from
+                the target. *Note that more files can be downloaded, since
+                a post with multiple images/videos is considered to be a
+                single media*. **[default: None]**.
+            timeframe (`tuple`, *optional*): a couple of `~datetime.datetime`
+                objects to enforce a time frame (the first item must be more
+                recent). Leave to `None` to ignore times. **[default: None]**
+            new_only (`bool`, *optional*): stop media discovery when already
+                downloaded medias are encountered. **[default: False]**
+            pgpbar_cls (`type`, *optional*): a `ProgressBar` subclass to
+                use to display page scraping progress. **[default: None]**
+            dlpbar_cls (`type`, *optional*): a `ProgressBar` subclass to
+                use to display file download progress. **[default: None]**
+
+        Returns:
+            `int`: the number of queued medias. May not be equal to the number
+                of downloaded medias if some errors occurred during
+                downloads.
+
+        """
         # Open the destination filesystem
         destination, close_destination = self._init_destfs(destination)
 
@@ -302,20 +444,42 @@ class InstaLooter(object):
 
     def login(self, username, password):
         # type: (str, str) -> None
+        """Log the instance in using the given credentials.
+
+        Arguments:
+            username (str): the username to log in with.
+            password (str): the password to log in with.
+
+        """
         self._login(username, password, session=self.session)
 
     def logout(self):
         # type: () -> None
+        """Log the instance out from the currently opened session.
+        """
         self._logout(session=self.session)
 
     def logged_in(self):
+        """Check if there's an open Instagram session.
+        """
         return self._logged_in(self.session)
 
     def _init_pbar(self,
                    it,
-                   pbar_cls,   # type: Optional[Type[ProgressBar]]
+                   pbar_cls=None,  # type: Optional[Type[ProgressBar]]
                    ):
         # type: (...) -> Union[ProgressBar, Iterable[Any]]
+        """Wrap an iterable within a `ProgressBar`.
+
+        Arguments:
+            it (`Iterator`): an iterable to wrap.
+            pgpbar_cls (`type`, *optional*): a `ProgressBar` subclass to use,
+                or `None` to avoid using a progress bar. **[default: None]**
+
+        Returns:
+            `Iterable`: the wrapped iterable.
+
+        """
         if pbar_cls is not None:
             if not issubclass(pbar_cls, ProgressBar):
                 raise TypeError("pbar must implement the ProgressBar interface !")
@@ -327,6 +491,20 @@ class InstaLooter(object):
 
     def _init_destfs(self, destination, create=True):
         # type: (Union[str, FS], bool) -> (FS, bool)
+        """Open a filesystem either from a FS URL or filesystem instance.
+
+        Arguments:
+            destination (`FS` or FS URL): the destination filesystem to
+                open.
+            create (`bool`): whether or not to create a new
+                filesystem if it does not exist. **[default: True]**
+
+        Returns:
+            (`FS`, `bool`): a tuple with the open filesystem, and a boolean
+                indicating whether or not the filesystem should be closed
+                by the function when done with.
+
+        """
         close_destination = False
         if isinstance(destination, six.binary_type):
             destination = destination.decode('utf-8')
@@ -340,13 +518,35 @@ class InstaLooter(object):
     def _fill_media_queue(self,
                           queue,            # type: six.moves.queue.Queue
                           destination,      # type: FS
-                          medias_iterator,  # type: Iterable[Any]
+                          medias_iter,      # type: Iterable[Any]
                           media_count=None, # type: Optional[int]
                           new_only=False,   # type: bool
                           condition=None,   # type: Optional[Callable[[dict], bool]]
                           ):
         # type: (...) -> int
+        """Fill the download queue with medias from the provided iterator.
 
+        Arguments:
+            queue (`~queue.Queue`): the download queue to fill.
+            destination (`FS`): the filesystem where to download the files.
+            medias_iterator (`Iterable`): an iterable over the Instagram
+                medias to download.
+            media_count (`int`, *optional*): the maximum number of new
+                medias to download, or ``None`` to download all discoverable
+                medias. **[default: None]**
+            new_only (`bool`): stop media discovery when a media that was
+                already downloaded is encountered. **[default: False]**
+            condition (`Callable`, *optional*): the condition to filter the
+                medias with. If `None` is given, a function is created using
+                the ``get_videos`` and ``videos_only`` passed at object
+                initialisation. **[default: None]**
+
+        Returns:
+            `int`: the number of queued medias. May not be equal to the number
+                of downloaded medias if some errors occurred during
+                downloads.
+
+        """
         # Create a condition from parameters if needed
         if condition is None:
             if self.videos_only:
@@ -358,7 +558,7 @@ class InstaLooter(object):
 
         # Queue all media filling the condition
         medias_queued = 0
-        for media in six.moves.filter(condition, medias_iterator):
+        for media in six.moves.filter(condition, medias_iter):
 
             # Check if the whole post info is required
             if self.namegen.needs_extended(media) or media["__typename"] != "GraphImage":
@@ -511,7 +711,8 @@ class PostLooter(InstaLooter):
                  timeframe=None,    # type: Optional[_Timeframe]
                  new_only=False,    # type: bool
                  pgpbar_cls=None,   # type: Optional[Type[ProgressBar]]
-                 dlpbar_cls=None):  # type: Optional[Type[ProgressBar]]
+                 dlpbar_cls=None,   # type: Optional[Type[ProgressBar]]
+                 ):
         # type: (...) -> int
 
         destination, close_destination = self._init_destfs(destination)

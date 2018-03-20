@@ -11,6 +11,8 @@ import six
 
 
 class NameGenerator(object):
+    """
+    """
 
     @classmethod
     def _get_info(cls, media):
