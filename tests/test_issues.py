@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 import textwrap
+import time
 import unittest
 import warnings
 
@@ -388,6 +389,7 @@ class TestPullRequests(unittest.TestCase):
         Set the access time and modification time of a downloaded media
         according to its IG date.
         """
+
         looter = ProfileLooter('franz_ferdinand',
             template='{code}', session=self.session)
         info = looter.get_post_info('BY77tSfBnRm')
@@ -397,22 +399,22 @@ class TestPullRequests(unittest.TestCase):
             session=self.session, template='{code}')
         post_looter.download(self.destfs)
         stat = self.destfs.getdetails('BY77tSfBnRm.jpg')
-        self.assertEqual(stat.accessed.timestamp(), info['taken_at_timestamp'])
-        self.assertEqual(stat.modified.timestamp(), info['taken_at_timestamp'])
+        self.assertEqual(stat.raw["details"]["accessed"], info['taken_at_timestamp'])
+        self.assertEqual(stat.raw["details"]["modified"], info['taken_at_timestamp'])
 
         # Test download_pictures
         pic = next(m for m in looter.medias() if not m['is_video'])
         looter.download_pictures(self.destfs, media_count=1)
         stat = self.destfs.getdetails('{}.jpg'.format(pic['shortcode']))
-        self.assertEqual(stat.accessed.timestamp(), pic['taken_at_timestamp'])
-        self.assertEqual(stat.modified.timestamp(), pic['taken_at_timestamp'])
+        self.assertEqual(stat.raw["details"]["accessed"], pic['taken_at_timestamp'])
+        self.assertEqual(stat.raw["details"]["modified"], pic['taken_at_timestamp'])
 
         # Test download_videos
         vid = next(m for m in looter.medias() if m['is_video'])
         looter.download_videos(self.destfs, media_count=1)
         stat = self.destfs.getdetails('{}.mp4'.format(vid['shortcode']))
-        self.assertEqual(stat.accessed.timestamp(), vid['taken_at_timestamp'])
-        self.assertEqual(stat.modified.timestamp(), vid['taken_at_timestamp'])
+        self.assertEqual(stat.raw["details"]["accessed"], vid['taken_at_timestamp'])
+        self.assertEqual(stat.raw["details"]["modified"], vid['taken_at_timestamp'])
 
 
 
