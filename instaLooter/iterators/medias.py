@@ -91,10 +91,9 @@ class TimedMediasIterator(MediasIterator):
             timestamp = media.get('taken_at_timestamp') or media['date']
             media_date = datetime.date.fromtimestamp(timestamp)
 
-            if self.start_time >= media_date >= end_time:
-                seen.add(media['node']['id'])
+            if self.start_time >= media_date >= self.end_time:
                 return media
-            elif media_date < end_time:
+            elif media_date < self.end_time:
                 self._finished = True
                 raise StopIteration
 
