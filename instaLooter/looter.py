@@ -138,7 +138,7 @@ class InstaLooter(object):
 
         # Create the media download bar from a dummy iterator
         dlpbar = self._init_pbar(
-            range(length_hint(medias_iterator)), dlpbar_cls)
+            six.moves.range(length_hint(medias_iterator)), dlpbar_cls)
 
         # Start a group of workers
         workers, queue = self._init_workers(
@@ -257,7 +257,7 @@ class InstaLooter(object):
         workers = []
         queue = six.moves.queue.Queue()
 
-        for _ in range(self.jobs):
+        for _ in six.moves.range(self.jobs):
             worker = InstaDownloader(
                 queue=queue,
                 destination=destination,
