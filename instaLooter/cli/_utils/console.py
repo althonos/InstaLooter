@@ -12,6 +12,10 @@ logging.SPAM = 5
 logging.NOTICE = 25
 logging.SUCCESS = 35
 
+logging.addLevelName(logging.SPAM, "SPAM")
+logging.addLevelName(logging.NOTICE, "NOTICE")
+logging.addLevelName(logging.SUCCESS, "SUCCESS")
+
 
 def warn_logging(logger):
     def showwarning(message, category, filename, lineno, file=None, line=None):

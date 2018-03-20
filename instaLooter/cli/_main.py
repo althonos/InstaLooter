@@ -19,7 +19,7 @@ import six
 from .. import __version__
 from ..looter import HashtagLooter, ProfileLooter, PostLooter
 from ..pbar import TqdmProgressBar
-# from ..batch import BatchRunner
+from ..batch import BatchRunner
 
 from . import __name__ as __parent__
 from ._utils.constants import HELP, USAGE, WARNING_ACTIONS
@@ -30,7 +30,7 @@ from ._utils.time import get_times_from_cli
 __all__ = ["main"]
 
 
-logger = logging.getLogger(__parent__)
+logger = logging.getLogger("instaLooter")
 
 
 @wrap_warnings(logger)
@@ -88,11 +88,11 @@ def main(argv=None, stream=None):
         _print("    available actions:", ', '.join(WARNING_ACTIONS))
         return 1
 
-    # if args['batch']:
-    #     with open(args['<batch_file>']) as batch_file:
-    #         batch_runner = BatchRunner(batch_file)
-    #     batch_runner.runAll()
-    #     return 0
+    if args['batch']:
+        with open(args['<batch_file>']) as batch_file:
+            batch_runner = BatchRunner(batch_file)
+        batch_runner.runAll()
+        return 0
 
     with warnings.catch_warnings():
         warnings.simplefilter(args['-W'])
