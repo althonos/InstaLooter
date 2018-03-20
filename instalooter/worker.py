@@ -118,7 +118,7 @@ class InstaDownloader(threading.Thread):
                         self._dump(media)
                     # Update progress bar if any
                     if self.pbar is not None and not self._killed:
-                        with self.pbar.lock():
+                        with self.pbar.get_lock():
                             self.pbar.update()
 
                 self.queue.task_done()

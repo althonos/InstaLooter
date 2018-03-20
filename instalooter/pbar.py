@@ -14,13 +14,15 @@ class ProgressBar(object):
 
     def __init__(self, it, *args, **kwargs):
         self.it = it
+        self.__lock = None
 
     def __iter__(self):
         return self
 
     def __next__(self):
+        item = next(self.it)
         self.update()
-        return next(self.it)
+        return item
 
     if six.PY2:
         next = __next__
@@ -33,17 +35,16 @@ class ProgressBar(object):
     def set_maximum(self, maximum):
         return NotImplemented
 
-    def close(self):
+    def finish(self):
         pass
 
     def set_lock(self, lock):
-        self._lock = lock
+        self.__lock = lock
 
-    def lock(self):
-        try:
-            return self._lock
-        except AttributeError:
+    def get_lock(self):
+        if self.__lock is None:
             raise RuntimeError("lock was not initialised")
+        return self.__lock
 
 
 class TqdmProgressBar(tqdm.tqdm, ProgressBar):
@@ -51,6 +52,7 @@ class TqdmProgressBar(tqdm.tqdm, ProgressBar):
     def __init__(self, it, *args, **kwargs):
         kwargs["leave"] = False
         super(TqdmProgressBar, self).__init__(it, *args, **kwargs)
+        ProgressBar.__init__(self, it)
 
     def set_maximum(self, maximum):
         self.total = maximum
