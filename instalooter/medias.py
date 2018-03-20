@@ -1,4 +1,9 @@
 # coding: utf-8
+"""Iterators over Instagram medias.
+
+Iterators defined in this module wrap `PageIterator` instances to yield
+individual medias defined in each page instead of whole pages.
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 

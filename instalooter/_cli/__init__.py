@@ -1,4 +1,9 @@
 # coding: utf-8
+"""Implementation of the main program executable.
+
+Do not rely on this module API, use the function exposed in
+``instalooter.cli`` instead.
+"""
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -17,20 +22,20 @@ import fs
 import six
 
 from .. import __version__
-from ..looter import InstaLooter, HashtagLooter, ProfileLooter, PostLooter
+from ..looters import InstaLooter, HashtagLooter, ProfileLooter, PostLooter
 from ..pbar import TqdmProgressBar
 from ..batch import BatchRunner
 
-from . import __name__ as __parent__
-from ._utils.constants import HELP, USAGE, WARNING_ACTIONS
-from ._utils.console import wrap_warnings
-from ._utils.time import get_times_from_cli
+from .constants import HELP, USAGE, WARNING_ACTIONS
+from .console import wrap_warnings
+from .time import get_times_from_cli
+from .login import login
 
 
 __all__ = ["main"]
 
 
-logger = logging.getLogger("instalooter")
+logger = logging.getLogger(__name__)
 
 
 @wrap_warnings(logger)
@@ -90,9 +95,9 @@ def main(argv=None, stream=None):
             # Login if requested
             if args['login']:
                 try:
-                    args['--username'] = six.moves.input('Username: ')
+                    if not args['--username']:
+                        args['--username'] = six.moves.input('Username: ')
                     login(args)
-                    logger.log(logging.SUCCESS, "Logged in successfully.")
                     return 0
                 except ValueError as ve:
                     logger.error(ve)
@@ -138,7 +143,7 @@ def main(argv=None, stream=None):
             # Attempt to login and extract the timeframe
             try:
                 if args['--username']:
-                    login(looter, args)
+                    login(args)
                 if args['--time']:
                     args['--time'] = get_times_from_cli(args['--time'])
                 if args['--num-to-dl']:

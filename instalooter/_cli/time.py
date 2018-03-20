@@ -7,7 +7,6 @@ import datetime
 import dateutil.relativedelta
 
 
-
 def date_from_isoformat(isoformat_date):
     """Convert an ISO-8601 date into a `datetime.date` object.
 

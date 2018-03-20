@@ -1,4 +1,6 @@
 # coding: utf-8
+"""Background download thread.
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -12,8 +14,7 @@ import time
 import requests
 import six
 
-from ._utils.libs import PIL, piexif, json
-from ._utils.contexts import on_exception
+from ._impl import PIL, piexif, json
 
 
 class InstaDownloader(threading.Thread):
@@ -57,11 +58,9 @@ class InstaDownloader(threading.Thread):
             return
 
         # FIXME: find a way to remove failed temporary downloads
-        # with on_exception(self.destination.remove, filename):
         with self.destination.open(filename, "wb") as f:
             with self.session.get(url) as res:
                 f.write(res.content)
-
         self._set_time(media, filename)
 
     def _download_video(self, media):
@@ -72,12 +71,10 @@ class InstaDownloader(threading.Thread):
             return
 
         # FIXME: find a way to remove failed temporary downloads
-        with on_exception(self.destination.remove, filename):
-            with self.destination.open(filename, "wb") as f:
-                with self.session.get(url) as res:
-                    for chunk in res.iter_content(io.DEFAULT_BUFFER_SIZE):
-                        f.write(chunk)
-
+        with self.destination.open(filename, "wb") as f:
+            with self.session.get(url) as res:
+                for chunk in res.iter_content(io.DEFAULT_BUFFER_SIZE):
+                    f.write(chunk)
         self._set_time(media, filename)
 
     def _download_sidecar(self, media):

@@ -1,4 +1,6 @@
 # coding: utf-8
+"""Instagram looters implementations.
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -20,16 +22,13 @@ import six
 from fs.base import FS
 
 from . import __author__, __name__ as __appname__, __version__
-from .iterators import pages
 
-from .iterators.medias import TimedMediasIterator, MediasIterator
+from ._impl import length_hint
+from ._utils import NameGenerator
+from .pages import ProfileIterator, HashtagIterator
+from .medias import TimedMediasIterator, MediasIterator
 from .pbar import ProgressBar
 from .worker import InstaDownloader
-
-from ._utils.libs import length_hint
-from ._utils.namegen import NameGenerator
-from ._utils.cookies import load_cookies, save_cookies
-
 
 # mypy annotations
 if False:
@@ -40,16 +39,39 @@ if False:
     _Timeframe = Tuple[Optional[datetime], Optional[datetime]]
 
 
+__all__ = [
+    "InstaLooter",
+    "ProfileLooter",
+    "HashtagLooter",
+    "PostLooter",
+]
+
+
 @six.add_metaclass(abc.ABCMeta)
 class InstaLooter(object):
+    """A brutal Instagram looter that raids without API tokens.
+    """
 
-    #: The filesystem where cache date is located
+    # : The filesystem where cache date is located
     cachefs = fs.open_fs(
         "usercache://{}:{}:{}".format(__appname__, __author__, __version__),
         create=True) # type: FS
 
-    #: The name of the cookie file in the cache filesystem
+    # : The name of the cookie file in the cache filesystem
     _COOKIE_FILE = "cookies.txt"
+
+    @classmethod
+    def _init_session(cls, session=None):
+        if session is None:
+            session = requests.Session()
+        session.cookies = six.moves.http_cookiejar.LWPCookieJar(
+            cls.cachefs.getsyspath(cls._COOKIE_FILE))
+        try:
+            session.cookies.load()
+        except IOError:
+            pass
+        session.cookies.clear_expired_cookies()
+        return session
 
     @classmethod
     def _login(cls, username, password, session=None):
@@ -90,7 +112,10 @@ class InstaLooter(object):
         with session.get(url) as res:
             if res.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
-            save_cookies(session)
+            try:
+                session.cookies.save()
+            except IOError:
+                pass
 
     @classmethod
     def _logout(cls, session=None):
@@ -104,18 +129,28 @@ class InstaLooter(object):
         if session is None:
             session = requests.Session()
 
-        try:
-            sessionid = next(ck.value
-                for ck in session.cookies
-                if ck.domain == "www.instagram.com"
-                and ck.path == "/" and ck.name == "sessionid")
+
+        sessionid = cls._sessionid(session)
+        if sessionid is not None:
             url = "https://www.instagram.com/accounts/logout/"
             session.post(url, data={"csrfmiddlewaretoken": sessionid})
-        except StopIteration:
-            sessionid = None
 
         if cls.cachefs.exists(cls._COOKIE_FILE):
             cls.cachefs.remove(cls._COOKIE_FILE)
+
+    @classmethod
+    def _logged_in(cls, session=None):
+        return cls._sessionid(session) is not None
+
+    @classmethod
+    def _sessionid(cls, session=None):
+        # type: (Optional[requests.Session]) -> None
+
+        session = cls._init_session(session)
+        return next((ck.value for ck in session.cookies
+                     if ck.domain == "www.instagram.com"
+                     and ck.name == "sessionid"
+                     and ck.path == "/"), None)
 
     def __init__(self,
                  add_metadata=False,
@@ -139,11 +174,8 @@ class InstaLooter(object):
         self.dump_json = dump_json or dump_only
         self.extended_dump = extended_dump
 
-        self.session = session or requests.Session()
+        self.session = self._init_session(session)
         atexit.register(self.session.close)
-        self.session.cookies = six.moves.http_cookiejar.LWPCookieJar(
-            self.cachefs.getsyspath(self._COOKIE_FILE))
-        load_cookies(self.session)
 
     @abc.abstractmethod
     def pages(self):
@@ -276,6 +308,9 @@ class InstaLooter(object):
         # type: () -> None
         self._logout(session=self.session)
 
+    def logged_in(self):
+        return self._logged_in(self.session)
+
     def _init_pbar(self,
                    it,
                    pbar_cls,   # type: Optional[Type[ProgressBar]]
@@ -398,7 +433,6 @@ class InstaLooter(object):
             worker.terminate()
 
 
-
 class ProfileLooter(InstaLooter):
 
     def __init__(self,
@@ -412,11 +446,10 @@ class ProfileLooter(InstaLooter):
 
     def pages(self):
         if self._owner_id is None:
-            it = pages.ProfileIterator.from_username(self._username, self.session)
+            it = ProfileIterator.from_username(self._username, self.session)
             self._owner_id = it.owner_id
             return it
-        return pages.ProfileIterator(self._owner_id, self.session)
-
+        return ProfileIterator(self._owner_id, self.session)
 
 
 class HashtagLooter(InstaLooter):
@@ -430,8 +463,7 @@ class HashtagLooter(InstaLooter):
         self._hashtag = hashtag
 
     def pages(self):
-        return pages.HashtagIterator(self._hashtag, self.session)
-
+        return HashtagIterator(self._hashtag, self.session)
 
 
 class PostLooter(InstaLooter):

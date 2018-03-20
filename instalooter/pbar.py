@@ -1,4 +1,10 @@
 # coding: utf-8
+"""Progress bars used to report `InstaLooter.download` progress.
+
+THe module exposes and abstract class that can be derived to implement
+your own progress displayer. The default implementation (which uses the
+`tqdm` library) is used by the CLI.
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 

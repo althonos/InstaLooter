@@ -15,10 +15,9 @@ import six
 
 import instalooter.batch
 import instalooter.cli
-import instalooter.looter
 
-from instalooter.looter import HashtagLooter, ProfileLooter, PostLooter
-from instalooter._utils.libs import length_hint, piexif, PIL
+from instalooter.looters import HashtagLooter, ProfileLooter, PostLooter
+from instalooter._impl import length_hint, piexif, PIL
 
 from .utils import mock
 
@@ -182,7 +181,7 @@ class TestResolvedIssues(unittest.TestCase):
         Checks that a multipost is successfully downloaded from
         the CLI `post` option.
         """
-        looter = instalooter.looter.PostLooter(
+        looter = PostLooter(
             'BRW-j_dBI6F', get_videos=True, session=self.session)
         looter.download(self.destfs)
         self.assertEqual(
@@ -398,7 +397,7 @@ class TestPullRequests(unittest.TestCase):
         info = looter.get_post_info('BY77tSfBnRm')
 
         # Test download_post
-        post_looter = instalooter.looter.PostLooter('BY77tSfBnRm',
+        post_looter = PostLooter('BY77tSfBnRm',
             session=self.session, template='{code}')
         post_looter.download(self.destfs)
         stat = self.destfs.getdetails('BY77tSfBnRm.jpg')

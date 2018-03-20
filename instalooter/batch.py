@@ -1,4 +1,6 @@
 # coding: utf-8
+"""Run several jobs sharing a session using a configuration file.
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -9,7 +11,7 @@ import os
 import requests
 import six
 
-from .looter import HashtagLooter, InstaLooter, ProfileLooter
+from .looters import HashtagLooter, InstaLooter, ProfileLooter
 from .pbar import TqdmProgressBar
 
 # mypy annotations

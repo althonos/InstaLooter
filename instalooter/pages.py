@@ -1,4 +1,6 @@
 # coding: utf-8
+"""Iterators over Instagram media pages.
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 

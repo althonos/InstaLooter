@@ -19,7 +19,7 @@ HELP = textwrap.dedent(
         instalooter user <profile> [<directory>] [options]
         instalooter post <post_token> [<directory>] [options]
         instalooter logout
-        instalooter login [-u USER] [-p PASS]
+        instalooter login [-u USER] [-p PASS] [--traceback]
 
     Arguments:
         <profile>                    The username of the profile to download
