@@ -171,7 +171,7 @@ def main(argv=None, stream=None):
                 logger.log(logging.SUCCESS, "Downloaded {} post.".format(n))
 
         except (Exception, KeyboardInterrupt) as e:
-            from ._utils.threadutils import threads_force_join, threads_count
+            from .threadutils import threads_force_join, threads_count
             # Show error traceback if any
             if not isinstance(e, KeyboardInterrupt):
                 logger.fatal(e)
