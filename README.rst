@@ -10,37 +10,41 @@ from an Instagram profile, without any API access. It can be seen as a
 re-implementation of the now deprecated `InstaRaider <https://github.com/akurtovic/InstaRaider>`_
 developed by `@akurtovic <https://github.com/akurtovic>`_.
 
-.. |starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star&maxAge=3600
+*The version* ``v1.0.0`` *was completely rewrote from scratch, and as such, will
+probably break compatibility with your homemade. Meanwhile, great care was
+taken to keep the CLI as consistent as possible with the previous versions.*
+
+.. |starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star
    :target: https://github.com/althonos/InstaLooter
 
-.. |repo| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |repo| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/althonos/InstaLooter
 
-.. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
-   :target: https://pypi.python.org/pypi/instaLooter
+.. |versions| image:: https://img.shields.io/pypi/v/instalooter.svg?style=flat-square
+   :target: https://pypi.python.org/pypi/instalooter
 
-.. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600&style=flat-square
-   :target: https://pypi.python.org/pypi/instaLooter
+.. |format| image:: https://img.shields.io/pypi/format/instalooter.svg?style=flat-square
+   :target: https://pypi.python.org/pypi/instalooter
 
-.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
+.. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?style=flat-square
    :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
 
-.. |coverage| image:: https://img.shields.io/codecov/c/github/althonos/InstaLooter/master.svg?maxAge=3600&style=flat-square
+.. |coverage| image:: https://img.shields.io/codecov/c/github/althonos/InstaLooter/master.svg?style=flat-square
    :target: https://codecov.io/gh/althonos/InstaLooter
 
-.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&maxAge=3600&style=flat-square
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&style=flat-square
    :target: https://travis-ci.org/althonos/InstaLooter/
 
-.. |doc| image:: https://img.shields.io/readthedocs/instalooter.svg?style=flat-square&maxAge=3600
+.. |doc| image:: https://img.shields.io/readthedocs/instalooter.svg?style=flat-square
    :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
 
-.. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square&maxAge=3600
+.. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square
    :target: https://requires.io/github/althonos/InstaLooter/requirements/?branch=master
 
-.. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square&maxAge=3600
+.. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square
    :target: https://landscape.io/github/althonos/InstaLooter/master
 
-.. |license| image:: https://img.shields.io/pypi/l/InstaLooter.svg?maxAge=3600&style=flat-square
+.. |license| image:: https://img.shields.io/pypi/l/instalooter.svg?style=flat-square
    :target: https://choosealicense.com/licenses/gpl-3.0/
 
 
@@ -64,67 +68,67 @@ Requirements
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
 
 
-.. |PyPI coloredlogs| image:: https://img.shields.io/pypi/v/coloredlogs.svg?maxAge=3600&style=flat-square
+.. |PyPI coloredlogs| image:: https://img.shields.io/pypi/v/coloredlogs.svg?style=flat-square
    :target: https://pypi.python.org/pypi/coloredlogs
 
-.. |PyPI dateutil| image:: https://img.shields.io/pypi/v/python-dateutil.svg?maxAge=3600&style=flat-square
+.. |PyPI dateutil| image:: https://img.shields.io/pypi/v/python-dateutil.svg?style=flat-square
    :target: https://pypi.python.org/pypi/python-dateutil/
 
-.. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg?maxAge=3600&style=flat-square
+.. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg?style=flat-square
    :target: https://pypi.python.org/pypi/docopt/
 
-.. |PyPI fs| image:: https://img.shields.io/pypi/v/fs.svg?maxAge=3600&style=flat-square
+.. |PyPI fs| image:: https://img.shields.io/pypi/v/fs.svg?style=flat-square
    :target: https://pypi.python.org/pypi/fs/
 
-.. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?maxAge=3600&style=flat-square
+.. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?style=flat-square
    :target: https://pypi.python.org/pypi/requests
 
-.. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?maxAge=3600&style=flat-square
+.. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?style=flat-square
    :target: https://pypi.python.org/pypi/six
 
-.. |PyPI tqdm| image:: https://img.shields.io/pypi/v/tqdm.svg?maxAge=3600&style=flat-square
+.. |PyPI tqdm| image:: https://img.shields.io/pypi/v/tqdm.svg?style=flat-square
    :target: https://pypi.python.org/pypi/tqdm
 
-.. |Source coloredlogs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |Source coloredlogs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/xolox/python-coloredlogs
 
-.. |Source dateutil| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |Source dateutil| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/dateutil/dateutil/
 
-.. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |Source docopt| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/docopt/docopt
 
-.. |Source fs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |Source fs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/PyFilesystem/pyfilesystem2
 
-.. |Source requests| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |Source requests| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/kennethreitz/requests
 
-.. |Source six| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |Source six| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/benjaminp/six
 
-.. |Source tqdm| image:: https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=3600&style=flat-square
+.. |Source tqdm| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/tqdm/tqdm
 
-.. |License coloredlogs| image:: https://img.shields.io/badge/license-MIT-blue.svg?maxAge=3600&style=flat-square
+.. |License coloredlogs| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License dateutil| image:: https://img.shields.io/pypi/l/python-dateutil.svg?maxAge=3600&style=flat-square
+.. |License dateutil| image:: https://img.shields.io/pypi/l/python-dateutil.svg?style=flat-square
    :target: https://choosealicense.com/licenses/apache-2.0/
 
-.. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg?maxAge=3600&style=flat-square
+.. |License docopt| image:: https://img.shields.io/pypi/l/docopt.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License fs| image:: https://img.shields.io/pypi/l/fs.svg?maxAge=3600&style=flat-square
+.. |License fs| image:: https://img.shields.io/pypi/l/fs.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?maxAge=3600&style=flat-square
+.. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?style=flat-square
    :target: https://choosealicense.com/licenses/apache-2.0/
 
-.. |License six| image:: https://img.shields.io/pypi/l/six.svg?maxAge=3600&style=flat-square
+.. |License six| image:: https://img.shields.io/pypi/l/six.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License tqdm| image:: https://img.shields.io/pypi/l/tqdm.svg?maxAge=3600&style=flat-square
+.. |License tqdm| image:: https://img.shields.io/pypi/l/tqdm.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mpl-2.0/
 
 
@@ -137,28 +141,28 @@ familiar with the package management of the Python ecosystem, please see the
 of the `documentation <http://instalooter.readthedocs.io/en/latest/index.html>`_.
 Yet, you will probably end up using the following command::
 
-  pip install --user instaLooter
+  pip install --user instalooter
 
 
 Usage
 -----
 
-InstaLooter comes with its CLI::
+instalooter comes with its CLI::
 
-    $ instaLooter user <username> [<directory>] [options]
-    $ instaLooter hashtag <hashtag> <directory> [options]
-    $ instaLooter post <post_token> <directory> [options]
-    $ instaLooter batch <batch_file>
+    $ instalooter user <username> [<directory>] [options]
+    $ instalooter hashtag <hashtag> <directory> [options]
+    $ instalooter post <post_token> <directory> [options]
+    $ instalooter batch <batch_file>
 
-See ``instaLooter --usage`` for all possible uses, or ``instaLooter --help``
+See ``instalooter --usage`` for all possible uses, or ``instalooter --help``
 for a complete usage guide.
 
 
 Logging in and out
 ------------------
-There are two ways to login on Instagram through *instaLooter*:
+There are two ways to login on Instagram through instalooter:
 
-* use the *login* subcommand (``instaLooter login``) to interactively login
+* use the *login* subcommand (``instalooter login``) to interactively login
   using your username and password.
 * give a ``--username`` (and, if you want, a ``--password``) argument to any of
   the download commands.
@@ -173,20 +177,20 @@ Examples
 
 Download all pictures from the *instagram* profile in the current directory::
 
-    $ instaLooter user instagram
+    $ instalooter user instagram
 
 Download the latest 20 pictures or videos tagged with *python* to */tmp*::
 
-    $ instaLooter hashtag python /tmp -n 20 -v -c MYLOGIN
+    $ instalooter hashtag python /tmp -n 20 -v -c MYLOGIN
 
 Download a single post from an url in the current directory::
 
-    $ instaLooter post "https://www.instagram.com/p/BFB6znLg5s1/" .
+    $ instalooter post "https://www.instagram.com/p/BFB6znLg5s1/" .
 
 Use a configuration file to download from several account using custom parameters
 (see `Batch mode <http://instalooter.readthedocs.io/en/latest/batch.html>`_)::
 
-    $ instaLooter batch /path/to/a/config/file.ini
+    $ instalooter batch /path/to/a/config/file.ini
 
 See more on the `Usage page <http://instalooter.readthedocs.io/en/latest/usage.html>`_
 of the `online documentation <http://instalooter.readthedocs.io/en/latest/index.html>`_.

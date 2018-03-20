@@ -8,8 +8,8 @@ import warnings
 
 import fs
 
-from instaLooter.cli import main
-from instaLooter.batch import BatchRunner
+from instalooter.cli import main
+from instalooter.batch import BatchRunner
 
 
 

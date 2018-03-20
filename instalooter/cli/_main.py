@@ -30,7 +30,7 @@ from ._utils.time import get_times_from_cli
 __all__ = ["main"]
 
 
-logger = logging.getLogger("instaLooter")
+logger = logging.getLogger("instalooter")
 
 
 @wrap_warnings(logger)
@@ -49,7 +49,7 @@ def main(argv=None, stream=None):
 
     try:
         args = docopt.docopt(
-            HELP, argv, version='instaLooter {}'.format(__version__))
+            HELP, argv, version='instalooter {}'.format(__version__))
     except docopt.DocoptExit as de:
         _print(de)
         return 1
@@ -65,17 +65,17 @@ def main(argv=None, stream=None):
         logger=logger)
 
     # if args['logout']:
-    #     if not os.path.exists(InstaLooter.COOKIE_FILE):
+    #     if not os.path.exists(instalooter.COOKIE_FILE):
     #         hues.error('Cookie file not found.')
     #         return 1
-    #     InstaLooter().logout()
+    #     instalooter().logout()
     #     hues.success('Logged out.')
     #     return 0
 
     # elif args['login']:
     #     try:
     #         args['--username'] = six.moves.input('Username: ')
-    #         login(InstaLooter(), args)
+    #         login(instalooter(), args)
     #         return 0
     #     except ValueError as ve:
     #         console.error(ve)

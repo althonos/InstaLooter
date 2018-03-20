@@ -7,7 +7,7 @@ import datetime
 
 import parameterized
 
-from instaLooter.cli._utils import time as timeutils
+from instalooter.cli._utils import time as timeutils
 
 from .utils.method_names import firstparam
 

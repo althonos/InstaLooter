@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class BatchRunner(object):
-    """Run `InstaLooter` in batch mode, using a configuration file.
+    """Run ``instalooter`` in batch mode, using a configuration file.
     """
 
     _CLS_MAP = {

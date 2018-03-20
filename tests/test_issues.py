@@ -13,12 +13,12 @@ import fs
 import requests
 import six
 
-import instaLooter.batch
-import instaLooter.cli
-import instaLooter.looter
+import instalooter.batch
+import instalooter.cli
+import instalooter.looter
 
-from instaLooter.looter import HashtagLooter, ProfileLooter, PostLooter
-from instaLooter._utils.libs import length_hint, piexif, PIL
+from instalooter.looter import HashtagLooter, ProfileLooter, PostLooter
+from instalooter._utils.libs import length_hint, piexif, PIL
 
 
 class TestResolvedIssues(unittest.TestCase):
@@ -75,14 +75,14 @@ class TestResolvedIssues(unittest.TestCase):
         """
         Thanks to @emijawdo for reporting this bug.
 
-        Checks that instaLooter does not crash when not given a destination
+        Checks that instalooter does not crash when not given a destination
         directory and uses the current directory.
         """
         initial_dir = os.getcwd()
         os.chdir(self.tmpdir)
 
         try:
-            instaLooter.cli.main(["user", "mysteryjets", "-n", "3", "-q"])
+            instalooter.cli.main(["user", "mysteryjets", "-n", "3", "-q"])
             self.assertEqual(len(self.destfs.listdir("/")), 3)
         finally:
             os.chdir(initial_dir)
@@ -104,7 +104,7 @@ class TestResolvedIssues(unittest.TestCase):
 
     def test_issue_006(self):
         """
-        Checks that instaLooter does not iterate forever on a private
+        Checks that instalooter does not iterate forever on a private
         profile.
         """
         looter = ProfileLooter("tldr", session=self.session)
@@ -179,7 +179,7 @@ class TestResolvedIssues(unittest.TestCase):
         Checks that a multipost is successfully downloaded from
         the CLI `post` option.
         """
-        looter = instaLooter.looter.PostLooter(
+        looter = instalooter.looter.PostLooter(
             'BRW-j_dBI6F', get_videos=True, session=self.session)
         looter.download(self.destfs)
         self.assertEqual(
@@ -200,9 +200,9 @@ class TestResolvedIssues(unittest.TestCase):
     #
     #     Checks that warn_windows does not trigger an exception.
     #     """
-    #     import instaLooter.utils
-    #     warnings.showwarning = instaLooter.utils.warn_windows
-    #     looter = instaLooter.InstaLooter(
+    #     import instalooter.utils
+    #     warnings.showwarning = instalooter.utils.warn_windows
+    #     looter = instalooter.InstaLooter(
     #         directory=self.tmpdir,
     #         profile="akjhdskjhfkjsdhfkjhdskjhfkjdshkfjhsdkjfdhkjdfshdfskhfd"
     #     )
@@ -230,7 +230,7 @@ class TestResolvedIssues(unittest.TestCase):
         doesn't cause the program to crash without finding any media to
         download.
         """
-        instaLooter.cli.main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", "5"])
+        instalooter.cli.main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", "5"])
         self.assertGreaterEqual(len(self.destfs.listdir('/')), 5)
 
     # OUTDATED: Sidecar info dicts are not converted anymore but passed
@@ -295,7 +295,7 @@ class TestResolvedIssues(unittest.TestCase):
     #     Check that urls containing 'h-ak-igx' are not stripped from all
     #     their parameters.
     #     """
-    #     looter = instaLooter.looter.PostLooter('BWOYSYQDCo5', template='{code}')
+    #     looter = instalooter.looter.PostLooter('BWOYSYQDCo5', template='{code}')
     #     info = next(looter.medias())
     #
     #     info['display_url'] = \
@@ -356,7 +356,7 @@ class TestResolvedIssues(unittest.TestCase):
             	therock: D:\\Instagram\\Profiles\\therock
             """
         ))
-        runner = instaLooter.batch.BatchRunner(configfile)
+        runner = instalooter.batch.BatchRunner(configfile)
         self.assertEqual(
             runner.getTargets(runner._get('Family', 'users')),
             {'instagram': 'D:\\Instagram\\Profiles\\instagram',
@@ -395,7 +395,7 @@ class TestPullRequests(unittest.TestCase):
         info = looter.get_post_info('BY77tSfBnRm')
 
         # Test download_post
-        post_looter = instaLooter.looter.PostLooter('BY77tSfBnRm',
+        post_looter = instalooter.looter.PostLooter('BY77tSfBnRm',
             session=self.session, template='{code}')
         post_looter.download(self.destfs)
         stat = self.destfs.getdetails('BY77tSfBnRm.jpg')

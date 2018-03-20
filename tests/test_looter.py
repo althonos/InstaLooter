@@ -10,7 +10,7 @@ import parameterized
 import requests
 import six
 
-from instaLooter.looter import ProfileLooter, HashtagLooter
+from instalooter.looter import ProfileLooter, HashtagLooter
 
 from .utils.method_names import signature
 

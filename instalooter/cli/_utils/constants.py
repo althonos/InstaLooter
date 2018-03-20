@@ -10,15 +10,15 @@ WARNING_ACTIONS = {'error', 'ignore', 'always', 'default', 'module', 'once'}
 
 HELP = textwrap.dedent(
     """
-    instaLooter - Another API-less Instagram pictures and videos downloader
+    instalooter - Another API-less Instagram pictures and videos downloader
 
     Usage:
-        instaLooter (login | logout)
-        instaLooter batch <batch_file> [<directory>] [options]
-        instaLooter hashtag <hashtag> [<directory>] [options]
-        instaLooter user <profile> [<directory>] [options]
-        instaLooter post <post_token> [<directory>] [options]
-        instaLooter (-h | --help | --version | --usage)
+        instalooter (login | logout)
+        instalooter batch <batch_file> [<directory>] [options]
+        instalooter hashtag <hashtag> [<directory>] [options]
+        instalooter user <profile> [<directory>] [options]
+        instalooter post <post_token> [<directory>] [options]
+        instalooter (-h | --help | --version | --usage)
 
     Arguments:
         <profile>                    The username of the profile to download
@@ -79,7 +79,7 @@ HELP = textwrap.dedent(
     Template:
         The default filename of the pictures and videos on Instagram doesn't
         show anything about the file you just downloaded. But using the -T
-        argument allows you to give instaLooter a filename template, using the
+        argument allows you to give instalooter a filename template, using the
         the following format with brackets-enclosed ({}) variable names among:
         - ``id``*² and ``code``*² of the instagram id of the media
         - ``ownerid``*, ``username`` and ``fullname`` of the owner
