@@ -4,5 +4,5 @@ from __future__ import unicode_literals
 
 __author__ = "althonos"
 __author_email__ = "martin.larralde@ens-cachan.fr"
-__version__ = "1.0.0"
+__version__ = "1.0.0-a.1"
 __license___ = "GPLv3+"
