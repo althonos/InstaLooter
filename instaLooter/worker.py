@@ -97,7 +97,7 @@ class InstaDownloader(threading.Thread):
         basename = self.namegen.base(media)
         filename = "{}.json".format(basename)
 
-        with self.destination.open(filename, "w") as f:
+        with self.destination.open(filename, "w" if six.PY3 else "wb") as f:
             json.dump(media, f, indent=4, sort_keys=True)
 
     def run(self):

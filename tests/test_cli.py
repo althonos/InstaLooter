@@ -21,8 +21,8 @@ class TestCLI(unittest.TestCase):
     def tearDown(self):
         self.destfs.close()
 
-    def test_plain(self):
-        r =instaLooter.cli.main(["user", "mysteryjets", self.tmpdir, "-q", '-n', '10'])
+    def test_user(self):
+        r = instaLooter.cli.main(["user", "mysteryjets", self.tmpdir, "-q", '-n', '10'])
         self.assertEqual(r, 0)
         self.assertEqual(len(self.destfs.listdir('/')), 10)
 
@@ -32,7 +32,8 @@ class TestCLI(unittest.TestCase):
         self.assertTrue(self.destfs.exists("1243533605591030581.jpg"))
 
     def test_dump_json(self):
-        instaLooter.cli.main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '-d'])
+        r = instaLooter.cli.main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '-d'])
+        self.assertEqual(r, 0)
 
         self.assertTrue(self.destfs.exists("1308972728853756295.json"))
         self.assertTrue(self.destfs.exists("1308972728853756295.jpg"))
@@ -44,7 +45,8 @@ class TestCLI(unittest.TestCase):
         self.assertEqual("BIqZ8L8AHmH", json_metadata["shortcode"])
 
     def test_dump_only(self):
-        instaLooter.cli.main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '-D'])
+        r = instaLooter.cli.main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '-D'])
+        self.assertEqual(r, 0)
 
         self.assertTrue(self.destfs.exists("1308972728853756295.json"))
         self.assertFalse(self.destfs.exists("1308972728853756295.jpg"))
