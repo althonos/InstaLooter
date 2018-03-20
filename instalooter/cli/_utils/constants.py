@@ -13,12 +13,13 @@ HELP = textwrap.dedent(
     instalooter - Another API-less Instagram pictures and videos downloader
 
     Usage:
-        instalooter (login | logout)
+        instalooter (-h | --help | --version | --usage)
         instalooter batch <batch_file> [<directory>] [options]
         instalooter hashtag <hashtag> [<directory>] [options]
         instalooter user <profile> [<directory>] [options]
         instalooter post <post_token> [<directory>] [options]
-        instalooter (-h | --help | --version | --usage)
+        instalooter logout
+        instalooter login [-u USER] [-p PASS]
 
     Arguments:
         <profile>                    The username of the profile to download

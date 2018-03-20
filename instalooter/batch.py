@@ -9,10 +9,16 @@ import os
 import requests
 import six
 
-from .looter import HashtagLooter, ProfileLooter
+from .looter import HashtagLooter, InstaLooter, ProfileLooter
 from .pbar import TqdmProgressBar
 
+# mypy annotations
+if False:
+    import io
+    from typing import Any, Dict, Type, Union
 
+
+#: The module logger
 logger = logging.getLogger(__name__)
 
 
@@ -23,9 +29,13 @@ class BatchRunner(object):
     _CLS_MAP = {
         'users': ProfileLooter,
         'hashtag': HashtagLooter,
-    }
+    }  # type: Dict[str, Type[InstaLooter]]
 
-    def __init__(self, handle, args=None):
+    def __init__(self,
+                 handle,    # type: Any
+                 args=None  # Dict[str, Any]
+                 ):
+        # type: (...) -> None
 
         close_handle = False
         if isinstance(handle, six.binary_type):

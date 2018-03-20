@@ -17,7 +17,7 @@ import fs
 import six
 
 from .. import __version__
-from ..looter import HashtagLooter, ProfileLooter, PostLooter
+from ..looter import InstaLooter, HashtagLooter, ProfileLooter, PostLooter
 from ..pbar import TqdmProgressBar
 from ..batch import BatchRunner
 
@@ -43,10 +43,14 @@ def main(argv=None, stream=None):
         stream (file handle): A file where to write error messages.
             Leave to `None` to use the `StandardErrorHandler` for
             log, and `sys.stderr` for error messages.
+
+    Returns:
+        int: An error code, or 0 if the program executed successfully.
     """
 
     _print = functools.partial(print, file=stream or sys.stderr)
 
+    # Parse command line arguments
     try:
         args = docopt.docopt(
             HELP, argv, version='instalooter {}'.format(__version__))
@@ -54,87 +58,95 @@ def main(argv=None, stream=None):
         _print(de)
         return 1
 
+    # Print usage and exit if required (docopt does not do this !)
     if args['--usage']:
         _print(USAGE)
         return 0
 
+    # Set the logger up with the requested logging level
     level = "ERROR" if args['--quiet'] else args.get("--loglevel", "INFO")
     coloredlogs.install(
         level=int(level) if level.isdigit() else level,
         stream=stream,
         logger=logger)
 
-    # if args['logout']:
-    #     if not os.path.exists(instalooter.COOKIE_FILE):
-    #         hues.error('Cookie file not found.')
-    #         return 1
-    #     instalooter().logout()
-    #     hues.success('Logged out.')
-    #     return 0
-
-    # elif args['login']:
-    #     try:
-    #         args['--username'] = six.moves.input('Username: ')
-    #         login(instalooter(), args)
-    #         return 0
-    #     except ValueError as ve:
-    #         console.error(ve)
-    #         if args["--traceback"]:
-    #            traceback.print_exc()
-    #         return 1
-
+    # Check the requested logging level
     if args['-W'] not in WARNING_ACTIONS:
         _print("Unknown warning action:", args['-W'])
         _print("    available actions:", ', '.join(WARNING_ACTIONS))
         return 1
 
-    if args['batch']:
-        with open(args['<batch_file>']) as batch_file:
-            batch_runner = BatchRunner(batch_file, args)
-        batch_runner.runAll()
-        return 0
-
     with warnings.catch_warnings():
         warnings.simplefilter(args['-W'])
 
-        if args['user']:
-            looter_cls = ProfileLooter
-            target = args['<profile>']
-        elif args['hashtag']:
-            looter_cls = HashtagLooter
-            target = args['<hashtag>']
-        elif args['post']:
-            looter_cls = PostLooter
-            target = args['<post_token>']
-        else:
-            raise NotImplementedError("TODO")
-
-        looter = looter_cls(
-            target,
-            add_metadata=args['--add-metadata'],
-            get_videos=args['--get-videos'],
-            videos_only=args['--videos-only'],
-            jobs=int(args['--jobs']) if args['--jobs'] is not None else 16,
-            template=args['--template'],
-            dump_json=args['--dump-json'],
-            dump_only=args['--dump-only'],
-            extended_dump=args['--extended-dump']
-        )
-
         try:
-            # login(looter, args)
-            if args['--time']:
-                timeframe = get_times_from_cli(args['--time'])
+            # Run in batch mode
+            if args['batch']:
+                with open(args['<batch_file>']) as batch_file:
+                    batch_runner = BatchRunner(batch_file, args)
+                batch_runner.runAll()
+                return 0
+
+            # Login if requested
+            if args['login']:
+                try:
+                    args['--username'] = six.moves.input('Username: ')
+                    login(args)
+                    logger.log(logging.SUCCESS, "Logged in successfully.")
+                    return 0
+                except ValueError as ve:
+                    logger.error(ve)
+                    if args["--traceback"]:
+                       traceback.print_exc()
+                    return 1
+
+            # Logout if requested
+            if args['logout']:
+                if InstaLooter.cachefs.exists(InstaLooter._COOKIE_FILE):
+                    InstaLooter._logout()
+                    logger.log(logging.SUCCESS, 'Logged out.')
+                else:
+                    warnings.warn('Cookie file not found.')
+                return 0
+
+            # Normal download mode:
+            if args['user']:
+                looter_cls = ProfileLooter
+                target = args['<profile>']
+            elif args['hashtag']:
+                looter_cls = HashtagLooter
+                target = args['<hashtag>']
+            elif args['post']:
+                looter_cls = PostLooter
+                target = args['<post_token>']
             else:
-                timeframe = None
-        except ValueError as ve:
-            _print("invalid format for --time parameter:", args["--time"])
-            _print("    (format is [D]:[D] where D is an ISO 8601 date)")
-            return 1
+                raise NotImplementedError("TODO")
 
-        try:
+            # Instantiate the looter
+            looter = looter_cls(
+                target,
+                add_metadata=args['--add-metadata'],
+                get_videos=args['--get-videos'],
+                videos_only=args['--videos-only'],
+                jobs=int(args['--jobs']) if args['--jobs'] is not None else 16,
+                template=args['--template'],
+                dump_json=args['--dump-json'],
+                dump_only=args['--dump-only'],
+                extended_dump=args['--extended-dump']
+            )
 
-            media_count = int(args['--num-to-dl']) if args['--num-to-dl'] else None
+            # Attempt to login and extract the timeframe
+            try:
+                if args['--username']:
+                    login(looter, args)
+                if args['--time']:
+                    args['--time'] = get_times_from_cli(args['--time'])
+                if args['--num-to-dl']:
+                    args['--num-to-dl'] = int(args['--num-to-dl'])
+            except ValueError as ve:
+                _print("invalid format for --time parameter:", args["--time"])
+                _print("    (format is [D]:[D] where D is an ISO 8601 date)")
+                return 1
 
             logger.debug("Opening destination filesystem")
             dest_url = args.get('<directory>') or os.getcwd()
@@ -143,19 +155,18 @@ def main(argv=None, stream=None):
             logger.log(logging.NOTICE, "Starting download of `{}`".format(target))
             n = looter.download(
                 destination=dest_fs,
-                media_count=media_count,
-                timeframe=timeframe,
+                media_count=args['--num-to-dl'],
+                timeframe=args['--time'],
                 new_only=args['--new'],
                 pgpbar_cls=None if args['--quiet'] else TqdmProgressBar,
                 dlpbar_cls=None if args['--quiet'] else TqdmProgressBar)
-
-            if n:
-                logger.log(logging.SUCCESS,
-                    "Downloaded {} media{} !".format(n, "s" if n > 1 else ""))
+            if n > 1:
+                logger.log(logging.SUCCESS, "Downloaded {} posts.".format(n))
+            elif n == 1:
+                logger.log(logging.SUCCESS, "Downloaded {} post.".format(n))
 
         except (Exception, KeyboardInterrupt) as e:
             from ._utils.threadutils import threads_force_join, threads_count
-
             # Show error traceback if any
             if not isinstance(e, KeyboardInterrupt):
                 logger.fatal(e)
@@ -163,13 +174,12 @@ def main(argv=None, stream=None):
                     traceback.print_exc()
             else:
                 logger.fatal("Interrupted")
-
             # Close remaining threads spawned by InstaLooter.download
             count = threads_count()
             if count:
-                logger.log(logging.NOTICE, "Terminating {} remaining workers...".format(count))
+                logger.log(logging.NOTICE,
+                    "Terminating {} remaining workers...".format(count))
                 threads_force_join()
-
             # Return the error number if any
             errno = e.errno if hasattr(e, "errno") else None
             return errno if errno is not None else 1

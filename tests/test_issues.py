@@ -23,7 +23,7 @@ from instalooter._utils.libs import length_hint, piexif, PIL
 from .utils import mock
 
 
-@mock.patch('instalooter.looter.requests.Session', lambda: TestResolvedIssues.session)
+# @mock.patch('instalooter.looter.requests.Session', lambda: TestResolvedIssues.session)
 class TestResolvedIssues(unittest.TestCase):
 
     if six.PY2:
@@ -367,7 +367,7 @@ class TestResolvedIssues(unittest.TestCase):
         )
 
 
-@mock.patch('instalooter.looter.requests.Session', lambda: TestPullRequests.session)
+# @mock.patch('instalooter.looter.requests.Session', lambda: TestPullRequests.session)
 class TestPullRequests(unittest.TestCase):
 
     @classmethod

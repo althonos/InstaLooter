@@ -15,7 +15,7 @@ from instalooter.cli._utils.constants import USAGE
 from .utils import mock
 
 
-@mock.patch('instalooter.looter.requests.Session', lambda: TestCLI.session)
+# @mock.patch('instalooter.looter.requests.Session', lambda: TestCLI.session)
 class TestCLI(unittest.TestCase):
 
     @classmethod
