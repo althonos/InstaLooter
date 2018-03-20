@@ -35,7 +35,7 @@ class NameGenerator(object):
     def _get_info(cls, media):
         info = {
             'id': media['id'],
-            'shortcode': media['shortcode'],
+            'code': media['shortcode'],
             'ownerid': media['owner']['id'],
             'username': media['owner'].get('username'),
             'fullname': media['owner'].get('full_name'),
