@@ -64,6 +64,8 @@ Requirements
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **six**           |  Python 2/3 compatibility  | |PyPI six|           | |Source six|           | |License six|           |
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **tenacity**      |  Retry until success       | |PyPI tenacity|      | |Source tenacity|      | |License tenacity|      |
++-------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **tqdm**          |  Dynamic output in CLI     | |PyPI tqdm|          | |Source tqdm|          | |License tqdm|          |
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
 
@@ -86,6 +88,9 @@ Requirements
 .. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?style=flat-square
    :target: https://pypi.python.org/pypi/six
 
+.. |PyPI six| image:: https://img.shields.io/pypi/v/tenacity.svg?style=flat-square
+   :target: https://pypi.python.org/pypi/tenacity
+
 .. |PyPI tqdm| image:: https://img.shields.io/pypi/v/tqdm.svg?style=flat-square
    :target: https://pypi.python.org/pypi/tqdm
 
@@ -107,9 +112,13 @@ Requirements
 .. |Source six| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/benjaminp/six
 
+.. |Source six| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
+   :target: https://github.com/jd/tenacity
+
 .. |Source tqdm| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/tqdm/tqdm
 
+.. For some reason shields.io does not retrieve the MIT license from PyPI
 .. |License coloredlogs| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
@@ -127,6 +136,9 @@ Requirements
 
 .. |License six| image:: https://img.shields.io/pypi/l/six.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
+
+.. |License six| image:: https://img.shields.io/pypi/l/tenacity.svg?style=flat-square
+   :target: https://choosealicense.com/licenses/apache-2.0/
 
 .. |License tqdm| image:: https://img.shields.io/pypi/l/tqdm.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mpl-2.0/
