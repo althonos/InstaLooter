@@ -13,14 +13,12 @@ import fs
 import requests
 import six
 
-import instalooter.batch
-import instalooter.cli
-
-from instalooter.looters import HashtagLooter, ProfileLooter, PostLooter
 from instalooter._impl import length_hint, piexif, PIL
+from instalooter.batch import BatchRunner
+from instalooter.cli import main
+from instalooter.looters import HashtagLooter, ProfileLooter, PostLooter
 
 from .utils import mock
-
 
 # @mock.patch('instalooter.looter.requests.Session', lambda: TestResolvedIssues.session)
 class TestResolvedIssues(unittest.TestCase):
@@ -46,7 +44,7 @@ class TestResolvedIssues(unittest.TestCase):
         warnings.showwarning = warnings._showwarning
 
     @unittest.expectedFailure
-    @unittest.skipIf(piexif is None, "piexif required for this test")
+    @unittest.skipUnless(piexif, "piexif required for this test")
     def test_issue_009(self):
         """
         Thanks to @kurtmaia for reporting this bug.
@@ -84,7 +82,7 @@ class TestResolvedIssues(unittest.TestCase):
         os.chdir(self.tmpdir)
 
         try:
-            instalooter.cli.main(["user", "mysteryjets", "-n", "3", "-q"])
+            main(["user", "mysteryjets", "-n", "3", "-q"])
             self.assertEqual(len(self.destfs.listdir("/")), 3)
         finally:
             os.chdir(initial_dir)
@@ -232,7 +230,7 @@ class TestResolvedIssues(unittest.TestCase):
         doesn't cause the program to crash without finding any media to
         download.
         """
-        instalooter.cli.main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", "5"])
+        main(["hashtag", "happy", self.tmpdir, "-q", "-t", "thisweek", "-n", "5"])
         self.assertGreaterEqual(len(self.destfs.listdir('/')), 5)
 
     # OUTDATED: Sidecar info dicts are not converted anymore but passed
@@ -329,7 +327,7 @@ class TestResolvedIssues(unittest.TestCase):
         )
 
     @unittest.expectedFailure
-    @unittest.skipIf(piexif is None, "piexif required for this test")
+    @unittest.skipUnless(piexif, "piexif required for this test")
     def test_issue_094(self):
         """
         Thanks to @jeanmarctst for raising this issue.
@@ -358,7 +356,7 @@ class TestResolvedIssues(unittest.TestCase):
             	therock: D:\\Instagram\\Profiles\\therock
             """
         ))
-        runner = instalooter.batch.BatchRunner(configfile)
+        runner = BatchRunner(configfile)
         self.assertEqual(
             runner.getTargets(runner._get('Family', 'users')),
             {'instagram': 'D:\\Instagram\\Profiles\\instagram',
