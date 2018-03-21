@@ -131,9 +131,13 @@ class ProfileIterator(PageIterator):
     def from_username(cls, username, session=None):
         session = session or requests.Session()
         url = "https://www.instagram.com/{}/?__a=1".format(username)
-        with session.get(url) as res:
-            data = res.json()
-        return cls(data['graphql']['user']['id'], session)
+        try:
+            with session.get(url) as res:
+                data = res.json()
+        except ValueError:
+            raise ValueError("account not found: {}".format(username))
+        else:
+            return cls(data['graphql']['user']['id'], session)
 
     def __init__(self, owner_id, session=None):
         super(ProfileIterator, self).__init__(session)

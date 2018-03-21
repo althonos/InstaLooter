@@ -11,7 +11,7 @@ import six
 
 
 class NameGenerator(object):
-    """
+    """Generator for filenames using a template.
     """
 
     @classmethod

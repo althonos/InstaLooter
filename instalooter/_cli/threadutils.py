@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 import threading
 
-from ...worker import InstaDownloader
+from ..worker import InstaDownloader
 
 def threads_force_join():
     for t in threading.enumerate():
