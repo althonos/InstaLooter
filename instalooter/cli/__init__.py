@@ -1,8 +1,9 @@
 # coding: utf-8
 """Implementation of the main program executable.
 
-Do not rely on this module API, use the function exposed in
-``instalooter.cli`` instead.
+Warning:
+    Only `.cli.main` and `.cli.logger` are guaranteed to be stable, do not
+    rely on any other member from this package !
 """
 from __future__ import absolute_import
 from __future__ import print_function
