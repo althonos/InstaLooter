@@ -20,7 +20,7 @@ See more details about one of the following topics:
    Batch mode <batch>
    Library Examples <examples>
    Periodic Downloads <cron>
-   API Reference <api>
+   API Reference <instalooter/index>
 
 
 
