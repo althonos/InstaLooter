@@ -13,6 +13,7 @@ import time
 
 import requests
 import six
+import tenacity
 
 from ._impl import PIL, piexif, json
 
@@ -20,6 +21,11 @@ from ._impl import PIL, piexif, json
 class InstaDownloader(threading.Thread):
     """The background InstaLooter worker class.
     """
+
+    _tenacity_options = {
+        "stop": tenacity.stop_after_attempt(5),
+        "wait": tenacity.wait_exponential(1, 10),
+    }
 
     def __init__(self,
                  queue,
@@ -46,9 +52,10 @@ class InstaDownloader(threading.Thread):
         self._killed = False
         self._downloading = None
 
+        retry = tenacity.retry(**self._tenacity_options)
         self._DOWNLOAD_METHODS = {
-            "GraphImage": self._download_image,
-            "GraphVideo": self._download_video,
+            "GraphImage": retry(self._download_image),
+            "GraphVideo": retry(self._download_video),
             "GraphSidecar": self._download_sidecar,
         }
 
