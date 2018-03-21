@@ -22,6 +22,8 @@ __all__ = [
 
 
 class MediasIterator(collections.Iterator):
+    """An iterator over the medias obtained from a page iterator.
+    """
 
     def __init__(self, page_iterator):
         self._it = page_iterator
@@ -74,6 +76,8 @@ class MediasIterator(collections.Iterator):
 
 
 class TimedMediasIterator(MediasIterator):
+    """An iterator over the medias within a specific timeframe.
+    """
 
     @staticmethod
     def get_times(timeframe):

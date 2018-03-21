@@ -24,6 +24,8 @@ __all__ = [
 
 @six.add_metaclass(abc.ABCMeta)
 class PageIterator(collections.Iterator):
+    """An abstract Instagram page iterator.
+    """
 
     URL_QUERY = "https://www.instagram.com/graphql/query/"
     PAGE_SIZE = 200
@@ -100,6 +102,8 @@ class PageIterator(collections.Iterator):
 
 
 class HashtagIterator(PageIterator):
+    """An iterator over the pages refering to a specific hashtag.
+    """
 
     QUERY_ID = "17882293912014529"
     section_generic = "hashtag"
@@ -122,6 +126,8 @@ class HashtagIterator(PageIterator):
 
 
 class ProfileIterator(PageIterator):
+    """An iterator over the pages of a user profile.
+    """
 
     QUERY_HASH = "472f257a40c653c64c666ce877d59d2b"
     section_generic = "user"

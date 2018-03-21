@@ -18,6 +18,8 @@ from ._impl import PIL, piexif, json
 
 
 class InstaDownloader(threading.Thread):
+    """The background InstaLooter worker class.
+    """
 
     def __init__(self,
                  queue,

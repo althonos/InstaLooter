@@ -28,9 +28,9 @@ License |license|
 -----------------
 
 InstaLooter is released under the
-`GNU General Public License v3 <https://choosealicense.com/licenses/gpl-3.0/>`_,
-and is fully open-source. The ``COPYING`` file distributed with the software
-contains the complete license text.
+`GNU General Public License v3 <https://choosealicense.com/licenses/gpl-3.0/>`_
+*or later*, and is fully open-source. The ``COPYING`` file distributed with
+the software contains the complete license text.
 
 
 Issues |issues|
@@ -42,7 +42,7 @@ an issue on the `issue tracker <https://github.com/althonos/InstaLooter/issues>`
 About
 -----
 
-instaLooter is maintained by:
+InstaLooter is maintained by:
   * `Martin Larralde <https://github.com/althonos>`_
 
 Special thanks to the following contributors:

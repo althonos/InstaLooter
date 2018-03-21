@@ -45,9 +45,9 @@ def main(argv=None, stream=None):
     Arguments:
         argv (list): The positional arguments to read. Defaults to
             `sys.argv` to use CLI arguments.
-        stream (file handle): A file where to write error messages.
-            Leave to `None` to use the `StandardErrorHandler` for
-            log, and `sys.stderr` for error messages.
+        stream (`~io.IOBase`): A file where to write error messages.
+            Leave to `None` to use the `~coloredlogs.StandardErrorHandler`
+            for logs, and `sys.stderr` for error messages.
 
     Returns:
         int: An error code, or 0 if the program executed successfully.

@@ -5,3 +5,5 @@ Batch Runner (`instalooter.batch`)
 
 .. automodule:: instalooter.batch
    :members:
+   :inherited-members:
+   :show-inheritance:

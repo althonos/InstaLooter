@@ -11,7 +11,7 @@ def date_from_isoformat(isoformat_date):
     """Convert an ISO-8601 date into a `datetime.date` object.
 
     Argument:
-        isoformat_date (`string`): a date in ISO-8601 format
+        isoformat_date (str): a date in ISO-8601 format
             (YYYY-MM-DD)
 
     Returns:
@@ -21,7 +21,7 @@ def date_from_isoformat(isoformat_date):
     Raises:
         ValueError: when the date could not be converted successfully.
 
-    See also:
+    See Also:
         `ISO-8601 specification <https://en.wikipedia.org/wiki/ISO_8601>`_.
     """
     year, month, day = isoformat_date.split('-')
@@ -32,7 +32,7 @@ def get_times_from_cli(cli_token):
     """Convert a CLI token to a datetime tuple.
 
     Argument:
-        cli_token (`str`): an isoformat datetime token ([ISO date]:[ISO date])
+        cli_token (str): an isoformat datetime token ([ISO date]:[ISO date])
             or a special value among:
                 * thisday
                 * thisweek
@@ -50,10 +50,10 @@ def get_times_from_cli(cli_token):
             (no colon in the token, not one of the special values, dates
             are not in proper ISO-8601 format.)
 
-    See also:
+    See Also:
         `ISO-8601 specification <https://en.wikipedia.org/wiki/ISO_8601>`_.
-    """
 
+    """
     today = datetime.date.today()
 
     if cli_token=="thisday":

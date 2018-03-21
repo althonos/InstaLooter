@@ -80,12 +80,12 @@ class BatchRunner(object):
             self.runJob(section_id, session=session)
 
     def runJob(self, section_id, session=None):
-        """Run a job as described in the section named `section_id`.
+        """Run a job as described in the section named ``section_id``.
 
         Raises:
-            KeyError: when the section could not be found.
-        """
+            `KeyError`: when the section could not be found.
 
+        """
         if not self.parser.has_section(section_id):
             raise KeyError('section not found: {}'.format(section_id))
 

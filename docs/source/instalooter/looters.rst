@@ -7,5 +7,3 @@ Looters (`instalooter.looters`)
    :members:
    :show-inheritance:
    :inherited-members:
-
-.. toctree::
