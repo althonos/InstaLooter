@@ -33,9 +33,10 @@ from .time import get_times_from_cli
 from .login import login
 
 
-__all__ = ["main"]
+__all__ = ["main", "logger"]
 
 
+#: A `~logging.Logger` instance used within the `.cli` module.
 logger = logging.getLogger(__name__)
 
 
@@ -46,7 +47,7 @@ def main(argv=None, stream=None):
     Arguments:
         argv (list): The positional arguments to read. Defaults to
             `sys.argv` to use CLI arguments.
-        stream (`~io.IOBase`): A file where to write error messages.
+        stream (~io.IOBase): A file where to write error messages.
             Leave to `None` to use the `~coloredlogs.StandardErrorHandler`
             for logs, and `sys.stderr` for error messages.
 

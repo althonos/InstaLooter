@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class BatchRunner(object):
-    """Run ``instalooter`` in batch mode, using a configuration file.
+    """Run ``InstaLooter`` in batch mode, using a configuration file.
     """
 
     _CLS_MAP = {
@@ -83,7 +83,7 @@ class BatchRunner(object):
         """Run a job as described in the section named ``section_id``.
 
         Raises:
-            `KeyError`: when the section could not be found.
+            KeyError: when the section could not be found.
 
         """
         if not self.parser.has_section(section_id):

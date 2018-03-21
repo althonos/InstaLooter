@@ -11,12 +11,10 @@ def date_from_isoformat(isoformat_date):
     """Convert an ISO-8601 date into a `datetime.date` object.
 
     Argument:
-        isoformat_date (str): a date in ISO-8601 format
-            (YYYY-MM-DD)
+        isoformat_date (str): a date in ISO-8601 format (YYYY-MM-DD)
 
     Returns:
-        `datetime.date`: the date object corresponding to the given ISO
-            formatted date.
+        ~datetime.date: the object corresponding to the given ISO date.
 
     Raises:
         ValueError: when the date could not be converted successfully.

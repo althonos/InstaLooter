@@ -21,7 +21,7 @@ def warn_logging(logger):
     """Create a `showwarning` function that uses the given logger.
 
     Arguments:
-        logger (`~logging.Logger`): a Logger instance.
+        logger (~logging.Logger): the logger to use.
 
     Returns:
         function: a function that can be used as the `warnings.showwarning`
@@ -37,11 +37,12 @@ def wrap_warnings(logger):
     """Have the function patch `warnings.showwarning` with the given logger.
 
     Arguments:
-        logger: a `~logging.Logger` instance.
+        logger (~logging.logger): the logger to wrap warnings with when
+            the decorated function is called
 
     Returns:
         `function`: a decorator function.
-        
+
     """
     def decorator(func):
         @functools.wraps(func)

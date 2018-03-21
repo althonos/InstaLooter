@@ -48,6 +48,10 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 
+.PHONY:
+cleanhtml:
+	rm -rf $(BUILDDIR)/*html*
+
 .PHONY: html
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
