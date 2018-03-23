@@ -5,14 +5,13 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import abc
-import collections
-import functools
 import json
 import math
 import time
+from typing import Any, Dict, Iterator, Iterable, Optional, Text
 
-import requests
 import six
+from requests import Session
 
 
 __all__ = [
@@ -23,7 +22,7 @@ __all__ = [
 
 
 @six.add_metaclass(abc.ABCMeta)
-class PageIterator(collections.Iterator):
+class PageIterator(Iterator[Dict[Text, Any]]):
     """An abstract Instagram page iterator.
     """
 
@@ -31,19 +30,26 @@ class PageIterator(collections.Iterator):
     PAGE_SIZE = 200
     INTERVAL = 0.5
 
-    section_generic = NotImplemented
-    section_media = NotImplemented
+    section_generic = NotImplemented    # type: Text
+    section_media = NotImplemented      # type: Text
 
     def __init__(self, session=None):
-        self._session = session or requests.Session()
+        # type: (Optional[Session]) -> None
+        self._session = session or Session()
         self._finished = False
-        self._cursor = None
+        self._cursor = None     # type: Optional[Text]
         self._current_page = 0
-        self._data_it = iter(self._page_loader(self._session))
-        self._total = None
+        self._total = None      # type: Optional[int]
         self._done = 0
+        self._data_it = iter(self._page_loader(self._session))
+
+    @abc.abstractmethod
+    def _geturl(self, cursor):
+        # type: (Optional[Text]) -> Text
+        return NotImplemented
 
     def _page_loader(self, session):
+        # type: (Session) -> Iterable[Dict[Text, Dict[Text, Any]]]
         while True:
             try:
                 # time.sleep(self.INTERVAL)
@@ -63,10 +69,10 @@ class PageIterator(collections.Iterator):
     def __length_hint__(self):
         if self._total is None:
             try:
-                data = next(self._data_it, None)
+                data = next(self._data_it)
                 c = data[self.section_generic][self.section_media]['count']
                 self._total = int(math.ceil(c / self.PAGE_SIZE))
-            except TypeError:
+            except (StopIteration, TypeError):
                 self._total = 0
         return self._total - self._done
 
@@ -135,7 +141,7 @@ class ProfileIterator(PageIterator):
 
     @classmethod
     def from_username(cls, username, session=None):
-        session = session or requests.Session()
+        session = session or Session()
         url = "https://www.instagram.com/{}/?__a=1".format(username)
         try:
             with session.get(url) as res:

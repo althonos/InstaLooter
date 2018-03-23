@@ -7,11 +7,9 @@ individual medias defined in each page instead of whole pages.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import collections
 import datetime
-import functools
+from typing import Any, Dict, List, Optional, Iterator, Iterable, Set, Text
 
-import requests
 import six
 
 
@@ -21,29 +19,31 @@ __all__ = [
 ]
 
 
-class MediasIterator(collections.Iterator):
+class MediasIterator(Iterator[Dict[Text, Any]]):
     """An iterator over the medias obtained from a page iterator.
     """
 
     def __init__(self, page_iterator):
-        self._it = page_iterator
-        self._seen = set()
-        self._edges = []
+        # type: (Iterable[Dict[Text, Any]]) -> None
+        self._it = iter(page_iterator)
+        self._seen = set()          # type: Set[Text]
+        self._edges = []            # type: List[Dict[Text, Dict[Text, Any]]]
         self._finished = False
-        self._total = None
+        self._total = None          # type: Optional[int]
         self._done = 0
-        self._tmp = None
 
     def __iter__(self):
+        # type: () -> MediasIterator
         return self
 
     def _next_page(self):
+        # type: () -> Dict[Text, Any]
         data = next(self._it)
         section = next(s for s in six.iterkeys(data) if s.endswith('_media'))
         return data[section]
 
     def __next__(self):
-
+        # type: () -> Dict[Text, Any]
         if self._finished:
             raise StopIteration
 

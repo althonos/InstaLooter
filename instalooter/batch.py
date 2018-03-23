@@ -4,20 +4,17 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import io
 import getpass
 import logging
-import os
+import typing
+from typing import Any, Mapping, Optional, Text, Type, Union
 
-import requests
 import six
+from requests import Session
 
-from .looters import HashtagLooter, InstaLooter, ProfileLooter
+from .looters import InstaLooter, HashtagLooter, ProfileLooter
 from .pbar import TqdmProgressBar
-
-# mypy annotations
-if False:
-    import io
-    from typing import Any, Dict, Type, Union
 
 
 #: The module logger
@@ -31,55 +28,103 @@ class BatchRunner(object):
     _CLS_MAP = {
         'users': ProfileLooter,
         'hashtag': HashtagLooter,
-    }  # type: Dict[str, Type[InstaLooter]]
+    }  # type: Mapping[Text, Union[Type[ProfileLooter], Type[HashtagLooter]]]
 
-    def __init__(self,
-                 handle,    # type: Any
-                 args=None  # Dict[str, Any]
-                 ):
-        # type: (...) -> None
+    def __init__(self, handle, args=None):
+        # type: (Any, Optional[Mapping[Text, Any]]) -> None
 
         close_handle = False
         if isinstance(handle, six.binary_type):
             handle = handle.decode('utf-8')
         if isinstance(handle, six.text_type):
-            handle = open(handle)
+            fp = open(handle)  # type: typing.IO
             close_handle = True
+        else:
+            fp = handle
 
         try:
             self.args = args or {}
             self.parser = six.moves.configparser.ConfigParser()
-            getattr(self.parser, "readfp" if six.PY2 else "read_file")(handle)
+            getattr(self.parser, "readfp" if six.PY2 else "read_file")(fp)
         finally:
             if close_handle:
                 handle.close()
 
+    @typing.overload
+    def _getboolean(self, section_id, key, default):
+        # type: (Text, Text, bool) -> bool
+        pass
+
+    @typing.overload
+    def _getboolean(self, section_id, key):
+        # type: (Text, Text) -> Optional[bool]
+        pass
+
+    @typing.overload
+    def _getboolean(self, section_id, key, default):
+        # type: (Text, Text, None) -> Optional[bool]
+        pass
+
     def _getboolean(self, section_id, key, default=None):
+        # type: (Text, Text, Optional[bool]) -> Optional[bool]
         if self.parser.has_option(section_id, key):
             return self.parser.getboolean(section_id, key)
         return default
 
+    @typing.overload
+    def _getint(self, section_id, key, default):
+        # type: (Text, Text, None) -> Optional[int]
+        pass
+
+    @typing.overload
+    def _getint(self, section_id, key):
+        # type: (Text, Text) -> Optional[int]
+        pass
+
+    @typing.overload
+    def _getint(self, section_id, key, default):
+        # type: (Text, Text, int) -> int
+        pass
+
     def _getint(self, section_id, key, default=None):
+        # type: (Text, Text, Optional[int]) -> Optional[int]
         if self.parser.has_option(section_id, key):
             return self.parser.getint(section_id, key)
         return default
 
+    @typing.overload
+    def _get(self, section_id, key, default):
+        # type: (Text, Text, None) -> Optional[Text]
+        pass
+
+    @typing.overload
+    def _get(self, section_id, key):
+        # type: (Text, Text) -> Optional[Text]
+        pass
+
+    @typing.overload
+    def _get(self, section_id, key, default):
+        # type: (Text, Text, Text) -> Text
+        pass
+
     def _get(self, section_id, key, default=None):
+        # type: (Text, Text, Optional[Text]) -> Optional[Text]
         if self.parser.has_option(section_id, key):
             return self.parser.get(section_id, key)
         return default
 
     def runAll(self):
+        # type: (...) -> None
         """Run all the jobs specified in the configuration file.
         """
-
         logger.debug("Creating batch session")
-        session = requests.Session()
+        session = Session()
 
         for section_id in self.parser.sections():
             self.runJob(section_id, session=session)
 
     def runJob(self, section_id, session=None):
+        # type: (Text, Optional[Session]) -> None
         """Run a job as described in the section named ``section_id``.
 
         Raises:
@@ -89,7 +134,7 @@ class BatchRunner(object):
         if not self.parser.has_section(section_id):
             raise KeyError('section not found: {}'.format(section_id))
 
-        session = session or requests.Session()
+        session = session or Session()
 
         for name, looter_cls in six.iteritems(self._CLS_MAP):
 
@@ -115,17 +160,17 @@ class BatchRunner(object):
                     extended_dump=self._getboolean(section_id, 'extended-dump', False),
                     session=session)
 
-                # if self.parser.has_option(section_id, 'username'):
-                #     looter.logout()
-                #     username = self._get(section_id, 'username')
-                #     password = self._get(section_id, 'password') or \
-                #         getpass.getpass('Password for "{}": '.format(username))
-                #     looter.login(username, password)
+                if self.parser.has_option(section_id, 'username'):
+                    looter.logout()
+                    username = self._get(section_id, 'username')
+                    password = self._get(section_id, 'password') or \
+                        getpass.getpass('Password for "{}": '.format(username))
+                    looter.login(username, password)  # type: ignore
 
                 n = looter.download(
                     directory,
                     media_count=self._getint(section_id, 'num-to-dl'),
-                    timeframe=self._get(section_id, 'timeframe'),
+                    # FIXME: timeframe=self._get(section_id, 'timeframe'),
                     new_only=self._getboolean(section_id, 'new', False),
                     pgpbar_cls=None if quiet else TqdmProgressBar,
                     dlpbar_cls=None if quiet else TqdmProgressBar)
@@ -133,6 +178,7 @@ class BatchRunner(object):
                 logger.log(35, "Downloaded {} medias !".format(n))
 
     def getTargets(self, raw_string):
+        # type: (Optional[Text]) -> Mapping[Text, Text]
         """Extract targets from a string in 'key: value' format.
         """
         targets = {}

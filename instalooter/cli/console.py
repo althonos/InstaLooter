@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import functools
 import logging
 import warnings
+from typing import Callable
 
 logging.SPAM = 5
 logging.NOTICE = 25
@@ -18,6 +19,7 @@ logging.addLevelName(logging.SUCCESS, "SUCCESS")
 
 
 def warn_logging(logger):
+    # type: (logging.Logger) -> Callable
     """Create a `showwarning` function that uses the given logger.
 
     Arguments:
@@ -38,7 +40,7 @@ def wrap_warnings(logger):
 
     Arguments:
         logger (~logging.logger): the logger to wrap warnings with when
-            the decorated function is called
+            the decorated function is called.
 
     Returns:
         `function`: a decorator function.

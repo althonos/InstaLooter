@@ -4,10 +4,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import typing
+
 try:
-    import ujson as json
+    import simplejson as json
 except ImportError:
-    import json
+    import json  # type: ignore
 
 try:
     import PIL.Image
@@ -20,6 +22,7 @@ try:
     from operator import length_hint
 except ImportError:
     def length_hint(obj, default=0):
+        # type: (typing.Any, int) -> int
         """Return an estimate of the number of items in obj.
 
         This is useful for presizing containers when building from an
@@ -31,6 +34,7 @@ except ImportError:
 
         See Also:
             `PEP 424 <https://www.python.org/dev/peps/pep-0424/>`_
+
         """
         try:
             return len(obj)
@@ -51,3 +55,6 @@ except ImportError:
             if hint < 0:
                 raise ValueError("__length_hint__() should return >= 0")
             return hint
+
+
+__all__ = ["PIL", "piexif", "json", "length_hint"]

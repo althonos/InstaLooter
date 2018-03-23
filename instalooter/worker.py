@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 
 import atexit
 import io
-import json
 import operator
 import threading
 import time

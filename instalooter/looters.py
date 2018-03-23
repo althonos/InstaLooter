@@ -14,15 +14,17 @@ import sys
 import threading
 import time
 import warnings
+from datetime import datetime
 
-import fs
-import requests
+import fs.base
 import six
+import typing
+from requests import Session
+from six.moves.queue import Queue
+from typing import *
 
-from fs.base import FS
 
 from . import __author__, __name__ as __appname__, __version__
-
 from ._impl import length_hint
 from ._utils import NameGenerator
 from .medias import TimedMediasIterator, MediasIterator
@@ -30,13 +32,9 @@ from .pages import PageIterator, ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
 from .worker import InstaDownloader
 
-# mypy annotations
-if False:
-    from typing import *
-    from datetime import datetime
-    from queue import Queue
-    # type of `timeframe` argument for methods that accept it
-    _Timeframe = Tuple[Optional[datetime], Optional[datetime]]
+
+_T = typing.TypeVar("_T")
+_Timeframe = Tuple[Optional[datetime], Optional[datetime]]
 
 
 __all__ = [
@@ -55,13 +53,14 @@ class InstaLooter(object):
     # : The filesystem where cache date is located
     cachefs = fs.open_fs(
         "usercache://{}:{}:{}".format(__appname__, __author__, __version__),
-        create=True) # type: FS
+        create=True) # type: fs.base.FS
 
     # : The name of the cookie file in the cache filesystem
     _COOKIE_FILE = "cookies.txt"
 
     @classmethod
     def _init_session(cls, session=None):
+        # type: (Optional[Session]) -> Session
         """Initialise the given session and load class cookies to its jar.
 
         Arguments:
@@ -72,20 +71,19 @@ class InstaLooter(object):
             ~requests.Session: an initialised session instance.
 
         """
-        if session is None:
-            session = requests.Session()
+        session = session or Session()
         session.cookies = six.moves.http_cookiejar.LWPCookieJar(
             cls.cachefs.getsyspath(cls._COOKIE_FILE))
         try:
             session.cookies.load()
         except IOError:
             pass
-        session.cookies.clear_expired_cookies()
+        session.cookies.clear_expired_cookies()  # type: ignore
         return session
 
     @classmethod
     def _login(cls, username, password, session=None):
-        # type: (str, str, Optional[requests.Session]) -> None
+        # type: (str, str, Optional[Session]) -> None
         """Login with provided credentials and session.
 
         Arguments:
@@ -98,9 +96,7 @@ class InstaLooter(object):
             Code taken from LevPasha/instabot.py
 
         """
-        if session is None:
-            session = requests.Session()
-
+        session = session or Session()
         homepage = "https://www.instagram.com/"
         data = {'username': username, 'password': password}
 
@@ -125,13 +121,13 @@ class InstaLooter(object):
             if res.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
             try:
-                session.cookies.save()
+                session.cookies.save()  # type: ignore
             except IOError:
                 pass
 
     @classmethod
     def _logout(cls, session=None):
-        # type: (Optional[requests.Session]) -> None
+        # type: (Optional[Session]) -> None
         """Log out from current session.
 
         Also deletes the eventual cookie file left in the cache directory,
@@ -145,9 +141,7 @@ class InstaLooter(object):
             Code taken from LevPasha/instabot.py
 
         """
-        if session is None:
-            session = requests.Session()
-
+        session = session or Session()
         sessionid = cls._sessionid(session)
         if sessionid is not None:
             url = "https://www.instagram.com/accounts/logout/"
@@ -158,7 +152,7 @@ class InstaLooter(object):
 
     @classmethod
     def _logged_in(cls, session=None):
-        # type: (Optional[requests.Session]) -> bool
+        # type: (Optional[Session]) -> bool
         """Check if there is an open Instagram session.
 
         Arguments:
@@ -173,7 +167,7 @@ class InstaLooter(object):
 
     @classmethod
     def _sessionid(cls, session=None):
-        # type: (Optional[requests.Session]) -> None
+        # type: (Optional[Session]) -> Optional[Text]
         """Get the ID of the currently opened Instagram session.
 
         Arguments:
@@ -184,22 +178,22 @@ class InstaLooter(object):
             str or None: the session ID, if any, or `None`.
 
         """
-        session = cls._init_session(session)
-        return next((ck.value for ck in session.cookies
+        _session = cls._init_session(session)
+        return next((ck.value for ck in _session.cookies
                      if ck.domain == "www.instagram.com"
                      and ck.name == "sessionid"
                      and ck.path == "/"), None)
 
     def __init__(self,
-                 add_metadata=False,
-                 get_videos=False,
-                 videos_only=False,
-                 jobs=16,
-                 template="{id}",
-                 dump_json=False,
-                 dump_only=False,
-                 extended_dump=False,
-                 session=None           # type: Optional[requests.Session]
+                 add_metadata=False,    # type: bool
+                 get_videos=False,      # type: bool
+                 videos_only=False,     # type: bool
+                 jobs=16,               # type: int
+                 template="{id}",       # type: Text
+                 dump_json=False,       # type: bool
+                 dump_only=False,       # type: bool
+                 extended_dump=False,   # type: bool
+                 session=None           # type: Optional[Session]
                  ):
         # type: (...) -> None
         """Create a new looter instance.
@@ -241,7 +235,7 @@ class InstaLooter(object):
 
     @abc.abstractmethod
     def pages(self):
-        # type: () -> PageIterator
+        # type: () -> Iterator[Dict[Text, Any]]
         """Obtain an iterator over Instagram post pages.
 
         Returns:
@@ -250,8 +244,11 @@ class InstaLooter(object):
         """
         return NotImplemented
 
-    def _medias(self, pages_iterator, timeframe=None):
-        # type: (Iterable[dict], Optional[_Timeframe]) -> MediasIterator
+    def _medias(self,
+                pages_iterator,     # type: Iterable[Dict[Text, Any]]
+                timeframe=None      # type: Optional[_Timeframe]
+                ):
+        # type: (...) -> Iterator[Dict[Text, Any]]
         """Obtain an iterator over the medias of the given pages iterator.
 
         Arguments:
@@ -267,7 +264,7 @@ class InstaLooter(object):
         return MediasIterator(pages_iterator)
 
     def medias(self, timeframe=None):
-        # type: (Optional[_Timeframe]) -> MediasIterator
+        # type: (Optional[_Timeframe]) -> Iterator[Dict[Text, Any]]
         """Obtain an iterator over the Instagram medias.
 
         Wraps the iterator returned by `InstaLooter.pages` to seamlessly
@@ -297,7 +294,7 @@ class InstaLooter(object):
             return res.json()['graphql']['shortcode_media']
 
     def download_pictures(self,
-                          destination,       # type: Union[str, FS]
+                          destination,       # type: Union[str, fs.base.FS]
                           media_count=None,  # type: Optional[int]
                           timeframe=None,    # type: Optional[_Timeframe]
                           new_only=False,    # type: bool
@@ -322,7 +319,7 @@ class InstaLooter(object):
         )
 
     def download_videos(self,
-                        destination,       # type: Union[str, FS]
+                        destination,       # type: Union[str, fs.base.FS]
                         media_count=None,  # type: Optional[int]
                         timeframe=None,    # type: Optional[_Timeframe]
                         new_only=False,    # type: bool
@@ -347,7 +344,7 @@ class InstaLooter(object):
         )
 
     def download(self,
-                 destination,           # type: Union[str, FS]
+                 destination,           # type: Union[str, fs.base.FS]
                  condition=None,        # type: Optional[Callable[[dict], bool]]
                  media_count=None,      # type: Optional[int]
                  timeframe=None,        # type: Optional[_Timeframe]
@@ -392,7 +389,7 @@ class InstaLooter(object):
         destination, close_destination = self._init_destfs(destination)
 
         # Create an iterator over the pages with an optional progress bar
-        pages_iterator = self.pages()
+        pages_iterator = self.pages()   # type: Iterable[Dict[Text, Any]]
         pages_iterator = pgpbar = self._init_pbar(pages_iterator, pgpbar_cls)
 
         # Create an iterator over the medias
@@ -417,9 +414,9 @@ class InstaLooter(object):
         # Once queuing the medias is fininished, finish the page progress bar
         # and set a new maximum on the download progress bar.
         if pgpbar_cls is not None:
-            pgpbar.finish()
+            pgpbar.finish()                         # type: ignore
         if dlpbar_cls is not None:
-            dlpbar.set_maximum(medias_queued)
+            dlpbar.set_maximum(medias_queued)       # type: ignore
 
         # If no medias were queued, issue a warning
         # TODO: refine warning depending on download parameters
@@ -433,7 +430,7 @@ class InstaLooter(object):
         # Once downloading is finished, finish the download progress bar
         # and close the destination if needed.
         if dlpbar_cls is not None:
-            dlpbar.finish()
+            dlpbar.finish()                        # type: ignore
         if close_destination:
             destination.close()
 
@@ -463,10 +460,10 @@ class InstaLooter(object):
         return self._logged_in(self.session)
 
     def _init_pbar(self,
-                   it,
+                   it,             # type: Iterable[_T]
                    pbar_cls=None,  # type: Optional[Type[ProgressBar]]
                    ):
-        # type: (...) -> Union[ProgressBar, Iterable[Any]]
+        # type: (...) -> Iterable[_T]
         """Wrap an iterable within a `ProgressBar`.
 
         Arguments:
@@ -488,7 +485,7 @@ class InstaLooter(object):
         return it
 
     def _init_destfs(self, destination, create=True):
-        # type: (Union[str, FS], bool) -> Tuple[FS, bool]
+        # type: (Union[str, fs.base.FS], bool) -> Tuple[fs.base.FS, bool]
         """Open a filesystem either from a FS URL or filesystem instance.
 
         Arguments:
@@ -507,13 +504,13 @@ class InstaLooter(object):
         if isinstance(destination, six.text_type):
             destination = fs.open_fs(destination, create=create)
             close_destination = True
-        if not isinstance(destination, FS):
+        if not isinstance(destination, fs.base.FS):
             raise TypeError("<destination> must be a FS URL or FS instance.")
         return destination, close_destination
 
     def _fill_media_queue(self,
-                          queue,            # type: six.moves.queue.Queue
-                          destination,      # type: FS
+                          queue,            # type: Queue
+                          destination,      # type: fs.base.FS
                           medias_iter,      # type: Iterable[Any]
                           media_count=None, # type: Optional[int]
                           new_only=False,   # type: bool
@@ -545,17 +542,19 @@ class InstaLooter(object):
 
         """
         # Create a condition from parameters if needed
-        if condition is None:
+        if condition is not None:
+            _condition = condition       # type: Callable[[dict], bool]
+        else:
             if self.videos_only:
-                def condition(media): return media['is_video']
+                def _condition(media): return media['is_video']
             elif not self.get_videos:
-                def condition(media): return not media['is_video']
+                def _condition(media): return not media['is_video']
             else:
-                def condition(media): return True
+                def _condition(media): return True
 
         # Queue all media filling the condition
         medias_queued = 0
-        for media in six.moves.filter(condition, medias_iter):
+        for media in six.moves.filter(_condition, medias_iter):
 
             # Check if the whole post info is required
             if self.namegen.needs_extended(media) or media["__typename"] != "GraphImage":
@@ -565,7 +564,7 @@ class InstaLooter(object):
             if media['__typename'] == "GraphSidecar":
                 # Check that each node fits the condition
                 for sidecar in media['edge_sidecar_to_children']['edges'][:]:
-                    if not condition(sidecar['node']):
+                    if not _condition(sidecar['node']):
                         media['edge_sidecar_to_children']['edges'].remove(sidecar)
 
                 # Check that the nodelist is not depleted
@@ -590,8 +589,8 @@ class InstaLooter(object):
     # WORKERS UTILS
 
     def _init_workers(self,
-                      pbar,         # type: Optional[ProgressBar]
-                      destination,  # type: FS
+                      pbar,         # type: Union[ProgressBar, Iterable, None]
+                      destination,  # type: fs.base.FS
                       ):
         # type: (...) -> Tuple[List[InstaDownloader], Queue]
 
@@ -634,16 +633,23 @@ class ProfileLooter(InstaLooter):
     """A looter targeting medias on a user profile.
     """
 
-    def __init__(self,
-                 username,  # type: str
-                 **kwargs
-                 ):
-        # type: (...) -> None
+    def __init__(self, username,  **kwargs):
+        # type: (str, **Any) -> None
+        """Create a new profile looter.
+
+        Arguments:
+            username (str): the username of the profile.
+
+        See `InstaLooter.__init__` for more details about accepted
+        keyword arguments.
+
+        """
         super(ProfileLooter, self).__init__(**kwargs)
         self._username = username
         self._owner_id = None
 
-    def pages(self):
+    def pages(self):  # noqa: D102
+        # type: () -> ProfileIterator
         if self._owner_id is None:
             it = ProfileIterator.from_username(self._username, self.session)
             self._owner_id = it.owner_id
@@ -655,15 +661,22 @@ class HashtagLooter(InstaLooter):
     """A looter targeting medias tagged with a hashtag.
     """
 
-    def __init__(self,
-                 hashtag,   # type: str
-                 **kwargs
-                 ):
-        # type: (...) -> None
+    def __init__(self, hashtag, **kwargs):
+        # type: (str, **Any) -> None
+        """Create a new hashtag looter.
+
+        Arguments:
+            username (str): the hashtag to search for.
+
+        See `InstaLooter.__init__` for more details about accepted
+        keyword arguments.
+
+        """
         super(HashtagLooter, self).__init__(**kwargs)
         self._hashtag = hashtag
 
-    def pages(self):
+    def pages(self):  # noqa: D102
+        # type: () -> HashtagIterator
         return HashtagIterator(self._hashtag, self.session)
 
 
@@ -671,22 +684,30 @@ class PostLooter(InstaLooter):
     """A looter targeting a specific post.
     """
 
-    def __init__(self,
-                 code,      # type: str
-                 **kwargs
-                 ):
-        # type: (...) -> None
+    def __init__(self, code, **kwargs):
+        # type: (str, **Any) -> None
+        """Create a new hashtag looter.
+
+        Arguments:
+            code (str): the code of the post to get.
+
+        See `InstaLooter.__init__` for more details about accepted
+        keyword arguments.
+
+        """
         super(PostLooter, self).__init__(**kwargs)
         self.code = code
         self._info = None   # type: Optional[dict]
 
     @property
     def info(self):
+        # type: () -> dict
         if self._info is None:
             self._info = self.get_post_info(self.code)
         return self._info
 
     def pages(self):
+        # type: () -> Iterator[Dict[Text, Any]]
         """Return a generator that yields a page with only the refered post.
 
         Yields:
@@ -718,12 +739,12 @@ class PostLooter(InstaLooter):
         if timeframe is not None:
             start, end = TimedMediasIterator.get_times(timeframe)
             timestamp = info.get("taken_at_timestamp") or info["media"]
-            if not (start >= media_date >= end):
+            if not (start >= timestamp >= end):
                 raise StopIteration
         yield info
 
     def download(self,
-                 destination,       # type: Union[str, FS]
+                 destination,       # type: Union[str, fs.base.FS]
                  condition=None,    # type: Optional[Callable[[dict], bool]]
                  media_count=None,  # type: Optional[int]
                  timeframe=None,    # type: Optional[_Timeframe]
@@ -747,7 +768,7 @@ class PostLooter(InstaLooter):
         """
         destination, close_destination = self._init_destfs(destination)
 
-        queue = six.moves.queue.Queue()
+        queue = six.moves.queue.Queue()  # type: Queue[Dict]
         medias_queued = self._fill_media_queue(
             queue, destination, iter(self.medias()), media_count,
             new_only, condition)
