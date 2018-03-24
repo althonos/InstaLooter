@@ -88,7 +88,7 @@ Requirements
 .. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?style=flat-square
    :target: https://pypi.python.org/pypi/six
 
-.. |PyPI six| image:: https://img.shields.io/pypi/v/tenacity.svg?style=flat-square
+.. |PyPI tenacity| image:: https://img.shields.io/pypi/v/tenacity.svg?style=flat-square
    :target: https://pypi.python.org/pypi/tenacity
 
 .. |PyPI tqdm| image:: https://img.shields.io/pypi/v/tqdm.svg?style=flat-square
@@ -112,7 +112,7 @@ Requirements
 .. |Source six| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/benjaminp/six
 
-.. |Source six| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
+.. |Source tenacity| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/jd/tenacity
 
 .. |Source tqdm| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
@@ -137,7 +137,7 @@ Requirements
 .. |License six| image:: https://img.shields.io/pypi/l/six.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License six| image:: https://img.shields.io/pypi/l/tenacity.svg?style=flat-square
+.. |License tenacity| image:: https://img.shields.io/pypi/l/tenacity.svg?style=flat-square
    :target: https://choosealicense.com/licenses/apache-2.0/
 
 .. |License tqdm| image:: https://img.shields.io/pypi/l/tqdm.svg?style=flat-square
