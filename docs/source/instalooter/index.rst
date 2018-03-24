@@ -3,34 +3,18 @@ API Reference
 
 .. toctree::
    :hidden:
-   :glob:
 
-   *
-
-
-.. rubric:: Batch Runner (`instalooter.batch`)
-
-.. currentmodule:: instalooter.batch
-
-.. autosummary::
-   :nosignatures:
-
-   BatchRunner
+   looters
+   cli
+   medias
+   pages
+   batch
+   pbar
+   worker
 
 
-
-.. rubric:: Command Line Interface  (`instalooter.cli`)
-
-.. currentmodule:: instalooter.cli
-
-.. autosummary::
-
-   main
-
-
-
-
-
+Main
+----
 
 .. rubric:: Looters (`instalooter.looters`)
 
@@ -45,6 +29,28 @@ API Reference
     PostLooter
 
 
+.. rubric:: Command Line Interface  (`instalooter.cli`)
+
+.. currentmodule:: instalooter.cli
+
+.. autosummary::
+
+   main
+
+
+
+    .. rubric:: Batch Runner (`instalooter.batch`)
+
+    .. currentmodule:: instalooter.batch
+
+    .. autosummary::
+       :nosignatures:
+
+       BatchRunner
+
+
+Iterators
+---------
 
 .. rubric:: Medias Iterators (`instalooter.medias`)
 
@@ -55,7 +61,6 @@ API Reference
 
     MediasIterator
     TimedMediasIterator
-
 
 
 .. rubric:: Pages Iterators (`instalooter.pages`)
@@ -70,6 +75,8 @@ API Reference
     ProfileIterator
 
 
+Miscellaneous
+-------------
 
 .. rubric:: Progress Bars (`instalooter.pbar`)
 
@@ -80,7 +87,6 @@ API Reference
 
     ProgressBar
     TqdmProgressBar
-
 
 
 .. rubric:: Background Downloader (`instalooter.worker`)

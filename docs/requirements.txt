@@ -1,4 +1,4 @@
-instaLooter
+instalooter
 setuptools >= 30.3
-sphinx
-sphinx_bootstrap_theme
+sphinx ~=1.7
+sphinx-bootstrap-theme ~=0.6
