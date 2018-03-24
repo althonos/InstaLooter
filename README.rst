@@ -11,8 +11,9 @@ re-implementation of the now deprecated `InstaRaider <https://github.com/akurtov
 developed by `@akurtovic <https://github.com/akurtovic>`_.
 
 *The version* ``v1.0.0`` *was completely rewrote from scratch, and as such, will
-probably break compatibility with your homemade. Meanwhile, great care was
-taken to keep the CLI as consistent as possible with the previous versions.*
+probably break compatibility with your homemade scripts. Meanwhile, great care
+was taken to keep the CLI as consistent as possible with the previous versions,
+so it'll hopefully feel like home.*
 
 .. |starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star
    :target: https://github.com/althonos/InstaLooter
