@@ -90,3 +90,6 @@ ENV/
 
 # Codacy token
 .codacy.token
+
+# MyPy
+.mypy_cache
