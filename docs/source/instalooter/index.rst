@@ -38,15 +38,14 @@ Main
    main
 
 
+.. rubric:: Batch Runner (`instalooter.batch`)
 
-    .. rubric:: Batch Runner (`instalooter.batch`)
+.. currentmodule:: instalooter.batch
 
-    .. currentmodule:: instalooter.batch
+.. autosummary::
+   :nosignatures:
 
-    .. autosummary::
-       :nosignatures:
-
-       BatchRunner
+   BatchRunner
 
 
 Iterators

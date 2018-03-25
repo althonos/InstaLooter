@@ -1,4 +1,4 @@
-instalooter
-setuptools >= 30.3
-sphinx ~=1.7
+setuptools ~=30.3
+sphinx ~=1.6
 sphinx-bootstrap-theme ~=0.6
+semantic-version ~=2.6
