@@ -8,77 +8,111 @@ that can be used to extend the capabilities of ``instaLooter``, to fit your
 needs more tightly or to integrate ``instaLooter`` to your program.
 
 
-Store the links to the pictures and videos of a profile into a file
--------------------------------------------------------------------
+Download pictures
+-----------------
 
-.. code::
+Download 50 posts from the `Dream Wife band <https://www.instagram.com/dreamwifetheband/?hl=fr>`_
+account to the `Pictures` directory in your home folder (you better be checking
+their music though):
 
-   from instaLooter import InstaLooter
-   looter = InstaLooter(profile="targetprofile")
+.. code:: python
 
-   with open("outputfile.txt", "w") as output:
-       for media in looter.medias():
-           if media['is_video']:
-               url = looter.get_post_info(media['code'])['video_url']
-           else:
-               url = media['display_src']
-           output.write("{}\n".format(url))
+   from instalooter.looters import ProfileLooter
+   looter = ProfileLooter("dreamwifetheband")
+   looter.download('~/Pictures', media_count=50)
 
 
-Get a set of users that commented a given profile
--------------------------------------------------
+Dump media links
+----------------
 
-.. code::
+Create a list with all the links to picture and video files tagged with
+`#ramones <https://www.instagram.com/explore/tags/ramones/>`_ in a file
+named `ramones.txt`:
 
-  from instaLooter import InstaLooter
-  looter = InstaLooter(profile="targetprofile")
+.. code:: python
 
-  users = set()
-  for media in looter.medias(with_pbar=True):
-     post_info = looter.get_post_info(media['code'])
-     for comment in post_info['edge_media_to_comment']['edges']:
-         user = comment['node']['owner']['username']
-         users.add(user)
+    def links(media, looter):
+        if media.get('__typename') == "GraphSidecar":
+            media = looter.get_post_info(media['shortcode'])
+            nodes = [e['node'] for e in media['edge_sidecar_to_children']['edges']]
+            return [n.get('video_url') or n.get('display_url') for n in nodes]
+        elif media['is_video']:
+            media = looter.get_post_info(media['shortcode'])
+            return [media['video_url']]
+        else:
+            return [media['display_url']]
+
+    from instalooter.looters import HashtagLooter
+    looter = HashtagLooter("ramones")
+
+    with open("ramones.txt", "w") as f:
+        for media in looter.medias():
+            for link in links(media, looter):
+                f.write("{}\n".format(link))
 
 
-Get a set of users tagged in pictures of a given profile
---------------------------------------------------------
+Users from comments
+-------------------
 
-.. code::
+Obtain a subset of users that commented on some of the posts of
+`Franz Ferdinand <https://www.instagram.com/franz_ferdinand>`_.
 
-   from instaLooter import InstaLooter
-   looter = InstaLooter(profile="targetprofile")
+.. code:: python
 
-   users = set()
-   for media in looter.medias(with_pbar=True):
-       post_info = looter.get_post_info(media['code'])
-       for usertag in post_info['edge_media_to_tagged_user']['edges']:
-           user = usertag['node']['user']['username']
+    from instalooter.looters import ProfileLooter
+    looter = ProfileLooter("franz_ferdinand")
+
+    users = set()
+    for media in looter.medias():
+       info = looter.get_post_info(media['shortcode'])
+       for comment in post_info['edge_media_to_comment']['edges']:
+           user = comment['node']['owner']['username']
+           users.add(user)
+
+
+Users from mentions
+-------------------
+
+
+
+.. code:: python
+
+    from instalooter.looters import ProfileLooter
+    looter = ProfileLooter("mandodiaomusic")
+
+    users = set()
+    for media in looter.medias():
+       info = looter.get_post_info(media['shortcode'])
+       for comment in post_info['edge_media_to_tagged_user']['edges']:
+           user = comment['node']['user']['username']
            users.add(user)
 
 
 Download resized pictures
 -------------------------
 
-Downloaded pictures will all be resized by IG to be 320 pixels wide
-with the same aspect ratio before being downloaded.
+Unfortunately, this is not possible anymore as Instagram added a hash signature
+to prevent messing with their URLs.
 
-.. code::
+..
+.. Downloaded pictures will all be resized by IG to be 320 pixels wide
+.. with the same aspect ratio before being downloaded.
+..
+.. .. code::
+..
+..     from instaLooter import InstaLooter
+..     from instaLooter.urlgen import resizer
+..
+..     looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=resizer(320))
+..     looter.download()
 
-    from instaLooter import InstaLooter
-    from instaLooter.urlgen import resizer
 
-    looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=resizer(320))
-    looter.download()
-
-
-Download thumbnails
--------------------
-
-.. code::
-
-    from instaLooter import InstaLooter
-    from instaLooter.urlgen import thumbnail
-
-    looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=thumbnail)
-    looter.download()
+.. Download thumbnails
+.. -------------------
+.. .. code::
+..
+..     from instaLooter import InstaLooter
+..     from instaLooter.urlgen import thumbnail
+..
+..     looter = InstaLooter(profile="xxxx", get_videos=True, url_generator=thumbnail)
+..     looter.download()
