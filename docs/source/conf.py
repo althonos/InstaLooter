@@ -115,6 +115,9 @@ html_theme_options = {
     # Choose Bootstrap version.
     'bootstrap_version': "3",
 
+    # Tab name for entire site. (Default: "Site")
+    'navbar_site_name': "Documentation",
+
     # HTML navbar class (Default: "navbar") to attach to <div> element.
     # For black navbar, do "navbar navbar-inverse"
     'navbar_class': "navbar navbar-inverse",
