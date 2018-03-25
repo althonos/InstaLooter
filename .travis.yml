@@ -26,8 +26,8 @@ script:
 - green -t
 
 after_success:
-- codecov
-- python-codacy-coverage -r coverage.xml
+- python -m codecov
+- python -m codacy -r coverage.xml
 
 deploy:
   provider: pypi
