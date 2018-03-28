@@ -108,7 +108,8 @@ class InstaLooter(object):
             'Host': 'www.instagram.com',
             'Origin': 'https://www.instagram.com',
             'Referer': 'https://www.instagram.com/',
-            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
+            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) \
+                           Gecko/20100101 Firefox/57.0",
             'X-Instagram-AJAX': '1',
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
@@ -120,7 +121,6 @@ class InstaLooter(object):
 
         with session.post(login_url, data=data, allow_redirects=True) as login:
             session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
-            csrftoken = login.cookies['csrftoken']
             session.cookies['ig_vw'] = '1536'
             session.cookies['ig_pr'] = '1.25'
             session.cookies['ig_vh'] = '772'

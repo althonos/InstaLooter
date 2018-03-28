@@ -67,10 +67,26 @@ class NameGenerator(object):
 
 
 def save_cookies(cookiejar, filepath):
-    with open(filepath, 'wb') as f:
-        pickle.dump(cookiejar, f)
+    """Saves the given cookiejar in the file specified by filepath.
+    Arguments:
+        cookiejar: cookiejar object to save
+        filepath: path to file in which the cookiejar should be saved
+
+    Returns:
+        nothing
+    """
+    with open(filepath, 'wb') as cookies_file:
+        pickle.dump(cookiejar, cookies_file)
 
 
 def load_cookies(filepath):
-    with open(filepath, 'rb') as f:
-        return pickle.load(f)
+    """Loads a cookies file and returns the resultant RequestsCookieJar object.
+
+    Arguments:
+        filepath: path to cookies file
+
+    Returns:
+        RequestsCookieJar object loaded from specified filepath
+    """
+    with open(filepath, 'rb') as cookies_file:
+        return pickle.load(cookies_file)
