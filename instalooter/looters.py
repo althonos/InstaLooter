@@ -26,7 +26,7 @@ from typing import *
 
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint
-from ._utils import NameGenerator
+from ._utils import NameGenerator, save_cookies, load_cookies
 from .medias import TimedMediasIterator, MediasIterator
 from .pages import PageIterator, ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
@@ -56,7 +56,7 @@ class InstaLooter(object):
         create=True) # type: fs.base.FS
 
     # : The name of the cookie file in the cache filesystem
-    _COOKIE_FILE = "cookies.txt"
+    _COOKIE_FILE = "cookies.p"
 
     @classmethod
     def _init_session(cls, session=None):
@@ -72,10 +72,8 @@ class InstaLooter(object):
 
         """
         session = session or Session()
-        session.cookies = six.moves.http_cookiejar.LWPCookieJar(
-            cls.cachefs.getsyspath(cls._COOKIE_FILE))
         try:
-            session.cookies.load()
+            session.cookies = load_cookies(cls.cachefs.getsyspath(cls._COOKIE_FILE))
         except IOError:
             pass
         session.cookies.clear_expired_cookies()  # type: ignore
@@ -98,30 +96,44 @@ class InstaLooter(object):
         """
         session = session or Session()
         homepage = "https://www.instagram.com/"
+        login_url = "https://www.instagram.com/accounts/login/ajax/"
         data = {'username': username, 'password': password}
 
         session.headers.update({
-            'Origin': homepage,
-            'Referer': homepage,
-            'X-Instragram-AJAX': '1',
-            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': '*/*',
+            'Accept-Language': 'EN-US',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Content-Length': '0',
+            'Host': 'www.instagram.com',
+            'Origin': 'https://www.instagram.com',
+            'Referer': 'https://www.instagram.com/',
+            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
+            'X-Instagram-AJAX': '1',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
         })
 
         with session.get(homepage) as res:
             session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
-        time.sleep(5 * random.random()) # nosec
+        time.sleep(5 * random.random())
 
-        url = "https://www.instagram.com/accounts/login/ajax/"
-        with session.post(url, data=data, allow_redirects=True) as res:
-            session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
-            if not res.status_code == 200:
+        with session.post(login_url, data=data, allow_redirects=True) as login:
+            session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
+            csrftoken = login.cookies['csrftoken']
+            session.cookies['ig_vw'] = '1536'
+            session.cookies['ig_pr'] = '1.25'
+            session.cookies['ig_vh'] = '772'
+            session.cookies['ig_or'] = 'landscape-primary'
+            time.sleep(5 * random.random())
+            if not login.status_code == 200:
                 raise SystemError("Login error: check your connection")
 
-        with session.get(url) as res:
+        with session.get(homepage) as res:
             if res.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
             try:
-                session.cookies.save()  # type: ignore
+                save_cookies(session.cookies, cls.cachefs.getsyspath(cls._COOKIE_FILE))
             except IOError:
                 pass
 

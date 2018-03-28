@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import datetime
 import operator
 import os
+import pickle
 from typing import Any, Dict, Mapping, Optional, Text
 
 import six
@@ -63,3 +64,13 @@ class NameGenerator(object):
             return False
         except KeyError:
             return True
+
+
+def save_cookies(cookiejar, filepath):
+    with open(filepath, 'wb') as f:
+        pickle.dump(cookiejar, f)
+
+
+def load_cookies(filepath):
+    with open(filepath, 'rb') as f:
+        return pickle.load(f)
