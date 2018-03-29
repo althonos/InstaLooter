@@ -125,7 +125,7 @@ class InstaLooter(object):
             session.cookies['ig_pr'] = '1.25'
             session.cookies['ig_vh'] = '772'
             session.cookies['ig_or'] = 'landscape-primary'
-            time.sleep(5 * random.random())
+            time.sleep(5 * random.random()) # nosec
             if not login.status_code == 200:
                 raise SystemError("Login error: check your connection")
 
