@@ -117,7 +117,7 @@ class InstaLooter(object):
 
         with session.get(homepage) as res:
             session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
-            time.sleep(5 * random.random())
+        time.sleep(5 * random.random()) # nosec
 
         with session.post(login_url, data=data, allow_redirects=True) as login:
             session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
