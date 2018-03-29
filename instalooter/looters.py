@@ -56,7 +56,7 @@ class InstaLooter(object):
         create=True) # type: fs.base.FS
 
     # : The name of the cookie file in the cache filesystem
-    _COOKIE_FILE = "cookies.p"
+    _COOKIE_FILE = "cookies.json"
 
     @classmethod
     def _init_session(cls, session=None):
@@ -117,7 +117,7 @@ class InstaLooter(object):
 
         with session.get(homepage) as res:
             session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
-        time.sleep(5 * random.random())
+            time.sleep(5 * random.random())
 
         with session.post(login_url, data=data, allow_redirects=True) as login:
             session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})

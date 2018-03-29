@@ -7,7 +7,8 @@ from __future__ import unicode_literals
 import datetime
 import operator
 import os
-import pickle
+import json
+from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 from typing import Any, Dict, Mapping, Optional, Text
 
 import six
@@ -75,8 +76,9 @@ def save_cookies(cookiejar, filepath):
     Returns:
         nothing
     """
-    with open(filepath, 'wb') as cookies_file:
-        pickle.dump(cookiejar, cookies_file)
+    with open(filepath, 'w') as cookies_file:
+        cookies = dict_from_cookiejar(cookiejar)
+        json.dump(cookies, cookies_file, indent=4)
 
 
 def load_cookies(filepath):
@@ -88,5 +90,6 @@ def load_cookies(filepath):
     Returns:
         RequestsCookieJar object loaded from specified filepath
     """
-    with open(filepath, 'rb') as cookies_file:
-        return pickle.load(cookies_file)
+    with open(filepath, 'r') as cookies_file:
+        cookies = json.load(cookies_file)
+        return cookiejar_from_dict(cookies)
