@@ -8,9 +8,7 @@ import abc
 import atexit
 import itertools
 import operator
-import os
 import random
-import sys
 import threading
 import time
 import warnings
@@ -23,12 +21,11 @@ from requests import Session
 from six.moves.queue import Queue
 from typing import *
 
-
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint
 from ._utils import NameGenerator
 from .medias import TimedMediasIterator, MediasIterator
-from .pages import PageIterator, ProfileIterator, HashtagIterator
+from .pages import ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
 from .worker import InstaDownloader
 
@@ -145,7 +142,7 @@ class InstaLooter(object):
             Code taken from LevPasha/instabot.py
 
         """
-        session = session or Session()
+        session = session or cls._init_session()
         sessionid = cls._sessionid(session)
         if sessionid is not None:
             url = "https://www.instagram.com/accounts/logout/"
@@ -598,8 +595,8 @@ class InstaLooter(object):
                       ):
         # type: (...) -> Tuple[List[InstaDownloader], Queue]
 
-        workers = []                        # type: List[InstaDownloader]
-        queue = six.moves.queue.Queue()     # type: Queue
+        workers = []        # type: List[InstaDownloader]
+        queue = Queue()     # type: Queue
 
         for _ in six.moves.range(self.jobs):
             worker = InstaDownloader(
