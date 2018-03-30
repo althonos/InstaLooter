@@ -51,6 +51,8 @@ class MediasIterator(Iterator[Dict[Text, Any]]):
             page = self._next_page()
             self._total = page['count']
             self._edges.extend(page['edges'])
+            if not page['edges']:
+                raise StopIteration
 
         media = self._edges.pop(0)
         self._done += 1
