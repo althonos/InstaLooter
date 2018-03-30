@@ -11,27 +11,32 @@ import operator
 import random
 import threading
 import time
+import typing
 import warnings
-from datetime import datetime
 
-import fs.base
+import fake_useragent
+import fs
 import six
 import typing
 from requests import Session
 from six.moves.queue import Queue
-from typing import *
 
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint
-from ._utils import NameGenerator
+from ._utils import NameGenerator, CachedClassProperty
 from .medias import TimedMediasIterator, MediasIterator
 from .pages import ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
 from .worker import InstaDownloader
 
-
-_T = typing.TypeVar("_T")
-_Timeframe = Tuple[Optional[datetime], Optional[datetime]]
+if typing.TYPE_CHECKING:
+    from datetime import datetime
+    from fs.base import FS
+    from typing import (
+        Any, Callable, Dict, Iterator, Iterable, List,
+        Optional, Text, Tuple, Type, Union)
+    _T = typing.TypeVar("_T")
+    _Timeframe = Tuple[Optional[datetime], Optional[datetime]]
 
 
 __all__ = [
@@ -47,12 +52,21 @@ class InstaLooter(object):
     """A brutal Instagram looter that raids without API tokens.
     """
 
-    # : The filesystem where cache date is located
-    cachefs = fs.open_fs(
-        "usercache://{}:{}:{}".format(__appname__, __author__, __version__),
-        create=True) # type: fs.base.FS
+    @CachedClassProperty
+    def _cachefs(cls):
+        """~fs.base.FS: the cache filesystem.
+        """
+        url = "usercache://{}:{}:{}".format(__appname__, __author__, __version__)
+        return fs.open_fs(url, create=True)
 
-    # : The name of the cookie file in the cache filesystem
+    @CachedClassProperty
+    def _user_agents(cls):
+        """~fake_useragent.UserAgent: a collection of fake user-agents.
+        """
+        filename = 'fake_useragent_{}.json'.format(fake_useragent.VERSION)
+        return fake_useragent.UserAgent(path=cls._cachefs.getsyspath(filename))
+
+    # str: The name of the cookie file in the cache filesystem
     _COOKIE_FILE = "cookies.txt"
 
     @classmethod
@@ -70,7 +84,7 @@ class InstaLooter(object):
         """
         session = session or Session()
         session.cookies = six.moves.http_cookiejar.LWPCookieJar(
-            cls.cachefs.getsyspath(cls._COOKIE_FILE))
+            cls._cachefs.getsyspath(cls._COOKIE_FILE))
         try:
             session.cookies.load()
         except IOError:
@@ -102,8 +116,7 @@ class InstaLooter(object):
             'Host': 'www.instagram.com',
             'Origin': 'https://www.instagram.com',
             'Referer': 'https://www.instagram.com',
-            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) \
-                           Gecko/20100101 Firefox/57.0",
+            'User-Agent': cls._user_agents.firefox,
             'X-Instagram-AJAX': '1',
             'X-Requested-With': 'XMLHttpRequest'
         })
@@ -148,8 +161,8 @@ class InstaLooter(object):
             url = "https://www.instagram.com/accounts/logout/"
             session.post(url, data={"csrfmiddlewaretoken": sessionid})
 
-        if cls.cachefs.exists(cls._COOKIE_FILE):
-            cls.cachefs.remove(cls._COOKIE_FILE)
+        if cls._cachefs.exists(cls._COOKIE_FILE):
+            cls._cachefs.remove(cls._COOKIE_FILE)
 
     @classmethod
     def _logged_in(cls, session=None):
@@ -768,7 +781,7 @@ class PostLooter(InstaLooter):
         """
         destination, close_destination = self._init_destfs(destination)
 
-        queue = six.moves.queue.Queue()  # type: Queue[Dict]
+        queue = Queue()                           # type: Queue[Dict]
         medias_queued = self._fill_media_queue(
             queue, destination, iter(self.medias()), media_count,
             new_only, condition)
