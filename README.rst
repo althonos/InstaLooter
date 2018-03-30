@@ -3,7 +3,7 @@ InstaLooter |starme|
 
 *Not all treasure's silver and gold, mate.*
 
-|build| |repo| |versions| |format| |coverage| |doc| |requirements| |grade| |license|
+|build| |repo| |versions| |format| |coverage| |doc| |grade| |license|
 
 InstaLooter is a program that can download any picture or video associated
 from an Instagram profile, without any API access. It can be seen as a
@@ -39,8 +39,8 @@ so it'll hopefully feel like home.*
 .. |doc| image:: https://img.shields.io/readthedocs/instalooter.svg?style=flat-square
    :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
 
-.. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square
-   :target: https://requires.io/github/althonos/InstaLooter/requirements/?branch=master
+.. .. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square
+..    :target: https://requires.io/github/althonos/InstaLooter/requirements/?branch=master
 
 .. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square
    :target: https://landscape.io/github/althonos/InstaLooter/master
@@ -53,22 +53,24 @@ Requirements
 ------------
 
 +-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **coloredlogs**   |  Colored output            | |PyPI coloredlogs|   | |Source coloredlogs|   | |License coloredlogs|   |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **dateutil**      |  Date manipulation         | |PyPI dateutil|      | |Source dateutil|      | |License dateutil|      |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **docopt**        |  CLI arguments parsing     | |PyPI docopt|        | |Source docopt|        | |License docopt|        |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **fs**            |  Filesystem handling       | |PyPI fs|            | |Source fs|            | |License fs|            |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **requests**      |  HTTP handling             | |PyPI requests|      | |Source requests|      | |License requests|      |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **six**           |  Python 2/3 compatibility  | |PyPI six|           | |Source six|           | |License six|           |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **tenacity**      |  Retry until success       | |PyPI tenacity|      | |Source tenacity|      | |License tenacity|      |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
-| **tqdm**          |  Dynamic output in CLI     | |PyPI tqdm|          | |Source tqdm|          | |License tqdm|          |
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **coloredlogs**    |  Colored output            | |PyPI coloredlogs|   | |Source coloredlogs|   | |License coloredlogs|   |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **dateutil**       |  Date manipulation         | |PyPI dateutil|      | |Source dateutil|      | |License dateutil|      |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **docopt**         |  CLI arguments parsing     | |PyPI docopt|        | |Source docopt|        | |License docopt|        |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **fs**             |  Filesystem handling       | |PyPI fs|            | |Source fs|            | |License fs|            |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **fake-useragent** |  Fake HTTP user agents     | |PyPI fakeua|        | |Source fakeua|        | |License fakeua|        |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **requests**       |  HTTP handling             | |PyPI requests|      | |Source requests|      | |License requests|      |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **six**            |  Python 2/3 compatibility  | |PyPI six|           | |Source six|           | |License six|           |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **tenacity**       |  Retry until success       | |PyPI tenacity|      | |Source tenacity|      | |License tenacity|      |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **tqdm**           |  Dynamic output in CLI     | |PyPI tqdm|          | |Source tqdm|          | |License tqdm|          |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
 
 
 .. |PyPI coloredlogs| image:: https://img.shields.io/pypi/v/coloredlogs.svg?style=flat-square
@@ -82,6 +84,9 @@ Requirements
 
 .. |PyPI fs| image:: https://img.shields.io/pypi/v/fs.svg?style=flat-square
    :target: https://pypi.python.org/pypi/fs/
+
+.. |PyPI fakeua| image:: https://img.shields.io/pypi/v/fake-useragent.svg?style=flat-square
+   :target: https://pypi.python.org/pypi/fake-useragent/
 
 .. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?style=flat-square
    :target: https://pypi.python.org/pypi/requests
@@ -107,6 +112,9 @@ Requirements
 .. |Source fs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/PyFilesystem/pyfilesystem2
 
+.. |Source fakeua| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
+   :target: https://github.com/hellysmile/fake-useragent
+
 .. |Source requests| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/kennethreitz/requests
 
@@ -119,7 +127,6 @@ Requirements
 .. |Source tqdm| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/tqdm/tqdm
 
-.. For some reason shields.io does not retrieve the MIT license from PyPI
 .. |License coloredlogs| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
@@ -132,13 +139,16 @@ Requirements
 .. |License fs| image:: https://img.shields.io/pypi/l/fs.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
+.. |License fakeua| image:: https://img.shields.io/badge/license-Apache_2.0-blue.svg?style=flat-square
+   :target: https://choosealicense.com/licenses/apache-2.0/
+
 .. |License requests| image:: https://img.shields.io/pypi/l/requests.svg?style=flat-square
    :target: https://choosealicense.com/licenses/apache-2.0/
 
 .. |License six| image:: https://img.shields.io/pypi/l/six.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
-.. |License tenacity| image:: https://img.shields.io/pypi/l/tenacity.svg?style=flat-square
+.. |License tenacity| image:: https://img.shields.io/badge/license-Apache_2.0-blue.svg?style=flat-square
    :target: https://choosealicense.com/licenses/apache-2.0/
 
 .. |License tqdm| image:: https://img.shields.io/pypi/l/tqdm.svg?style=flat-square
