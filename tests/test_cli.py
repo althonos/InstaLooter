@@ -10,17 +10,19 @@ import fs
 import parameterized
 import requests
 import six
+from six.moves.queue import Queue
 
 from instalooter.cli import main
-from instalooter.cli.constants import USAGE
 from instalooter.cli import time as timeutils
-from instalooter.cli import login
+from instalooter.cli import threadutils
+from instalooter.cli.constants import USAGE
+from instalooter.cli.login import login
+from instalooter.worker import InstaDownloader
 
 from .utils import mock
 from .utils.method_names import firstparam
 
 
-# @mock.patch('instalooter.looter.requests.Session', lambda: TestCLI.session)
 class TestCLI(unittest.TestCase):
 
     @classmethod
@@ -118,7 +120,6 @@ class TestTimeUtils(unittest.TestCase):
         self.assertRaises(ValueError, timeutils.get_times_from_cli, token)
 
 
-
 @mock.patch('instalooter.looters.InstaLooter._login')
 @mock.patch('getpass.getpass')
 class TestLoginUtils(unittest.TestCase):
@@ -145,3 +146,39 @@ class TestLoginUtils(unittest.TestCase):
         logged_in_.return_value = True
         login(args)
         login_.assert_not_called()
+
+
+class TestThreadUtils(unittest.TestCase):
+
+    def test_threads_count(self):
+
+        q = Queue()
+        t1 = InstaDownloader(q, None, None)
+        t2 = InstaDownloader(q, None, None)
+
+        try:
+            self.assertEqual(threadutils.threads_count(), 0)
+            t1.start()
+            self.assertEqual(threadutils.threads_count(), 1)
+            t2.start()
+            self.assertEqual(threadutils.threads_count(), 2)
+        finally:
+            t1.terminate()
+            t2.terminate()
+
+    def test_threads_force_join(self):
+
+        q = Queue()
+        t1 = InstaDownloader(q, None, None)
+        t2 = InstaDownloader(q, None, None)
+
+        t1.start()
+        t2.start()
+
+        self.assertTrue(t1.is_alive())
+        self.assertTrue(t2.is_alive())
+
+        threadutils.threads_force_join()
+
+        self.assertFalse(t1.is_alive())
+        self.assertFalse(t2.is_alive())
