@@ -26,7 +26,7 @@ from typing import *
 
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint
-from ._utils import NameGenerator, save_cookies, load_cookies
+from ._utils import NameGenerator
 from .medias import TimedMediasIterator, MediasIterator
 from .pages import PageIterator, ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
@@ -56,7 +56,7 @@ class InstaLooter(object):
         create=True) # type: fs.base.FS
 
     # : The name of the cookie file in the cache filesystem
-    _COOKIE_FILE = "cookies.json"
+    _COOKIE_FILE = "cookies.txt"
 
     @classmethod
     def _init_session(cls, session=None):
@@ -72,8 +72,10 @@ class InstaLooter(object):
 
         """
         session = session or Session()
+        session.cookies = six.moves.http_cookiejar.LWPCookieJar(
+            cls.cachefs.getsyspath(cls._COOKIE_FILE))
         try:
-            session.cookies = load_cookies(cls.cachefs.getsyspath(cls._COOKIE_FILE))
+            session.cookies.load()
         except IOError:
             pass
         session.cookies.clear_expired_cookies()  # type: ignore
@@ -94,24 +96,18 @@ class InstaLooter(object):
             Code taken from LevPasha/instabot.py
 
         """
-        session = session or Session()
+        session = session or cls._init_session()
         homepage = "https://www.instagram.com/"
         login_url = "https://www.instagram.com/accounts/login/ajax/"
         data = {'username': username, 'password': password}
 
         session.headers.update({
-            'Accept': '*/*',
-            'Accept-Language': 'EN-US',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Content-Length': '0',
             'Host': 'www.instagram.com',
             'Origin': 'https://www.instagram.com',
-            'Referer': 'https://www.instagram.com/',
+            'Referer': 'https://www.instagram.com',
             'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) \
                            Gecko/20100101 Firefox/57.0",
             'X-Instagram-AJAX': '1',
-            'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         })
 
@@ -121,10 +117,6 @@ class InstaLooter(object):
 
         with session.post(login_url, data=data, allow_redirects=True) as login:
             session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
-            session.cookies['ig_vw'] = '1536'
-            session.cookies['ig_pr'] = '1.25'
-            session.cookies['ig_vh'] = '772'
-            session.cookies['ig_or'] = 'landscape-primary'
             time.sleep(5 * random.random()) # nosec
             if not login.status_code == 200:
                 raise SystemError("Login error: check your connection")
@@ -133,7 +125,7 @@ class InstaLooter(object):
             if res.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
             try:
-                save_cookies(session.cookies, cls.cachefs.getsyspath(cls._COOKIE_FILE))
+                session.cookies.save()  # type: ignore
             except IOError:
                 pass
 

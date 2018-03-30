@@ -7,8 +7,6 @@ from __future__ import unicode_literals
 import datetime
 import operator
 import os
-import json
-from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 from typing import Any, Dict, Mapping, Optional, Text
 
 import six
@@ -65,31 +63,3 @@ class NameGenerator(object):
             return False
         except KeyError:
             return True
-
-
-def save_cookies(cookiejar, filepath):
-    """Saves the given cookiejar in the file specified by filepath.
-    Arguments:
-        cookiejar: cookiejar object to save
-        filepath: path to file in which the cookiejar should be saved
-
-    Returns:
-        nothing
-    """
-    with open(filepath, 'w') as cookies_file:
-        cookies = dict_from_cookiejar(cookiejar)
-        json.dump(cookies, cookies_file, indent=4)
-
-
-def load_cookies(filepath):
-    """Loads a cookies file and returns the resultant RequestsCookieJar object.
-
-    Arguments:
-        filepath: path to cookies file
-
-    Returns:
-        RequestsCookieJar object loaded from specified filepath
-    """
-    with open(filepath, 'r') as cookies_file:
-        cookies = json.load(cookies_file)
-        return cookiejar_from_dict(cookies)
