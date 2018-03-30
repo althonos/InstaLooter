@@ -75,7 +75,7 @@ documentation), use the *test* and/or *doc* extras:
 
   $ pip install --user ".[test]"    # install only test dependencies
   $ pip install --user ".[doc]"     # install only doc dependencies
-  $ pip install --user ".[alldev]"  # install all dev dependencies
+  $ pip install --user ".[dev]"     # install all dev dependencies
 
 
 .. |pypi| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
