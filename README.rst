@@ -164,7 +164,7 @@ familiar with the package management of the Python ecosystem, please see the
 of the `documentation <http://instalooter.readthedocs.io/en/latest/index.html>`_.
 Yet, you will probably end up using the following command::
 
-  pip install --user instalooter
+  pip install --user instalooter --pre
 
 
 Usage

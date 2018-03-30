@@ -109,7 +109,7 @@ def main(argv=None, stream=None):
 
             # Logout if requested
             if args['logout']:
-                if InstaLooter.cachefs.exists(InstaLooter._COOKIE_FILE):
+                if InstaLooter._cachefs.exists(InstaLooter._COOKIE_FILE):
                     InstaLooter._logout()
                     logger.log(logging.SUCCESS, 'Logged out.')
                 else:

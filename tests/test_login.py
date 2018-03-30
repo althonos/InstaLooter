@@ -21,13 +21,13 @@ class TestLogin(unittest.TestCase):
 
         self.assertFalse(looter.logged_in())
         self.assertRaises(StopIteration, lambda: next(looter.medias()))
-        self.assertFalse(looter.cachefs.exists(looter._COOKIE_FILE))
+        self.assertFalse(looter._cachefs.exists(looter._COOKIE_FILE))
 
         try:
             looter.login(USERNAME, PASSWORD)
             self.assertTrue(looter.logged_in())
-            self.assertTrue(looter.cachefs.exists(looter._COOKIE_FILE))
+            self.assertTrue(looter._cachefs.exists(looter._COOKIE_FILE))
             self.assertTrue(next(looter.medias()))
         finally:
             looter.logout()
-            self.assertFalse(looter.cachefs.exists(looter._COOKIE_FILE))
+            self.assertFalse(looter._cachefs.exists(looter._COOKIE_FILE))
