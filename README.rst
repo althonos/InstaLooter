@@ -52,7 +52,7 @@ so it'll hopefully feel like home.*
 Requirements
 ------------
 
-+-------------------+----------------------------+----------------------+------------------------+-------------------------+
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **coloredlogs**    |  Colored output            | |PyPI coloredlogs|   | |Source coloredlogs|   | |License coloredlogs|   |
 +--------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **dateutil**       |  Date manipulation         | |PyPI dateutil|      | |Source dateutil|      | |License dateutil|      |
@@ -173,9 +173,9 @@ Usage
 instalooter comes with its CLI::
 
     $ instalooter user <username> [<directory>] [options]
-    $ instalooter hashtag <hashtag> <directory> [options]
-    $ instalooter post <post_token> <directory> [options]
-    $ instalooter batch <batch_file>
+    $ instalooter hashtag <hashtag> [<directory>] [options]
+    $ instalooter post <post_token> [<directory>] [options]
+    $ instalooter batch [<batch_file>]
 
 See ``instalooter --usage`` for all possible uses, or ``instalooter --help``
 for a complete usage guide.
@@ -190,7 +190,7 @@ There are two ways to login on Instagram through instalooter:
 * give a ``--username`` (and, if you want, a ``--password``) argument to any of
   the download commands.
 
-In both cases, a session cookie will be created in the system temporary folder.
+In both cases, a session cookie will be created in a cache-specific folder.
 To delete it and close your session on the server, use the ``logout``
 subcommand.
 
@@ -206,9 +206,9 @@ Download the latest 20 pictures or videos tagged with *python* to */tmp*::
 
     $ instalooter hashtag python /tmp -n 20 -v -c MYLOGIN
 
-Download a single post from an url in the current directory::
+Download a single post from an url in the `~/Pictures` directory::
 
-    $ instalooter post "https://www.instagram.com/p/BFB6znLg5s1/" .
+    $ instalooter post "https://www.instagram.com/p/BFB6znLg5s1/" ~/Pictures
 
 Use a configuration file to download from several account using custom parameters
 (see `Batch mode <http://instalooter.readthedocs.io/en/latest/batch.html>`_)::
