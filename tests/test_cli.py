@@ -14,6 +14,7 @@ import six
 from instalooter.cli import main
 from instalooter.cli.constants import USAGE
 from instalooter.cli import time as timeutils
+from instalooter.cli import login
 
 from .utils import mock
 from .utils.method_names import firstparam
@@ -115,3 +116,32 @@ class TestTimeUtils(unittest.TestCase):
     ], testcase_func_name=firstparam)
     def test_get_times_from_cli_bad_format(self, token):
         self.assertRaises(ValueError, timeutils.get_times_from_cli, token)
+
+
+
+@mock.patch('instalooter.looters.InstaLooter._login')
+@mock.patch('getpass.getpass')
+class TestLoginUtils(unittest.TestCase):
+
+    def test_cli_login_no_username(self, getpass_, login_):
+        args = {'--username': None, "--password": None}
+        login(args)
+        login_.assert_not_called()
+
+    def test_cli_login_no_password(self, getpass_, login_):
+        args = {'--username': "user", "--password": None, "--quiet": False}
+        getpass_.return_value = "pasw"
+        login(args)
+        login_.assert_called_once_with("user", "pasw")
+
+    def test_cli_login(self, getpass_, login_):
+        args = {'--username': "user", "--password": "pasw", "--quiet": False}
+        login(args)
+        login_.assert_called_once_with("user", "pasw")
+
+    @mock.patch('instalooter.looters.InstaLooter._logged_in')
+    def test_cli_already_logged_in(self, logged_in_, getpass_, login_):
+        args = {'--username': "user", "--password": "pasw", "--quiet": False}
+        logged_in_.return_value = True
+        login(args)
+        login_.assert_not_called()

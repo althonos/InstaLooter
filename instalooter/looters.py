@@ -574,9 +574,8 @@ class InstaLooter(object):
 
             # Check that the file does not exist
             # FIXME: not working well with sidecar
-            if destination.exists(self.namegen.file(media)):
-                if new_only:
-                    break
+            if new_only and destination.exists(self.namegen.file(media)):
+                break
 
             # Put the medias in the queue
             queue.put(media)
