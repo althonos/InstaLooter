@@ -52,6 +52,7 @@ Special thanks to the following contributors:
   * `AndCycle <https://github.com/AndCycle>`_
   * `Pauli Salmenrinne <https://github.com/susundberg>`_
   * `Geoff <https://github.com/gffde3>`_
+  * `Lev Velykoivanenko <https://github.com/AbysmalBiscuit>`_
 
 
 Indices and tables

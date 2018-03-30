@@ -96,28 +96,32 @@ class InstaLooter(object):
             Code taken from LevPasha/instabot.py
 
         """
-        session = session or Session()
+        session = session or cls._init_session()
         homepage = "https://www.instagram.com/"
+        login_url = "https://www.instagram.com/accounts/login/ajax/"
         data = {'username': username, 'password': password}
 
         session.headers.update({
-            'Origin': homepage,
-            'Referer': homepage,
-            'X-Instragram-AJAX': '1',
-            'X-Requested-With': 'XMLHttpRequest',
+            'Host': 'www.instagram.com',
+            'Origin': 'https://www.instagram.com',
+            'Referer': 'https://www.instagram.com',
+            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) \
+                           Gecko/20100101 Firefox/57.0",
+            'X-Instagram-AJAX': '1',
+            'X-Requested-With': 'XMLHttpRequest'
         })
 
         with session.get(homepage) as res:
             session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
         time.sleep(5 * random.random()) # nosec
 
-        url = "https://www.instagram.com/accounts/login/ajax/"
-        with session.post(url, data=data, allow_redirects=True) as res:
-            session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
-            if not res.status_code == 200:
+        with session.post(login_url, data=data, allow_redirects=True) as login:
+            session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
+            time.sleep(5 * random.random()) # nosec
+            if not login.status_code == 200:
                 raise SystemError("Login error: check your connection")
 
-        with session.get(url) as res:
+        with session.get(homepage) as res:
             if res.text.find(username) == -1:
                 raise ValueError('Login error: check your login data')
             try:
