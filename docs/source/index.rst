@@ -67,10 +67,10 @@ Indices and tables
    :target: https://github.com/althonos/InstaLooter
 
 .. |versions| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
-   :target: https://pypi.python.org/pypi/instaLooter
+   :target: https://pypi.org/project/instaLooter
 
 .. |format| image:: https://img.shields.io/pypi/format/instaLooter.svg?maxAge=3600&style=flat-square
-   :target: https://pypi.python.org/pypi/instaLooter
+   :target: https://pypi.org/project/instaLooter
 
 .. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?maxAge=3600&style=flat-square
    :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard

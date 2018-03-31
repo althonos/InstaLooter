@@ -79,7 +79,7 @@ documentation), use the *test* and/or *doc* extras:
 
 
 .. |pypi| image:: https://img.shields.io/pypi/v/instaLooter.svg?maxAge=3600&style=flat-square
-   :target: https://pypi.python.org/pypi/instaLooter
+   :target: https://pypi.org/project/instaLooter
 
 .. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&maxAge=3600&style=flat-square
    :target: https://travis-ci.org/althonos/InstaLooter/

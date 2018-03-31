@@ -22,10 +22,10 @@ so it'll hopefully feel like home.*
    :target: https://github.com/althonos/InstaLooter
 
 .. |versions| image:: https://img.shields.io/pypi/v/instalooter.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/instalooter
+   :target: https://pypi.org/project/instalooter
 
 .. |format| image:: https://img.shields.io/pypi/format/instalooter.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/instalooter
+   :target: https://pypi.org/project/instalooter
 
 .. |grade| image:: https://img.shields.io/codacy/grade/9b8c7da6887c4195b9e960cb04b59a91/master.svg?style=flat-square
    :target: https://www.codacy.com/app/althonos/InstaLooter/dashboard
@@ -74,31 +74,31 @@ Requirements
 
 
 .. |PyPI coloredlogs| image:: https://img.shields.io/pypi/v/coloredlogs.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/coloredlogs
+   :target: https://pypi.org/project/coloredlogs
 
 .. |PyPI dateutil| image:: https://img.shields.io/pypi/v/python-dateutil.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/python-dateutil/
+   :target: https://pypi.org/project/python-dateutil/
 
 .. |PyPI docopt| image:: https://img.shields.io/pypi/v/docopt.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/docopt/
+   :target: https://pypi.org/project/docopt/
 
 .. |PyPI fs| image:: https://img.shields.io/pypi/v/fs.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/fs/
+   :target: https://pypi.org/project/fs/
 
 .. |PyPI fakeua| image:: https://img.shields.io/pypi/v/fake-useragent.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/fake-useragent/
+   :target: https://pypi.org/project/fake-useragent/
 
 .. |PyPI requests| image:: https://img.shields.io/pypi/v/requests.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/requests
+   :target: https://pypi.org/project/requests
 
 .. |PyPI six| image:: https://img.shields.io/pypi/v/six.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/six
+   :target: https://pypi.org/project/six
 
 .. |PyPI tenacity| image:: https://img.shields.io/pypi/v/tenacity.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/tenacity
+   :target: https://pypi.org/project/tenacity
 
 .. |PyPI tqdm| image:: https://img.shields.io/pypi/v/tqdm.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/tqdm
+   :target: https://pypi.org/project/tqdm
 
 .. |Source coloredlogs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/xolox/python-coloredlogs

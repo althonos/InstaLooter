@@ -131,7 +131,7 @@ html_theme_options = {
     # A list of tuples containing pages or urls to link to.
     'navbar_links': [
         ("GitHub", "https://github.com/althonos/InstaLooter", True),
-        ("PyPI", "https://pypi.python.org/pypi/InstaLooter", True),
+        ("PyPI", "https://pypi.org/project/InstaLooter", True),
     ],
 
 }

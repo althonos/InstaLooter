@@ -112,7 +112,7 @@ Options - Metadata
   Add date and caption metadata to downloaded pictures (requires
   `PIL <http://www.pythonware.com/products/pil/>`_ or
   `Pillow <https://python-pillow.org/>`_ as well as
-  `piexif <https://pypi.python.org/pypi/piexif>`_).
+  `piexif <https://pypi.org/project/piexif>`_).
 
 ``-D, --dump-only``
   Save only the metadata and no video / picture.
