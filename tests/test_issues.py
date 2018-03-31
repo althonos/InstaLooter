@@ -358,7 +358,7 @@ class TestResolvedIssues(unittest.TestCase):
         ))
         runner = BatchRunner(configfile)
         self.assertEqual(
-            runner.getTargets(runner._get('Family', 'users')),
+            runner.get_targets(runner._get('Family', 'users')),
             {'instagram': 'D:\\Instagram\\Profiles\\instagram',
              'therock': 'D:\\Instagram\\Profiles\\therock'}
         )

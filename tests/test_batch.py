@@ -12,7 +12,6 @@ from instalooter.cli import main
 from instalooter.batch import BatchRunner
 
 
-
 class TestBatchRunner(unittest.TestCase):
 
     def setUp(self):
@@ -42,8 +41,8 @@ class TestBatchRunner(unittest.TestCase):
 
         retcode = main(["batch", self.destfs.getsyspath('batch.ini')])
         self.assertEqual(retcode, 0)
-        self.assertEqual(len(list(self.destfs.filterdir("/", ["*.jpg"]))), 6)
-
+        self.assertGreaterEqual(
+            len(list(self.destfs.filterdir("/", ["*.jpg"]))), 6)
 
 
 def setUpModule():

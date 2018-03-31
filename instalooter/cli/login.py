@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import getpass
 import logging
 
+from . import logutils
 from ..looters import InstaLooter
 
 
@@ -18,6 +19,6 @@ def login(args):
             password = args['--password'] or getpass.getpass()
             InstaLooter._login(username, password)
             if not args['--quiet']:
-                logger.log(logging.SUCCESS, 'Logged in.')
+                logger.log(logutils.SUCCESS, 'Logged in.')
         elif not args['--quiet']:
-            logger.log(logging.SUCCESS, "Already logged in.")
+            logger.log(logutils.SUCCESS, "Already logged in.")

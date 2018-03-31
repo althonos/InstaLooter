@@ -91,7 +91,7 @@ def main(argv=None, stream=None):
             if args['batch']:
                 with open(args['<batch_file>']) as batch_file:
                     batch_runner = BatchRunner(batch_file, args)
-                batch_runner.runAll()
+                batch_runner.run_all()
                 return 0
 
             # Login if requested

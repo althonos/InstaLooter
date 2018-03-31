@@ -76,15 +76,15 @@ class InstaLooter(object):
         """Initialise the given session and load class cookies to its jar.
 
         Arguments:
-            session (~requests.Session): a `requests` session,
-                or `None` to create a new one.
+            session (~requests.Session, optional): a `requests`
+                session, or `None` to create a new one.
 
         Returns:
             ~requests.Session: an initialised session instance.
 
         """
         session = session or Session()
-        session.cookies = LWPCookieJar(                    # type: ignore
+        session.cookies = LWPCookieJar(
             cls._cachefs.getsyspath(cls._COOKIE_FILE))
         try:
             typing.cast(CookieJar, session.cookies).load()
@@ -101,14 +101,14 @@ class InstaLooter(object):
         Arguments:
             username (str): the username to log in with.
             password (str): the password to log in with.
-            session (~requests.Session or None): the session to use,
+            session (~requests.Session, optional): the session to use,
                 or `None` to create a new session.
 
         Note:
             Code taken from LevPasha/instabot.py
 
         """
-        session = session or cls._init_session()
+        session = cls._init_session(session)
         homepage = "https://www.instagram.com/"
         login_url = "https://www.instagram.com/accounts/login/ajax/"
         data = {'username': username, 'password': password}
@@ -156,7 +156,7 @@ class InstaLooter(object):
             Code taken from LevPasha/instabot.py
 
         """
-        session = session or cls._init_session()
+        session = cls._init_session(session)
         sessionid = cls._sessionid(session)
         if sessionid is not None:
             url = "https://www.instagram.com/accounts/logout/"
@@ -194,7 +194,7 @@ class InstaLooter(object):
 
         """
         _session = cls._init_session(session)
-        _cookies = typing.cast(CookieJar, session.cookies)
+        _cookies = typing.cast(CookieJar, _session.cookies)
         return next((ck.value for ck in _cookies
                      if ck.domain == "www.instagram.com"
                      and ck.name == "sessionid"
