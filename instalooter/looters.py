@@ -17,6 +17,7 @@ import fs
 import six
 from requests import Session
 from six.moves.queue import Queue
+from six.moves.http_cookiejar import CookieJar, LWPCookieJar
 
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint
@@ -83,7 +84,7 @@ class InstaLooter(object):
 
         """
         session = session or Session()
-        session.cookies = six.moves.http_cookiejar.LWPCookieJar(  # type: ignore
+        session.cookies = LWPCookieJar(                    # type: ignore
             cls._cachefs.getsyspath(cls._COOKIE_FILE))
         try:
             typing.cast(CookieJar, session.cookies).load()

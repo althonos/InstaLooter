@@ -29,7 +29,7 @@ __all__ = [
 
 
 @six.add_metaclass(abc.ABCMeta)
-class PageIterator(Iterator[Dict[Text, Any]]):
+class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
     """An abstract Instagram page iterator.
     """
 

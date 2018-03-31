@@ -13,7 +13,7 @@ import typing
 import six
 
 if typing.TYPE_CHECKING:
-    from typing import Any, Dict, List, Optional, Iterator, Iterable, Set, Text
+    from typing import Any, Dict, List, Optional, Iterable, Set, Text
 
 
 _I = typing.TypeVar('_I', bound='MediasIterator')
@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 
-class MediasIterator(Iterator[Dict[Text, Any]]):
+class MediasIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
     """An iterator over the medias obtained from a page iterator.
     """
 
