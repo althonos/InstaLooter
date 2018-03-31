@@ -5,13 +5,20 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import abc
-import json
 import math
 import time
-from typing import Any, Dict, Iterator, Iterable, Optional, Text
+import typing
 
 import six
 from requests import Session
+
+from ._impl import json
+
+if typing.TYPE_CHECKING:
+    from typing import Any, Dict, Iterator, Iterable, Optional, Text
+
+
+_I = typing.TypeVar('_I', bound='PageIterator')
 
 
 __all__ = [
@@ -58,7 +65,7 @@ class PageIterator(Iterator[Dict[Text, Any]]):
 
                 try:
                     c = data['data'][self.section_generic][self.section_media]['count']
-                    self._total = math.ceil(c / self.PAGE_SIZE)
+                    self._total = int(math.ceil(c / self.PAGE_SIZE))
                 except (KeyError, TypeError):
                     self._total = 0
 

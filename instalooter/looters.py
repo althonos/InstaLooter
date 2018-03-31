@@ -6,8 +6,6 @@ from __future__ import unicode_literals
 
 import abc
 import atexit
-import itertools
-import operator
 import random
 import threading
 import time
@@ -17,7 +15,6 @@ import warnings
 import fake_useragent
 import fs
 import six
-import typing
 from requests import Session
 from six.moves.queue import Queue
 
@@ -31,10 +28,11 @@ from .worker import InstaDownloader
 
 if typing.TYPE_CHECKING:
     from datetime import datetime
-    from fs.base import FS
     from typing import (
         Any, Callable, Dict, Iterator, Iterable, List,
         Optional, Text, Tuple, Type, Union)
+    from fs.base import FS
+    from six.moves.http_cookiejar import CookieJar
     _T = typing.TypeVar("_T")
     _Timeframe = Tuple[Optional[datetime], Optional[datetime]]
 
@@ -53,6 +51,7 @@ class InstaLooter(object):
     """
 
     @CachedClassProperty
+    @classmethod
     def _cachefs(cls):
         """~fs.base.FS: the cache filesystem.
         """
@@ -60,6 +59,7 @@ class InstaLooter(object):
         return fs.open_fs(url, create=True)
 
     @CachedClassProperty
+    @classmethod
     def _user_agents(cls):
         """~fake_useragent.UserAgent: a collection of fake user-agents.
         """
@@ -83,13 +83,13 @@ class InstaLooter(object):
 
         """
         session = session or Session()
-        session.cookies = six.moves.http_cookiejar.LWPCookieJar(
+        session.cookies = six.moves.http_cookiejar.LWPCookieJar(  # type: ignore
             cls._cachefs.getsyspath(cls._COOKIE_FILE))
         try:
-            session.cookies.load()
+            typing.cast(CookieJar, session.cookies).load()
         except IOError:
             pass
-        session.cookies.clear_expired_cookies()  # type: ignore
+        typing.cast(CookieJar, session).cookies.clear_expired_cookies()
         return session
 
     @classmethod
@@ -193,7 +193,8 @@ class InstaLooter(object):
 
         """
         _session = cls._init_session(session)
-        return next((ck.value for ck in _session.cookies
+        _cookies = typing.cast(CookieJar, session.cookies)
+        return next((ck.value for ck in _cookies
                      if ck.domain == "www.instagram.com"
                      and ck.name == "sessionid"
                      and ck.path == "/"), None)
@@ -349,7 +350,7 @@ class InstaLooter(object):
         """
         return self.download(
             destination,
-            condition=operator.itemgetter("is_video"),
+            condition=lambda media: media["is_video"],
             media_count=media_count,
             timeframe=timeframe,
             new_only=new_only,

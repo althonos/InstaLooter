@@ -7,7 +7,11 @@ from __future__ import unicode_literals
 import functools
 import logging
 import warnings
-from typing import Callable
+import typing
+
+if typing.TYPE_CHECKING:
+    from typing import Callable
+
 
 logging.SPAM = 5
 logging.NOTICE = 25

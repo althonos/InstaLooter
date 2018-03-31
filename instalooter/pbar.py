@@ -9,15 +9,18 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import abc
-import threading
 import typing
 
 import six
 import tqdm
 
+if typing.TYPE_CHECKING:
+    from threading import Lock, RLock
+    from typing import Union
 
-_T = typing.TypeVar('_T')
-_L = typing.TypeVar('_L', )
+
+_T = typing.TypeVar('_T', covariant=True)
+_L = typing.TypeVar('_L')
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -27,7 +30,7 @@ class ProgressBar(typing.Iterator[_T]):
 
     def __init__(self, it, *args, **kwargs):
         self.it = it
-        self.__lock = None  # type: typing.Union[threading.Lock, threading.RLock, None]
+        self.__lock = None  # type: Union[Lock, RLock, None]
 
     def __iter__(self):
         # type: () -> ProgressBar[_T]
@@ -63,13 +66,13 @@ class ProgressBar(typing.Iterator[_T]):
         pass
 
     def set_lock(self, lock):
-        # type: (typing.Union[threading.Lock, threading.RLock]) -> None
+        # type: (Union[Lock, RLock]) -> None
         """Set a lock to be used by parallel workers.
         """
         self.__lock = lock
 
     def get_lock(self):
-        # type: () -> typing.Union[threading.Lock, threading.RLock]
+        # type: () -> Union[Lock, RLock]
         """Obtain the progress bar lock.
         """
         if self.__lock is None:

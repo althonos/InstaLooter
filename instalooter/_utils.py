@@ -7,9 +7,12 @@ from __future__ import unicode_literals
 import datetime
 import operator
 import os
-from typing import Any, Dict, Mapping, Optional, Text
+import typing
 
 import six
+
+if typing.TYPE_CHECKING:
+    from typing import Any, Dict, Mapping, Optional, Text
 
 
 class NameGenerator(object):

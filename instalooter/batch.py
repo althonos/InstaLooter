@@ -8,13 +8,16 @@ import io
 import getpass
 import logging
 import typing
-from typing import Any, Mapping, Optional, Text, Type, Union
 
 import six
 from requests import Session
 
-from .looters import InstaLooter, HashtagLooter, ProfileLooter
+from .looters import HashtagLooter, ProfileLooter
 from .pbar import TqdmProgressBar
+
+if typing.TYPE_CHECKING:
+    from typing import Any, Dict, Mapping, Optional, Text, Type, Union
+    from .looter import InstaLooter
 
 
 #: The module logger
@@ -28,7 +31,7 @@ class BatchRunner(object):
     _CLS_MAP = {
         'users': ProfileLooter,
         'hashtag': HashtagLooter,
-    }  # type: Mapping[Text, Union[Type[ProfileLooter], Type[HashtagLooter]]]
+    }  # type: Mapping[Text, Type[InstaLooter]]
 
     def __init__(self, handle, args=None):
         # type: (Any, Optional[Mapping[Text, Any]]) -> None
@@ -37,18 +40,18 @@ class BatchRunner(object):
         if isinstance(handle, six.binary_type):
             handle = handle.decode('utf-8')
         if isinstance(handle, six.text_type):
-            fp = open(handle)  # type: typing.IO
+            _handle = open(handle)  # type: typing.IO
             close_handle = True
         else:
-            fp = handle
+            _handle = handle
 
         try:
             self.args = args or {}
             self.parser = six.moves.configparser.ConfigParser()
-            getattr(self.parser, "readfp" if six.PY2 else "read_file")(fp)
+            getattr(self.parser, "readfp" if six.PY2 else "read_file")(_handle)
         finally:
             if close_handle:
-                handle.close()
+                _handle.close()
 
     @typing.overload
     def _getboolean(self, section_id, key, default):
@@ -113,17 +116,17 @@ class BatchRunner(object):
             return self.parser.get(section_id, key)
         return default
 
-    def runAll(self):
-        # type: (...) -> None
+    def run_all(self):
+        # type: () -> None
         """Run all the jobs specified in the configuration file.
         """
         logger.debug("Creating batch session")
         session = Session()
 
         for section_id in self.parser.sections():
-            self.runJob(section_id, session=session)
+            self.run_job(section_id, session=session)
 
-    def runJob(self, section_id, session=None):
+    def run_job(self, section_id, session=None):
         # type: (Text, Optional[Session]) -> None
         """Run a job as described in the section named ``section_id``.
 
@@ -138,7 +141,7 @@ class BatchRunner(object):
 
         for name, looter_cls in six.iteritems(self._CLS_MAP):
 
-            targets = self.getTargets(self._get(section_id, name))
+            targets = self.get_targets(self._get(section_id, name))
             quiet = self._getboolean(
                 section_id, "quiet", self.args.get("--quiet", False))
 
@@ -165,7 +168,7 @@ class BatchRunner(object):
                     username = self._get(section_id, 'username')
                     password = self._get(section_id, 'password') or \
                         getpass.getpass('Password for "{}": '.format(username))
-                    looter.login(username, password)  # type: ignore
+                    looter.login(username, password)
 
                 n = looter.download(
                     directory,
@@ -177,8 +180,8 @@ class BatchRunner(object):
 
                 logger.log(35, "Downloaded {} medias !".format(n))
 
-    def getTargets(self, raw_string):
-        # type: (Optional[Text]) -> Mapping[Text, Text]
+    def get_targets(self, raw_string):
+        # type: (Optional[Text]) -> Dict[Text, Text]
         """Extract targets from a string in 'key: value' format.
         """
         targets = {}

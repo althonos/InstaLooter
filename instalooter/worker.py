@@ -4,7 +4,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import atexit
 import io
 import operator
 import threading
@@ -101,9 +100,9 @@ class InstaDownloader(threading.Thread):
     def _dump(self, media):
         basename = self.namegen.base(media)
         filename = "{}.json".format(basename)
-
-        with self.destination.open(filename, "w" if six.PY3 else "wb") as f:
-            json.dump(media, f, indent=4, sort_keys=True)
+        mode = "w" if six.PY3 else "wb"
+        with self.destination.open(filename, mode) as dest:
+            json.dump(media, dest, indent=4, sort_keys=True)
 
     def run(self):
         while not self._killed:

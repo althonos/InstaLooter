@@ -8,9 +8,15 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
-from typing import Any, Dict, List, Optional, Iterator, Iterable, Set, Text
+import typing
 
 import six
+
+if typing.TYPE_CHECKING:
+    from typing import Any, Dict, List, Optional, Iterator, Iterable, Set, Text
+
+
+_I = typing.TypeVar('_I', bound='MediasIterator')
 
 
 __all__ = [
@@ -33,7 +39,7 @@ class MediasIterator(Iterator[Dict[Text, Any]]):
         self._done = 0
 
     def __iter__(self):
-        # type: () -> MediasIterator
+        # type: (_I) -> _I
         return self
 
     def _next_page(self):
