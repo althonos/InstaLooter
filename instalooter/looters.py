@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import abc
 import atexit
+import functools
 import random
 import threading
 import time

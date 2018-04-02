@@ -147,7 +147,7 @@ class ProfileIterator(PageIterator):
     section_media = "edge_owner_to_timeline_media"
 
     @classmethod
-    def from_username(cls, username, session=None):
+    def _user_data(cls, username, session=None):
         session = session or Session()
         url = "https://www.instagram.com/{}/?__a=1".format(username)
         try:
@@ -156,7 +156,14 @@ class ProfileIterator(PageIterator):
         except ValueError:
             raise ValueError("account not found: {}".format(username))
         else:
-            return cls(data['graphql']['user']['id'], session)
+            return data
+
+    @classmethod
+    def from_username(cls, username, session=None):
+        data = cls._user_data(username, session)['graphql']['user']
+        if data['is_private'] and not data['followed_by_viewer']:
+            raise RuntimeError("user '{}' is private".format(username))
+        return cls(data['id'], session)
 
     def __init__(self, owner_id, session=None):
         super(ProfileIterator, self).__init__(session)
