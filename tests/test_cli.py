@@ -129,14 +129,18 @@ class TestLoginUtils(unittest.TestCase):
         login(args)
         login_.assert_not_called()
 
-    def test_cli_login_no_password(self, getpass_, login_):
+    @mock.patch('instalooter.looters.InstaLooter._logged_in')
+    def test_cli_login_no_password(self, logged_in_, getpass_, login_):
         args = {'--username': "user", "--password": None, "--quiet": False}
+        logged_in_.return_value = False
         getpass_.return_value = "pasw"
         login(args)
         login_.assert_called_once_with("user", "pasw")
 
-    def test_cli_login(self, getpass_, login_):
+    @mock.patch('instalooter.looters.InstaLooter._logged_in')
+    def test_cli_login(self, logged_in_, getpass_, login_):
         args = {'--username': "user", "--password": "pasw", "--quiet": False}
+        logged_in_.return_value = False
         login(args)
         login_.assert_called_once_with("user", "pasw")
 
