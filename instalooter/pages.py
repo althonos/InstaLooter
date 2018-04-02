@@ -162,7 +162,10 @@ class ProfileIterator(PageIterator):
     def from_username(cls, username, session=None):
         data = cls._user_data(username, session)['graphql']['user']
         if data['is_private'] and not data['followed_by_viewer']:
-            raise RuntimeError("user '{}' is private".format(username))
+            connected_id = next((ck.value for ck in session.cookies
+                                 if ck.name=="ds_user_id"), None)
+            if connected_id != data['id']:
+                raise RuntimeError("user '{}' is private".format(username))
         return cls(data['id'], session)
 
     def __init__(self, owner_id, session=None):
