@@ -102,6 +102,7 @@ class TestResolvedIssues(unittest.TestCase):
         for f in self.destfs.scandir("/"):
             self.assertTrue(f.name.startswith('mysteryjets'))
 
+    @unittest.expectedFailure
     def test_issue_006(self):
         """
         Checks that instalooter does not iterate forever on a private
