@@ -62,12 +62,13 @@ class InstaLooter(object):
 
     @CachedClassProperty
     @classmethod
-    def _user_agent(cls):
+    def _user_agents(cls):
         """~fake_useragent.UserAgent: a collection of fake user-agents.
         """
         filename = 'fake_useragent_{}.json'.format(fake_useragent.VERSION)
-        ua = fake_useragent.UserAgent(path=cls._cachefs.getsyspath(filename))
-        return ua.firefox
+        return fake_useragent.UserAgent(
+            path=cls._cachefs.getsyspath(filename),
+            safe_attrs=['__name__', '__objclass__'])
 
     # str: The name of the cookie file in the cache filesystem
     _COOKIE_FILE = "cookies.txt"
@@ -119,7 +120,7 @@ class InstaLooter(object):
             'Host': 'www.instagram.com',
             'Origin': 'https://www.instagram.com',
             'Referer': 'https://www.instagram.com',
-            'User-Agent': cls._user_agent,
+            'User-Agent': cls._user_agents.firefox,
             'X-Instagram-AJAX': '1',
             'X-Requested-With': 'XMLHttpRequest'
         })
@@ -667,8 +668,20 @@ class ProfileLooter(InstaLooter):
         self._username = username
         self._owner_id = None
 
-    def pages(self):  # noqa: D102
+    def pages(self):
         # type: () -> ProfileIterator
+        """Obtain an iterator over Instagram post pages.
+
+        Returns:
+            PageIterator: an iterator over the instagram post pages.
+
+        Raises:
+            ValueError: when the requested user does not exist.
+            RuntimeError: when the user is a private account
+                and there is no logged user (or the logged user
+                does not follow that account).
+
+        """
         if self._owner_id is None:
             it = ProfileIterator.from_username(self._username, self.session)
             self._owner_id = it.owner_id
