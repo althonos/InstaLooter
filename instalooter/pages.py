@@ -18,9 +18,6 @@ if typing.TYPE_CHECKING:
     from typing import Any, Dict, Iterator, Iterable, Optional, Text
 
 
-_I = typing.TypeVar('_I', bound='PageIterator')
-
-
 __all__ = [
     "PageIterator",
     "HashtagIterator",

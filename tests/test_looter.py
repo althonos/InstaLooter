@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import unittest
 import warnings
 
-import fs
+import fs.memoryfs
 import parameterized
 import requests
 import six
@@ -28,7 +28,7 @@ class TestInstaLooter(unittest.TestCase):
         cls.session.close()
 
     def setUp(self):
-        self.destfs = fs.open_fs('mem://')
+        self.destfs = fs.memoryfs.MemoryFS()
 
     def tearDown(self):
         self.destfs.close()

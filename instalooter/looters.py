@@ -463,6 +463,8 @@ class InstaLooter(object):
 
         """
         self._login(username, password, session=self.session)
+        # workaround of #154
+        self.session = self._init_session()
 
     def logout(self):
         # type: () -> None
