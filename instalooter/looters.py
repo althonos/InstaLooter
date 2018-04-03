@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import abc
 import atexit
+import copy
 import functools
 import random
 import threading
@@ -18,7 +19,7 @@ import fs
 import six
 from requests import Session
 from six.moves.queue import Queue
-from six.moves.http_cookiejar import CookieJar, LWPCookieJar
+from six.moves.http_cookiejar import FileCookieJar, LWPCookieJar
 
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint
@@ -90,10 +91,10 @@ class InstaLooter(object):
         session.cookies = LWPCookieJar(
             cls._cachefs.getsyspath(cls._COOKIE_FILE))
         try:
-            typing.cast(CookieJar, session.cookies).load()
+            typing.cast(FileCookieJar, session.cookies).load()
         except IOError:
             pass
-        typing.cast(CookieJar, session).cookies.clear_expired_cookies()
+        typing.cast(FileCookieJar, session.cookies).clear_expired_cookies()
         return session
 
     @classmethod
@@ -112,36 +113,42 @@ class InstaLooter(object):
 
         """
         session = cls._init_session(session)
+        headers = copy.deepcopy(session.headers)
         homepage = "https://www.instagram.com/"
         login_url = "https://www.instagram.com/accounts/login/ajax/"
         data = {'username': username, 'password': password}
 
-        session.headers.update({
-            'Host': 'www.instagram.com',
-            'Origin': 'https://www.instagram.com',
-            'Referer': 'https://www.instagram.com',
-            'User-Agent': cls._user_agents.firefox,
-            'X-Instagram-AJAX': '1',
-            'X-Requested-With': 'XMLHttpRequest'
-        })
+        try:
+            session.headers.update({
+                'Host': 'www.instagram.com',
+                'Origin': 'https://www.instagram.com',
+                'Referer': 'https://www.instagram.com',
+                'User-Agent': cls._user_agents.firefox,
+                'X-Instagram-AJAX': '1',
+                'X-Requested-With': 'XMLHttpRequest'
+            })
 
-        with session.get(homepage) as res:
-            session.headers.update({'X-CSRFToken': res.cookies['csrftoken']})
-        time.sleep(5 * random.random()) # nosec
-
-        with session.post(login_url, data=data, allow_redirects=True) as login:
-            session.headers.update({'X-CSRFToken': login.cookies['csrftoken']})
+            with session.get(homepage) as res:
+                token = res.cookies['csrftoken']
+                session.headers.update({'X-CSRFToken': token})
             time.sleep(5 * random.random()) # nosec
-            if not login.status_code == 200:
-                raise SystemError("Login error: check your connection")
 
-        with session.get(homepage) as res:
-            if res.text.find(username) == -1:
-                raise ValueError('Login error: check your login data')
-            try:
-                session.cookies.save()  # type: ignore
-            except IOError:
-                pass
+            with session.post(login_url, data, allow_redirects=True) as login:
+                token = login.cookies['csrftoken']
+                session.headers.update({'X-CSRFToken': token})
+                time.sleep(5 * random.random()) # nosec
+                if not login.status_code == 200:
+                    raise SystemError("Login error: check your connection")
+
+            with session.get(homepage) as res:
+                if res.text.find(username) == -1:
+                    raise ValueError('Login error: check your login data')
+                try:
+                    typing.cast(FileCookieJar, session.cookies).save()
+                except IOError:
+                    pass
+        finally:
+            session.headers = headers
 
     @classmethod
     def _logout(cls, session=None):
@@ -197,7 +204,7 @@ class InstaLooter(object):
 
         """
         _session = cls._init_session(session)
-        _cookies = typing.cast(CookieJar, _session.cookies)
+        _cookies = typing.cast(FileCookieJar, _session.cookies)
         return next((ck.value for ck in _cookies
                      if ck.domain == "www.instagram.com"
                      and ck.name == "sessionid"
@@ -465,8 +472,6 @@ class InstaLooter(object):
 
         """
         self._login(username, password, session=self.session)
-        # workaround of #154
-        self.session = self._init_session()
 
     def logout(self):
         # type: () -> None
