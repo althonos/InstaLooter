@@ -20,7 +20,7 @@ class TestLogin(unittest.TestCase):
         looter = ProfileLooter(USERNAME)
 
         self.assertFalse(looter.logged_in())
-        self.assertRaises(StopIteration, lambda: next(looter.medias()))
+        self.assertRaises(RuntimeError, looter.medias)
         self.assertFalse(looter._cachefs.exists(looter._COOKIE_FILE))
 
         try:
