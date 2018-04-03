@@ -62,11 +62,12 @@ class InstaLooter(object):
 
     @CachedClassProperty
     @classmethod
-    def _user_agents(cls):
+    def _user_agent(cls):
         """~fake_useragent.UserAgent: a collection of fake user-agents.
         """
         filename = 'fake_useragent_{}.json'.format(fake_useragent.VERSION)
-        return fake_useragent.UserAgent(path=cls._cachefs.getsyspath(filename))
+        ua = fake_useragent.UserAgent(path=cls._cachefs.getsyspath(filename))
+        return ua.firefox
 
     # str: The name of the cookie file in the cache filesystem
     _COOKIE_FILE = "cookies.txt"
@@ -118,7 +119,7 @@ class InstaLooter(object):
             'Host': 'www.instagram.com',
             'Origin': 'https://www.instagram.com',
             'Referer': 'https://www.instagram.com',
-            'User-Agent': cls._user_agents.firefox,
+            'User-Agent': cls._user_agent,
             'X-Instagram-AJAX': '1',
             'X-Requested-With': 'XMLHttpRequest'
         })
