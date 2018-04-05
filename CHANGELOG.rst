@@ -9,6 +9,9 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v1.0.0_ - 2018-04-05
+--------------------
+
 Added
 '''''
 - This CHANGELOG file.
@@ -36,4 +39,6 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v0.14.0...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v1.0.0...HEAD
+.. _v1.0.0: https://github.com/althonos/InstaLooter/compare/v0.14.0...v1.0.0
+
