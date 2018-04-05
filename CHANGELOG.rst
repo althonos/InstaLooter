@@ -1,0 +1,39 @@
+Changelog
+=========
+
+All notable changes to this project will be documented in this file.
+
+The format is based on `Keep a Changelog <http://keepachangelog.com>`_ and this
+project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
+
+Unreleased_
+-----------
+
+Added
+'''''
+- This CHANGELOG file.
+- Typing annotations using the ``typing`` module.
+- Limited retries on connection failure, using `tenacity <https://http://pypi.org/project/tenacity/>`_.
+- Real-world User Agent spoofing, using `fake-useragent <https://pypi.org/project/fake-useragent/>`_
+
+Fixed
+'''''
+- API changes made by Instagram ca. March 2018.
+
+Changed
+'''''''
+- Whole new API following major code refactor and rewrite.
+- Requests to the API directly use JSON and GraphQL queries when possible.
+- License is now GPLv3 *or later* instead of GPLv3.
+- I/O now uses PyFilesystem (FS URLs can be passed as CLI arguments).
+
+Removed
+'''''''
+- Exif metadata handling (*will be added back in later release*).
+- ``urlgen`` capabilities (Instagram signs picture URL since 2018).
+- Python 3.5.1 support (lacks the required ``typing`` version).
+- ``progressbar2`` dependency, replaced by ``tqdm``
+- ``hues`` dependency, replaced by ``coloredlogs``
+- ``BeautifulSoup4`` dependency
+
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v0.14.0...HEAD
