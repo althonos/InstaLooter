@@ -1,22 +1,17 @@
 InstaLooter |starme|
 ====================
 
+.. |starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star
+   :target: https://github.com/althonos/InstaLooter
+
 *Not all treasure's silver and gold, mate.*
 
 |build| |repo| |versions| |format| |coverage| |doc| |grade| |license|
+|keepachangelog| |saythanks|
 
-InstaLooter is a program that can download any picture or video associated
-from an Instagram profile, without any API access. It can be seen as a
-re-implementation of the now deprecated `InstaRaider <https://github.com/akurtovic/InstaRaider>`_
-developed by `@akurtovic <https://github.com/akurtovic>`_.
 
-*The version* ``v1.0.0`` *was completely rewrote from scratch, and as such, will
-probably break compatibility with your homemade scripts. Meanwhile, great care
-was taken to keep the CLI as consistent as possible with the previous versions,
-so it'll hopefully feel like home.*
-
-.. |starme| image:: https://img.shields.io/github/stars/althonos/InstaLooter.svg?style=social&label=Star
-   :target: https://github.com/althonos/InstaLooter
+.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&style=flat-square
+   :target: https://travis-ci.org/althonos/InstaLooter/
 
 .. |repo| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/althonos/InstaLooter
@@ -33,20 +28,34 @@ so it'll hopefully feel like home.*
 .. |coverage| image:: https://img.shields.io/codecov/c/github/althonos/InstaLooter/master.svg?style=flat-square
    :target: https://codecov.io/gh/althonos/InstaLooter
 
-.. |build| image:: https://img.shields.io/travis/althonos/InstaLooter/master.svg?label=travis-ci&style=flat-square
-   :target: https://travis-ci.org/althonos/InstaLooter/
-
 .. |doc| image:: https://img.shields.io/readthedocs/instalooter.svg?style=flat-square
    :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
 
 .. .. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square
 ..    :target: https://requires.io/github/althonos/InstaLooter/requirements/?branch=master
 
-.. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square
-   :target: https://landscape.io/github/althonos/InstaLooter/master
+.. .. |health| image:: https://landscape.io/github/althonos/InstaLooter/master/landscape.svg?style=flat-square
+..    :target: https://landscape.io/github/althonos/InstaLooter/master
 
 .. |license| image:: https://img.shields.io/pypi/l/instalooter.svg?style=flat-square
    :target: https://choosealicense.com/licenses/gpl-3.0/
+
+.. |keepachangelog| image:: https://img.shields.io/badge/keep%20a-changelog-8A0707.svg?maxAge=86400&style=flat-square
+   :target: http://keepachangelog.com/
+
+.. |saythanks| image:: https://img.shields.io/badge/say-thanks!-1EAEDB.svg?maxAge=86400&style=flat-square
+   :target: https://saythanks.io/to/althonos
+
+
+InstaLooter is a program that can download any picture or video associated
+from an Instagram profile, without any API access. It can be seen as a
+re-implementation of the now deprecated `InstaRaider <https://github.com/akurtovic/InstaRaider>`_
+developed by `@akurtovic <https://github.com/akurtovic>`_.
+
+``v1.0.0`` *was completely rewrote from scratch, and as such, will
+probably break compatibility with your homemade scripts. Meanwhile, great care
+was taken to keep the CLI as consistent as possible with the previous versions,
+so it'll hopefully feel like home.*
 
 
 Requirements
