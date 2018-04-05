@@ -1,5 +1,5 @@
-Examples
-========
+API Examples
+============
 
 .. toctree::
 

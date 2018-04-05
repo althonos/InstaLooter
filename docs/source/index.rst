@@ -12,16 +12,25 @@ following using your credentials to log in.
 
 See more details about one of the following topics:
 
+.. rubric:: Guides
+
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
 
-   Installation <install>
-   Usage <usage>
-   Batch mode <batch>
-   Library Examples <examples>
-   Periodic Downloads <cron>
-   API Reference <instalooter/index>
+    Installation <install>
+    Usage <usage>
+    Batch mode <batch>
+    Periodic Downloads <cron>
 
+
+.. rubric:: Library
+
+.. toctree::
+    :maxdepth: 1
+
+    API Examples <examples>
+    Changelog <changelog>
+    API Reference <instalooter/index>
 
 
 License |license|

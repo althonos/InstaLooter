@@ -11,6 +11,7 @@
 
 import os
 import sys
+import shutil
 import collections
 import datetime
 import semantic_version
@@ -22,11 +23,20 @@ import sphinx_bootstrap_theme
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
+docsrc_dir = os.path.abspath(os.path.join(__file__, '..'))
+project_dir = os.path.abspath(os.path.join(docsrc_dir, '..', '..'))
+
+sys.path.insert(0, project_dir)
 import instalooter
 
-# -- Project information -----------------------------------------------------
+# -- Files setup -------------------------------------------------------------
 
+with open(os.path.join(project_dir, "CHANGELOG.rst"), 'rb') as src:
+    with open(os.path.join(docsrc_dir, "changelog.rst"), 'wb') as dst:
+        dst.write(b":tocdepth: 2\n\n")
+        shutil.copyfileobj(src, dst)
+
+# -- Project information -----------------------------------------------------
 
 project = 'InstaLooter'
 author = instalooter.__author__
@@ -149,7 +159,10 @@ html_static_path = ['_static']
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-html_sidebars = {"*": [], os.path.join("instalooter", "*"): []}
+html_sidebars = {
+    "*": ['localtoc.html'],
+    os.path.join("instalooter", "*"): [],
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
