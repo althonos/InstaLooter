@@ -266,6 +266,10 @@ class InstaLooter(object):
             self.session.headers['X-CSRFToken'] = res.cookies['csrftoken']
             self.rhx = get_shared_data(res.text)['rhx_gis']
 
+        # Set User-Agent
+        if not 'User-Agent' in self.session.headers:
+            self.session.headers['User-Agent'] = self._user_agents.firefox
+
 
     @abc.abstractmethod
     def pages(self):

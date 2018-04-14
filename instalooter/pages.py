@@ -65,17 +65,15 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
                 magic = "{}:{}:{}".format(self.rhx, session.headers['X-CSRFToken'], json_params)
                 session.headers['x-instagram-gis'] = hashlib.md5(magic.encode('utf-8')).hexdigest()
                 url = self.URL.format(json_params)
-
                 with session.get(url) as res:
                     data = res.json()
-
                 try:
                     c = data['data'][self.section_generic][self.section_media]['count']
                     self._total = int(math.ceil(c / self.PAGE_SIZE))
                 except (KeyError, TypeError):
                     self._total = 0
-
                 yield data['data']
+
             except KeyError as e:
                 time.sleep(10)
 

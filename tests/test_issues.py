@@ -371,6 +371,7 @@ class TestPullRequests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
+        # cls.session = None
 
     @classmethod
     def tearDownClass(cls):
