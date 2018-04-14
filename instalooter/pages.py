@@ -75,6 +75,8 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
                 yield data['data']
 
             except KeyError as e:
+                if data.get('message') == 'rate limited':
+                    raise RuntimeError("Query rate exceeded (wait before next run)")
                 time.sleep(10)
 
     def __length_hint__(self):
