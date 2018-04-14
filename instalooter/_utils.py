@@ -5,11 +5,15 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
+import hashlib
 import operator
 import os
+import re
 import typing
 
 import six
+
+from ._impl import json
 
 if typing.TYPE_CHECKING:
     from typing import Any, Dict, Mapping, Optional, Text
@@ -83,3 +87,8 @@ class CachedClassProperty(object):
 
     def __set__(self, obj, value):
         raise AttributeError("can't set attribute")
+
+
+def get_shared_data(html):
+    match = re.search(r'window._sharedData = ({[^\n]*});', html)
+    return json.loads(match.group(1))

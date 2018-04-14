@@ -9,6 +9,7 @@ import atexit
 import copy
 import functools
 import random
+import re
 import threading
 import time
 import typing
@@ -22,8 +23,8 @@ from six.moves.queue import Queue
 from six.moves.http_cookiejar import FileCookieJar, LWPCookieJar
 
 from . import __author__, __name__ as __appname__, __version__
-from ._impl import length_hint
-from ._utils import NameGenerator, CachedClassProperty
+from ._impl import length_hint, json
+from ._utils import NameGenerator, CachedClassProperty, get_shared_data
 from .medias import TimedMediasIterator, MediasIterator
 from .pages import ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
@@ -88,6 +89,7 @@ class InstaLooter(object):
 
         """
         session = session or Session()
+        # Load cookies
         session.cookies = LWPCookieJar(
             cls._cachefs.getsyspath(cls._COOKIE_FILE))
         try:
@@ -259,6 +261,12 @@ class InstaLooter(object):
         self.session = self._init_session(session)
         atexit.register(self.session.close)
 
+        # Get CSRFToken and RHX
+        with self.session.get('https://www.instagram.com/') as res:
+            self.session.headers['X-CSRFToken'] = res.cookies['csrftoken']
+            self.rhx = get_shared_data(res.text)['rhx_gis']
+
+
     @abc.abstractmethod
     def pages(self):
         # type: () -> Iterator[Dict[Text, Any]]
@@ -315,9 +323,10 @@ class InstaLooter(object):
             dict: a media dictionaries, in the format used by Instagram.
 
         """
-        url = "https://www.instagram.com/p/{}/?__a=1".format(code)
+        url = "https://www.instagram.com/p/{}/".format(code)
         with self.session.get(url) as res:
-            return res.json()['graphql']['shortcode_media']
+            data = get_shared_data(res.text)
+            return data['entry_data']['PostPage'][0]['graphql']['shortcode_media']
 
     def download_pictures(self,
                           destination,       # type: Union[str, fs.base.FS]
@@ -691,7 +700,7 @@ class ProfileLooter(InstaLooter):
             it = ProfileIterator.from_username(self._username, self.session)
             self._owner_id = it.owner_id
             return it
-        return ProfileIterator(self._owner_id, self.session)
+        return ProfileIterator(self._owner_id, self.session, self.rhx)
 
 
 class HashtagLooter(InstaLooter):
@@ -714,7 +723,7 @@ class HashtagLooter(InstaLooter):
 
     def pages(self):  # noqa: D102
         # type: () -> HashtagIterator
-        return HashtagIterator(self._hashtag, self.session)
+        return HashtagIterator(self._hashtag, self.session, self.rhx)
 
 
 class PostLooter(InstaLooter):

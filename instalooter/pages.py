@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import abc
+import hashlib
 import math
 import time
 import typing
@@ -13,6 +14,7 @@ import six
 from requests import Session
 
 from ._impl import json
+from ._utils import get_shared_data
 
 if typing.TYPE_CHECKING:
     from typing import Any, Dict, Iterator, Iterable, Optional, Text
@@ -30,16 +32,17 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
     """An abstract Instagram page iterator.
     """
 
-    URL_QUERY = "https://www.instagram.com/graphql/query/"
+    BASE_URL = "https://www.instagram.com/graphql/query/"
     PAGE_SIZE = 200
     INTERVAL = 0.5
 
     section_generic = NotImplemented    # type: Text
     section_media = NotImplemented      # type: Text
 
-    def __init__(self, session=None):
-        # type: (Optional[Session]) -> None
-        self._session = session or Session()
+    def __init__(self, session, rhx):
+        # type: (Session) -> None
+        self._session = session
+        self.rhx = rhx
         self._finished = False
         self._cursor = None     # type: Optional[Text]
         self._current_page = 0
@@ -48,7 +51,7 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
         self._data_it = iter(self._page_loader(self._session))
 
     @abc.abstractmethod
-    def _geturl(self, cursor):
+    def _getparams(self, cursor):
         # type: (Optional[Text]) -> Text
         return NotImplemented
 
@@ -56,8 +59,14 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
         # type: (Session) -> Iterable[Dict[Text, Dict[Text, Any]]]
         while True:
             try:
-                # time.sleep(self.INTERVAL)
-                with session.get(self._geturl(self._cursor)) as res:
+
+                params = self._getparams(self._cursor)
+                json_params = json.dumps(params, separators=(',', ':'))
+                magic = "{}:{}:{}".format(self.rhx, session.headers['X-CSRFToken'], json_params)
+                session.headers['x-instagram-gis'] = hashlib.md5(magic.encode('utf-8')).hexdigest()
+                url = self.URL.format(json_params)
+
+                with session.get(url) as res:
                     data = res.json()
 
                 try:
@@ -116,23 +125,21 @@ class HashtagIterator(PageIterator):
     """
 
     QUERY_ID = "17882293912014529"
+    URL = "{}?query_id={}&variables={{}}".format(PageIterator.BASE_URL, QUERY_ID)
+
     section_generic = "hashtag"
     section_media = "edge_hashtag_to_media"
 
-    def __init__(self, hashtag, session=None):
-        super(HashtagIterator, self).__init__(session)
+    def __init__(self, hashtag, session, rhx):
+        super(HashtagIterator, self).__init__(session, rhx)
         self.hashtag = hashtag
 
-    def _geturl(self, cursor):
-        return "{base}?query_id={id}&variables={vars}".format(
-            base=self.URL_QUERY,
-            id=self.QUERY_ID,
-            vars=json.dumps({
-                "tag_name": self.hashtag,
-                "first": self.PAGE_SIZE,
-                "after": cursor
-            })
-        )
+    def _getparams(self, cursor):
+        return {
+            "tag_name": self.hashtag,
+            "first": self.PAGE_SIZE,
+            "after": cursor
+        }
 
 
 class ProfileIterator(PageIterator):
@@ -140,42 +147,38 @@ class ProfileIterator(PageIterator):
     """
 
     QUERY_HASH = "472f257a40c653c64c666ce877d59d2b"
+    URL = "{}?query_hash={}&variables={{}}".format(PageIterator.BASE_URL, QUERY_HASH)
+
     section_generic = "user"
     section_media = "edge_owner_to_timeline_media"
 
     @classmethod
-    def _user_data(cls, username, session=None):
-        session = session or Session()
-        url = "https://www.instagram.com/{}/?__a=1".format(username)
+    def _user_data(cls, username, session):
+        url = "https://www.instagram.com/{}/".format(username)
         try:
             with session.get(url) as res:
-                data = res.json()
-        except ValueError:
+                return get_shared_data(res.text)
+        except (ValueError, AttributeError):
             raise ValueError("account not found: {}".format(username))
-        else:
-            return data
 
     @classmethod
-    def from_username(cls, username, session=None):
-        data = cls._user_data(username, session)['graphql']['user']
+    def from_username(cls, username, session):
+        user_data = cls._user_data(username, session)
+        data = user_data['entry_data']['ProfilePage'][0]['graphql']['user']
         if data['is_private'] and not data['followed_by_viewer']:
             connected_id = next((ck.value for ck in session.cookies
                                  if ck.name=="ds_user_id"), None)
             if connected_id != data['id']:
                 raise RuntimeError("user '{}' is private".format(username))
-        return cls(data['id'], session)
+        return cls(data['id'], session, user_data['rhx_gis'])
 
-    def __init__(self, owner_id, session=None):
-        super(ProfileIterator, self).__init__(session)
+    def __init__(self, owner_id, session, rhx):
+        super(ProfileIterator, self).__init__(session, rhx)
         self.owner_id = owner_id
 
-    def _geturl(self, cursor):
-        return "{base}?query_hash={hash}&variables={vars}".format(
-            base=self.URL_QUERY,
-            hash=self.QUERY_HASH,
-            vars=json.dumps({
-                "id": self.owner_id,
-                "first": self.PAGE_SIZE,
-                "after": cursor,
-            })
-        )
+    def _getparams(self, cursor):
+        return {
+            "id": self.owner_id,
+            "first": self.PAGE_SIZE,
+            "after": cursor,
+        }
