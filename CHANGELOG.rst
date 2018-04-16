@@ -9,6 +9,13 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Fixed
+'''''
+- API changes made by Instagram ca. April 2018 (excluding logging in / out)
+- Calling `operator.length_hint` on ``PageIterator`` objects will no longer
+  cause duplicate server queries.
+
+
 v1.0.0_ - 2018-04-05
 --------------------
 
