@@ -371,7 +371,6 @@ class TestPullRequests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
-        # cls.session = None
 
     @classmethod
     def tearDownClass(cls):
@@ -384,34 +383,45 @@ class TestPullRequests(unittest.TestCase):
     def tearDown(self):
         self.destfs.close()
 
-    def test_pr_122(self):
-        """
-        Feature implemented by @susundberg.
+    def _pr_122_looter(self):
+        return ProfileLooter('franz_ferdinand', template='{code}', session=self.session)
+
+    def test_pr_122_download_post(self):
+        """Feature implemented by @susundberg.
 
         Set the access time and modification time of a downloaded media
         according to its IG date.
         """
-
-        looter = ProfileLooter('franz_ferdinand',
-            template='{code}', session=self.session)
-        info = looter.get_post_info('BY77tSfBnRm')
-
-        # Test download_post
-        post_looter = PostLooter('BY77tSfBnRm',
-            session=self.session, template='{code}')
+        code = 'BY77tSfBnRm'
+        post_looter = PostLooter(code, session=self.session, template='{code}')
+        info = post_looter.get_post_info(code)
         post_looter.download(self.destfs)
-        stat = self.destfs.getdetails('BY77tSfBnRm.jpg')
+        stat = self.destfs.getdetails('{}.jpg'.format(code))
         self.assertEqual(stat.raw["details"]["accessed"], info['taken_at_timestamp'])
         self.assertEqual(stat.raw["details"]["modified"], info['taken_at_timestamp'])
 
+    def test_pr_122_download_pictures(self):
+        """Feature implemented by @susundberg.
+
+        Set the access time and modification time of a downloaded media
+        according to its IG date.
+        """
         # Test download_pictures
+        looter = self._pr_122_looter()
         pic = next(m for m in looter.medias() if not m['is_video'])
         looter.download_pictures(self.destfs, media_count=1)
         stat = self.destfs.getdetails('{}.jpg'.format(pic['shortcode']))
         self.assertEqual(stat.raw["details"]["accessed"], pic['taken_at_timestamp'])
         self.assertEqual(stat.raw["details"]["modified"], pic['taken_at_timestamp'])
 
+    def test_pr_122_download_videos(self):
+        """Feature implemented by @susundberg.
+
+        Set the access time and modification time of a downloaded media
+        according to its IG date.
+        """
         # Test download_videos
+        looter = self._pr_122_looter()
         vid = next(m for m in looter.medias() if m['is_video'])
         looter.download_videos(self.destfs, media_count=1)
         stat = self.destfs.getdetails('{}.mp4'.format(vid['shortcode']))
