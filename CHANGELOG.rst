@@ -9,6 +9,15 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.0.0_ - 2018-04-16
+--------------------
+
+Changed
+'''''''
+- Passing a pre-initialised ``Session`` to ``PageIterator`` constructor
+  is now mandatory
+- ``HashtagIterator`` must be provided a ``rhx`` (it is infered for ``ProfileIterator``)
+
 Fixed
 '''''
 - API changes made by Instagram ca. April 2018 (excluding logging in / out)
@@ -46,6 +55,7 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v1.0.0...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.0.0...HEAD
+.. _v2.0.0: https://github.com/althonos/InstaLooter/compare/v1.0.0...v2.0.0
 .. _v1.0.0: https://github.com/althonos/InstaLooter/compare/v0.14.0...v1.0.0
 
