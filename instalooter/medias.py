@@ -8,6 +8,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
+import time
 import typing
 
 import six
@@ -96,6 +97,8 @@ class TimedMediasIterator(MediasIterator):
             end_time = timeframe[1] or datetime.date.fromtimestamp(0)
         except (IndexError, AttributeError):
             raise TypeError("'timeframe' must be a couple of dates!")
+        start_time = int(time.mktime(start_time.timetuple()))
+        end_time = int(time.mktime(end_time.timetuple()))
         return start_time, end_time
 
     def __init__(self, page_iterator, timeframe=None):
