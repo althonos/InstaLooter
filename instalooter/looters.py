@@ -122,6 +122,10 @@ class InstaLooter(object):
 
         try:
             session.headers.update({
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Language': 'en-US,en;q=0.8',
+                'Connection': 'keep-alive',
+                'Content-Length': '0',
                 'Host': 'www.instagram.com',
                 'Origin': 'https://www.instagram.com',
                 'Referer': 'https://www.instagram.com',
