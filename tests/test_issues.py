@@ -55,9 +55,10 @@ class TestResolvedIssues(unittest.TestCase):
         Checks that adding metadata to pictures downloaded from a hashtag
         works as well.
         """
-        looter = ProfileLooter("fluoxetine", add_metadata=True, session=self.session)
-        looter.download(self.destfs, media_count=10)
-
+        looter = HashtagLooter("fluoxetine", add_metadata=True, session=self.session)
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('fluoxetine'))
+            looter.download(self.destfs, media_count=10)
         for f in self.destfs.listdir("/"):
             exif = piexif.load(self.destfs.getbytes(f))
             self.assertTrue(exif['Exif']) # Date & Caption
@@ -185,8 +186,7 @@ class TestResolvedIssues(unittest.TestCase):
         Checks that a multipost is successfully downloaded from
         the CLI `post` option.
         """
-        looter = PostLooter(
-            'BRW-j_dBI6F', get_videos=True, session=self.session)
+        looter = PostLooter('BRW-j_dBI6F', get_videos=True, session=self.session)
         looter.download(self.destfs)
         self.assertEqual(
             set(self.destfs.listdir("/")),
@@ -224,11 +224,9 @@ class TestResolvedIssues(unittest.TestCase):
         """
         looter = ProfileLooter("nintendo", videos_only=True, session=self.session)
         day = datetime.date(2017, 3, 10)
-
         with contexter.Contexter() as ctx:
             ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
             looter.download(self.destfs, timeframe=[day, day])
-
         self.assertEqual(self.destfs.listdir("/"), ["1467639884243493431.mp4"])
 
     def test_issue_052(self):
@@ -272,11 +270,9 @@ class TestResolvedIssues(unittest.TestCase):
             "nintendo", get_videos=True, add_metadata=True,
             template='{id}-{likescount}-{commentscount}',
             session=self.session)
-
         with contexter.Contexter() as ctx:
             ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
             looter.download(self.destfs, media_count=10)
-
         for image in self.destfs.listdir("/"):
             self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.(jpg|mp4)')
 
@@ -317,23 +313,14 @@ class TestResolvedIssues(unittest.TestCase):
     #     with open(os.path.join(self.tmpdir, 'BWOYSYQDCo5.jpg'), 'rb') as f:
     #         self.assertNotIn(b'5xx Server Error', f.read())
 
-    @unittest.expectedFailure
     def test_issue_084(self):
         """Thanks to @raphaelbernardino for reporting this bug.
 
         Make sure private profiles with few pictures (less than a page worth)
-        raise the private warning as expected.
+        raise the private error as expected.
         """
-
-        with warnings.catch_warnings(record=True) as registry:
-            warnings.simplefilter('always')
-            looter = ProfileLooter("raphaelbernardino", session=self.session)
-            list(looter.medias())
-
-        self.assertEqual(
-            six.text_type(registry[0].message),
-            u"Profile raphaelbernardino is private, retry after logging in."
-        )
+        looter = ProfileLooter("raphaelbernardino", session=self.session)
+        self.assertRaises(RuntimeError, looter.medias)
 
     @unittest.expectedFailure
     @unittest.skipUnless(piexif, "piexif required for this test")

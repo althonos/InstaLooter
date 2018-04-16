@@ -14,8 +14,8 @@ USERNAME = os.getenv("IG_USERNAME")
 PASSWORD = os.getenv("IG_PASSWORD")
 
 
-@unittest.skip('fixme')
-#@unittest.skipUnless(USERNAME and PASSWORD, "credentials required")
+@unittest.skipIf(os.getenv("CI") == "true", "not working in CI")
+@unittest.skipUnless(USERNAME and PASSWORD, "credentials required")
 class TestLogin(unittest.TestCase):
 
     def setUp(self):

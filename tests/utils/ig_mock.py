@@ -39,3 +39,8 @@ if __name__ == "__main__":
         nintendo = instalooter.looters.ProfileLooter("nintendo")
         with mockfs.open("pages/nintendo", "w") as f:
             json.dump(list(nintendo.pages()), f)
+
+        fluoxetine = instalooter.looters.HashtagLooter("fluoxetine")
+        with mockfs.open("pages/fluoxetine", "w") as f:
+            pages_it = fluoxetine.pages_it
+            json.dump([next(pages_it) for _ in range(3)], f)
