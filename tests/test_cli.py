@@ -6,6 +6,7 @@ import datetime
 import unittest
 import json
 
+import contexter
 import fs
 import parameterized
 import requests
@@ -21,6 +22,7 @@ from instalooter.worker import InstaDownloader
 
 from .utils import mock
 from .utils.method_names import firstparam
+from .utils.ig_mock import MockPages
 
 
 class TestCLI(unittest.TestCase):
@@ -41,7 +43,9 @@ class TestCLI(unittest.TestCase):
         self.destfs.close()
 
     def test_user(self):
-        r = main(["user", "mysteryjets", self.tmpdir, "-q", '-n', '10'])
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch('instalooter.cli.ProfileLooter.pages', MockPages('nintendo'))
+            r = main(["user", "nintendo", self.tmpdir, "-q", '-n', '10'])
         self.assertEqual(r, 0)
         self.assertEqual(len(self.destfs.listdir('/')), 10)
 

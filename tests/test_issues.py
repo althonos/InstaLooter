@@ -3,12 +3,14 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
+import json
 import os
 import textwrap
 import time
 import unittest
 import warnings
 
+import contexter
 import fs
 import requests
 import six
@@ -19,6 +21,7 @@ from instalooter.cli import main
 from instalooter.looters import HashtagLooter, ProfileLooter, PostLooter
 
 from .utils import mock
+from .utils.ig_mock import MockPages
 
 # @mock.patch('instalooter.looter.requests.Session', lambda: TestResolvedIssues.session)
 class TestResolvedIssues(unittest.TestCase):
@@ -61,14 +64,15 @@ class TestResolvedIssues(unittest.TestCase):
             self.assertTrue(exif['0th'])  # Image creator
 
     def test_issue_012(self):
-        """
-        Feature request by @paramjitrohit.
+        """Feature request by @paramjitrohit.
 
         Allows downloading pictures and videos only within a timeframe.
         """
-        looter = ProfileLooter("slotfaceofficial", session=self.session)
-        day = datetime.date(2017, 2, 18)
-        medias_in_timeframe = list(looter.medias(timeframe=[day, day]))
+        looter = ProfileLooter("nintendo", session=self.session)
+        day = datetime.date(2018, 3, 16)
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            medias_in_timeframe = list(looter.medias(timeframe=[day, day]))
         self.assertEqual(len(medias_in_timeframe), 2)
 
     def test_issue_019(self):
@@ -82,34 +86,33 @@ class TestResolvedIssues(unittest.TestCase):
         os.chdir(self.tmpdir)
 
         try:
-            main(["user", "mysteryjets", "-n", "3", "-q"])
-            self.assertEqual(len(self.destfs.listdir("/")), 3)
+            with contexter.Contexter() as ctx:
+                ctx << mock.patch('instalooter.looters.InstaLooter.pages', MockPages('nintendo'))
+                main(["user", "nintendo", "-n", "3", "-q"])
+                self.assertEqual(len(self.destfs.listdir("/")), 3)
         finally:
             os.chdir(initial_dir)
 
     def test_issue_014(self):
-        """
-        Feature request by @JFLarsen.
+        """Feature request by @JFLarsen.
 
         Allows customizing filenames using a template following Python
         `.format()` minilanguage.
         """
-
-        looter = ProfileLooter(
-            "mysteryjets", template="{username}.{id}", session=self.session)
-        looter.download(self.destfs, media_count=5)
-
+        looter = ProfileLooter("nintendo", template="{username}.{id}", session=self.session)
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            looter.download(self.destfs, media_count=5)
         for f in self.destfs.scandir("/"):
-            self.assertTrue(f.name.startswith('mysteryjets'))
+            self.assertTrue(f.name.startswith('nintendo.'))
 
-    @unittest.expectedFailure
     def test_issue_006(self):
         """
         Checks that instalooter does not iterate forever on a private
         profile.
         """
-        looter = ProfileLooter("tldr", session=self.session)
-        with self.assertRaises(StopIteration):
+        with self.assertRaises(RuntimeError):
+            looter = ProfileLooter("tldr", session=self.session)
             next(looter.medias())
 
     def test_issue_015(self):
@@ -119,13 +122,15 @@ class TestResolvedIssues(unittest.TestCase):
         Checks that videos are not downloaded several times if present
         already in the destination directory.
         """
-        looter = ProfileLooter("instagram", session=self.session)
-        looter.download_videos(self.destfs, media_count=1)
+        looter = ProfileLooter("nintendo", session=self.session)
 
-        video_file = next(self.destfs.filterdir("/", ["*.mp4"]))
-        mtime = self.destfs.getdetails(video_file.name).accessed
-        looter.download_videos(self.destfs, media_count=1)
-        self.assertEqual(mtime, self.destfs.getdetails(video_file.name).accessed)
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            looter.download_videos(self.destfs, media_count=1)
+            video_file = next(self.destfs.filterdir("/", ["*.mp4"]))
+            mtime = self.destfs.getdetails(video_file.name).accessed
+            looter.download_videos(self.destfs, media_count=1)
+            self.assertEqual(mtime, self.destfs.getdetails(video_file.name).accessed)
 
     def test_issue_022(self):
         """
@@ -135,10 +140,10 @@ class TestResolvedIssues(unittest.TestCase):
         a Windows forbidden character in the filename.
         """
         FORBIDDEN = set('<>:"/\|?*')
-
-        looter = ProfileLooter(
-            "mysteryjets", template="{datetime}", session=self.session)
-        looter.download(self.destfs, media_count=5)
+        looter = ProfileLooter("nintendo", template="{datetime}", session=self.session)
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            looter.download(self.destfs, media_count=5)
         for f in self.destfs.scandir("/"):
             self.assertFalse(FORBIDDEN.intersection(f.name))
 
@@ -213,19 +218,21 @@ class TestResolvedIssues(unittest.TestCase):
     #         self.fail()
 
     def test_issue_041(self):
-        """
-        Feature request by @liorlior
+        """Feature request by @liorlior
 
         Allow downloading only videos.
         """
         looter = ProfileLooter("nintendo", videos_only=True, session=self.session)
         day = datetime.date(2017, 3, 10)
-        looter.download(self.destfs, timeframe=[day, day])
-        self.assertTrue(self.destfs.isfile("1467639884243493431.mp4"))
+
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            looter.download(self.destfs, timeframe=[day, day])
+
+        self.assertEqual(self.destfs.listdir("/"), ["1467639884243493431.mp4"])
 
     def test_issue_052(self):
-        """
-        Thanks to @cyrusclarke for reporting this bug.
+        """Thanks to @cyrusclarke for reporting this bug.
 
         Checks that on hashtags with a lot of posts, the time parameter
         doesn't cause the program to crash without finding any media to
@@ -255,24 +262,26 @@ class TestResolvedIssues(unittest.TestCase):
     #         self.assertIsNotNone(media[key])
 
     def test_issue_066(self):
-        """
-        Thanks to @douglasrizzo for reporting this bug.
+        """Thanks to @douglasrizzo for reporting this bug.
 
         Check that likescount and commentscount can be used
         in filename templates without causing the program to
         crash.
         """
         looter = ProfileLooter(
-            "zuck", get_videos=True, add_metadata=True,
+            "nintendo", get_videos=True, add_metadata=True,
             template='{id}-{likescount}-{commentscount}',
             session=self.session)
-        looter.download(self.destfs, media_count=10)
+
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            looter.download(self.destfs, media_count=10)
+
         for image in self.destfs.listdir("/"):
             self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.(jpg|mp4)')
 
     def test_issue_076(self):
-        """
-        Thanks to @zeshuaro for reporting this bug.
+        """Thanks to @zeshuaro for reporting this bug.
 
         Check that when downloading hashtags, the downloader
         actually stops.
@@ -310,8 +319,7 @@ class TestResolvedIssues(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_issue_084(self):
-        """
-        Thanks to @raphaelbernardino for reporting this bug.
+        """Thanks to @raphaelbernardino for reporting this bug.
 
         Make sure private profiles with few pictures (less than a page worth)
         raise the private warning as expected.
@@ -330,22 +338,19 @@ class TestResolvedIssues(unittest.TestCase):
     @unittest.expectedFailure
     @unittest.skipUnless(piexif, "piexif required for this test")
     def test_issue_094(self):
-        """
-        Thanks to @jeanmarctst for raising this issue.
+        """Thanks to @jeanmarctst for raising this issue.
 
         Make sure caption is properly extracted from images downloaded
         from a post code and written to the metadata.
         """
         looter = PostLooter("BY77tSfBnRm",
             add_metadata=True, template='{code}', session=self.session)
-
         looter.download(self.destfs)
         metadata = piexif.load(self.destfs.getbytes("BY77tSfBnRm.jpg"), True)
         self.assertTrue(metadata['Exif']['UserComment'])
 
     def test_issue_125(self):
-        """
-        Thanks to @applepanda for reporting this bug.
+        """Thanks to @applepanda for reporting this bug.
 
         Make sure colons in path do not cause issue in batch mode.
         """
@@ -384,7 +389,7 @@ class TestPullRequests(unittest.TestCase):
         self.destfs.close()
 
     def _pr_122_looter(self):
-        return ProfileLooter('franz_ferdinand', template='{code}', session=self.session)
+        return ProfileLooter('nintendo', template='{code}', session=self.session)
 
     def test_pr_122_download_post(self):
         """Feature implemented by @susundberg.
@@ -408,8 +413,10 @@ class TestPullRequests(unittest.TestCase):
         """
         # Test download_pictures
         looter = self._pr_122_looter()
-        pic = next(m for m in looter.medias() if not m['is_video'])
-        looter.download_pictures(self.destfs, media_count=1)
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            pic = next(m for m in looter.medias() if not m['is_video'])
+            looter.download_pictures(self.destfs, media_count=1)
         stat = self.destfs.getdetails('{}.jpg'.format(pic['shortcode']))
         self.assertEqual(stat.raw["details"]["accessed"], pic['taken_at_timestamp'])
         self.assertEqual(stat.raw["details"]["modified"], pic['taken_at_timestamp'])
@@ -422,8 +429,10 @@ class TestPullRequests(unittest.TestCase):
         """
         # Test download_videos
         looter = self._pr_122_looter()
-        vid = next(m for m in looter.medias() if m['is_video'])
-        looter.download_videos(self.destfs, media_count=1)
+        with contexter.Contexter() as ctx:
+            ctx << mock.patch.object(looter, 'pages', MockPages('nintendo'))
+            vid = next(m for m in looter.medias() if m['is_video'])
+            looter.download_videos(self.destfs, media_count=1)
         stat = self.destfs.getdetails('{}.mp4'.format(vid['shortcode']))
         self.assertEqual(stat.raw["details"]["accessed"], vid['taken_at_timestamp'])
         self.assertEqual(stat.raw["details"]["modified"], vid['taken_at_timestamp'])

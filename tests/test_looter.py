@@ -36,7 +36,7 @@ class TestInstaLooter(unittest.TestCase):
     @parameterized.parameterized.expand([
         parameterized.param("instagram",),
         parameterized.param("instagram", get_videos=True),
-        parameterized.param("serotonine",),
+        # parameterized.param("serotonine",),
     ], testcase_func_name=signature)
     def test_profile(self, profile, **kwargs):
         looter = ProfileLooter(profile, session=self.session, **kwargs)
