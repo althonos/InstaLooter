@@ -30,6 +30,8 @@ from .pages import ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
 from .worker import InstaDownloader
 
+from datetime import date
+
 if typing.TYPE_CHECKING:
     from datetime import datetime
     from typing import (
@@ -793,6 +795,7 @@ class PostLooter(InstaLooter):
         if timeframe is not None:
             start, end = TimedMediasIterator.get_times(timeframe)
             timestamp = info.get("taken_at_timestamp") or info["media"]
+            timestamp = date.fromtimestamp(timestamp)
             if not (start >= timestamp >= end):
                 raise StopIteration
         yield info
