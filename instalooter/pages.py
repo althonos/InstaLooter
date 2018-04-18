@@ -62,7 +62,7 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
                 # Prepare the query
                 params = self._getparams(cursor)
                 json_params = json.dumps(params, separators=(',', ':'))
-                magic = "{}:{}:{}".format(rhx, session.headers['X-CSRFToken'], json_params)
+                magic = "{}:{}".format(rhx, json_params)
                 session.headers['x-instagram-gis'] = hashlib.md5(magic.encode('utf-8')).hexdigest()
                 url = self._URL.format(json_params)
                 # Query the server for data
