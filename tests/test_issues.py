@@ -90,7 +90,7 @@ class TestResolvedIssues(unittest.TestCase):
             with contexter.Contexter() as ctx:
                 ctx << mock.patch('instalooter.looters.InstaLooter.pages', MockPages('nintendo'))
                 main(["user", "nintendo", "-n", "3", "-q"])
-                self.assertEqual(len(self.destfs.listdir("/")), 3)
+                self.assertGreaterEqual(len(self.destfs.listdir("/")), 3)
         finally:
             os.chdir(initial_dir)
 
