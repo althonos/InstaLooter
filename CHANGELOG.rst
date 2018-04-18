@@ -9,18 +9,29 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Changed
+'''''''
+- Updated the query hash in ``ProfileIterator`` (although previous seemed
+  to keep working).
+
+Fixed
+'''''
+- *RHX-GIS* computation not using the CSRF token anymore.
+- Lowered ``PageIterator.PAGE_SIZE`` to 50 to comply with Instagram.
+
+
 v2.0.0_ - 2018-04-16
 --------------------
 
 Changed
 '''''''
 - Passing a pre-initialised ``Session`` to ``PageIterator`` constructor
-  is now mandatory
-- ``HashtagIterator`` must be provided a ``rhx`` (it is infered for ``ProfileIterator``)
+  is now mandatory.
+- ``HashtagIterator`` must be provided a ``rhx`` (it is infered for ``ProfileIterator``).
 
 Fixed
 '''''
-- API changes made by Instagram ca. April 2018 (excluding logging in / out)
+- API changes made by Instagram ca. April 2018 (excluding logging in / out).
 - Calling `operator.length_hint` on ``PageIterator`` objects will no longer
   cause duplicate server queries.
 
