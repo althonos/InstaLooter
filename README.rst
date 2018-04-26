@@ -80,6 +80,8 @@ Requirements
 +--------------------+----------------------------+----------------------+------------------------+-------------------------+
 | **tqdm**           |  Dynamic output in CLI     | |PyPI tqdm|          | |Source tqdm|          | |License tqdm|          |
 +--------------------+----------------------------+----------------------+------------------------+-------------------------+
+| **verboselogs**    |  More detailed logs        | |PyPI verboselogs|   | |Source verboselogs|   | |License verboselogs|   |
++--------------------+----------------------------+----------------------+------------------------+-------------------------+
 
 
 .. |PyPI coloredlogs| image:: https://img.shields.io/pypi/v/coloredlogs.svg?style=flat-square
@@ -109,6 +111,9 @@ Requirements
 .. |PyPI tqdm| image:: https://img.shields.io/pypi/v/tqdm.svg?style=flat-square
    :target: https://pypi.org/project/tqdm
 
+.. |PyPI verboselogs| image:: https://img.shields.io/pypi/v/verboselogs.svg?style=flat-square
+   :target: https://pypi.org/project/verboselogs
+
 .. |Source coloredlogs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/xolox/python-coloredlogs
 
@@ -136,6 +141,9 @@ Requirements
 .. |Source tqdm| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
    :target: https://github.com/tqdm/tqdm
 
+.. |Source verboselogs| image:: https://img.shields.io/badge/source-GitHub-303030.svg?style=flat-square
+   :target: https://github.com/xolox/python-verboselogs
+
 .. |License coloredlogs| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mit/
 
@@ -162,6 +170,9 @@ Requirements
 
 .. |License tqdm| image:: https://img.shields.io/pypi/l/tqdm.svg?style=flat-square
    :target: https://choosealicense.com/licenses/mpl-2.0/
+
+.. |License verboselogs| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+   :target: https://choosealicense.com/licenses/mit/
 
 
 Installation
