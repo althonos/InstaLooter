@@ -9,6 +9,11 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Changed
+'''''''
+- Use ``verboselogs`` as the backend logging library.
+
+
 v2.0.1_ - 2018-04-18
 --------------------
 
@@ -73,4 +78,3 @@ Removed
 .. _v2.0.1: https://github.com/althonos/InstaLooter/compare/v2.0.0...v2.0.1
 .. _v2.0.0: https://github.com/althonos/InstaLooter/compare/v1.0.0...v2.0.0
 .. _v1.0.0: https://github.com/althonos/InstaLooter/compare/v0.14.0...v1.0.0
-
