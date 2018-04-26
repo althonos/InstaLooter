@@ -10,6 +10,7 @@ import logging
 import typing
 
 import six
+import verboselogs
 from requests import Session
 
 from .looters import HashtagLooter, ProfileLooter
@@ -21,7 +22,8 @@ if typing.TYPE_CHECKING:
 
 
 #: The module logger
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
+logger.addHandler(logging.StreamHandler())
 
 
 class BatchRunner(object):
@@ -178,7 +180,7 @@ class BatchRunner(object):
                     pgpbar_cls=None if quiet else TqdmProgressBar,
                     dlpbar_cls=None if quiet else TqdmProgressBar)
 
-                logger.log(35, "Downloaded {} medias !".format(n))
+                logger.success("Downloaded %i medias !", n)
 
     def get_targets(self, raw_string):
         # type: (Optional[Text]) -> Dict[Text, Text]

@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 import json
+import os
 
 import contexter
 import fs

@@ -21,6 +21,7 @@ import coloredlogs
 import docopt
 import fs
 import six
+import verboselogs
 
 from .. import __version__
 from ..looters import InstaLooter, HashtagLooter, ProfileLooter, PostLooter
@@ -37,7 +38,8 @@ __all__ = ["main", "logger"]
 
 
 #: A `~logging.Logger` instance used within the `.cli` module.
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
+logger.addHandler(logging.StreamHandler())
 
 
 @logutils.wrap_warnings(logger)
@@ -102,7 +104,7 @@ def main(argv=None, stream=None):
                     login(args)
                     return 0
                 except ValueError as ve:
-                    logger.log(logutils.ERROR, ve)
+                    logger.error("%s", ve)
                     if args["--traceback"]:
                        traceback.print_exc()
                     return 1
@@ -111,7 +113,7 @@ def main(argv=None, stream=None):
             if args['logout']:
                 if InstaLooter._cachefs.exists(InstaLooter._COOKIE_FILE):
                     InstaLooter._logout()
-                    logger.log(logutils.SUCCESS, 'Logged out.')
+                    logger.success('Logged out.')
                 else:
                     warnings.warn('Cookie file not found.')
                 return 0
@@ -155,12 +157,11 @@ def main(argv=None, stream=None):
                 _print("    (format is [D]:[D] where D is an ISO 8601 date)")
                 return 1
 
-            logger.log(logutils.DEBUG, "Opening destination filesystem")
+            logger.debug("Opening destination filesystem")
             dest_url = args.get('<directory>') or os.getcwd()
             dest_fs = fs.open_fs(dest_url, create=True)
 
-            logger.log(
-                logutils.NOTICE, "Starting download of `{}`".format(target))
+            logger.notice("Starting download of `%s`", target)
             n = looter.download(
                 destination=dest_fs,
                 media_count=args['--num-to-dl'],
@@ -169,24 +170,23 @@ def main(argv=None, stream=None):
                 pgpbar_cls=None if args['--quiet'] else TqdmProgressBar,
                 dlpbar_cls=None if args['--quiet'] else TqdmProgressBar)
             if n > 1:
-                logger.log(logutils.SUCCESS, "Downloaded {} posts.".format(n))
+                logger.success("Downloaded %i posts.", n)
             elif n == 1:
-                logger.log(logutils.SUCCESS, "Downloaded {} post.".format(n))
+                logger.success("Downloaded %i post.", n)
 
         except (Exception, KeyboardInterrupt) as e:
             from .threadutils import threads_force_join, threads_count
             # Show error traceback if any
             if not isinstance(e, KeyboardInterrupt):
-                logger.log(logutils.CRITICAL, e)
+                logger.critical("%s", e)
                 if args["--traceback"]:
                     traceback.print_exc()
             else:
-                logger.log(logutils.CRITICAL, "Interrupted")
+                logger.critical("Interrupted")
             # Close remaining threads spawned by InstaLooter.download
             count = threads_count()
             if count:
-                logger.log(logutils.NOTICE,
-                    "Terminating {} remaining workers...".format(count))
+                logger.notice("Terminating %i remaining workers...", count)
                 threads_force_join()
             # Return the error number if any
             errno = e.errno if hasattr(e, "errno") else None
@@ -196,7 +196,7 @@ def main(argv=None, stream=None):
             return 0
 
         finally:
-            logger.log(logutils.DEBUG, "Closing destination filesystem")
+            logger.debug("Closing destination filesystem")
             try:
                 dest_fs.close()
             except Exception:

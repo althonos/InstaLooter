@@ -13,20 +13,6 @@ if typing.TYPE_CHECKING:
     from typing import Callable
 
 
-SPAM = 5
-DEBUG = 10
-INFO = 20
-NOTICE = 25
-WARNING = 30
-SUCCESS = 35
-ERROR = 40
-CRITICAL = 50
-
-logging.addLevelName(SPAM, "SPAM")
-logging.addLevelName(NOTICE, "NOTICE")
-logging.addLevelName(SUCCESS, "SUCCESS")
-
-
 def warn_logging(logger):
     # type: (logging.Logger) -> Callable
     """Create a `showwarning` function that uses the given logger.
