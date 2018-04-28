@@ -5,11 +5,13 @@ from __future__ import unicode_literals
 import getpass
 import logging
 
-from . import logutils
+import verboselogs
+
 from ..looters import InstaLooter
 
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
+logger.addHandler(logging.StreamHandler())
 
 
 def login(args):
@@ -19,6 +21,6 @@ def login(args):
             password = args['--password'] or getpass.getpass()
             InstaLooter._login(username, password)
             if not args['--quiet']:
-                logger.log(logutils.SUCCESS, 'Logged in.')
+                logger.success('Logged in.')
         elif not args['--quiet']:
-            logger.log(logutils.SUCCESS, "Already logged in.")
+            logger.success("Already logged in.")
