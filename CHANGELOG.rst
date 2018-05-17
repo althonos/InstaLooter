@@ -9,8 +9,12 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.0.2_ - 2018-05-17
+--------------------
+
 Changed
 '''''''
+- Bump ``coloredlogs`` required version to `10.0`.
 - Use ``verboselogs`` as the backend logging library.
 
 
@@ -74,7 +78,8 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.0.1...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.0.2...HEAD
+.. _v2.0.2: https://github.com/althonos/InstaLooter/compare/v2.0.1...v2.0.2
 .. _v2.0.1: https://github.com/althonos/InstaLooter/compare/v2.0.0...v2.0.1
 .. _v2.0.0: https://github.com/althonos/InstaLooter/compare/v1.0.0...v2.0.0
 .. _v1.0.0: https://github.com/althonos/InstaLooter/compare/v0.14.0...v1.0.0
