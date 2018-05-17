@@ -319,7 +319,7 @@ class TestResolvedIssues(unittest.TestCase):
         Make sure private profiles with few pictures (less than a page worth)
         raise the private error as expected.
         """
-        looter = ProfileLooter("raphaelbernardino", session=self.session)
+        looter = ProfileLooter("rararudo", session=self.session)
         self.assertRaises(RuntimeError, looter.medias)
 
     @unittest.expectedFailure
