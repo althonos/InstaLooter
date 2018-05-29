@@ -62,7 +62,7 @@ Special thanks to the following contributors:
   * `Pauli Salmenrinne <https://github.com/susundberg>`_
   * `Geoff <https://github.com/gffde3>`_
   * `Lev Velykoivanenko <https://github.com/AbysmalBiscuit>`_
-
+  * `Maksymilian Ratajczyk <https://github.com/mratajczyk>`_
 
 Indices and tables
 ------------------
