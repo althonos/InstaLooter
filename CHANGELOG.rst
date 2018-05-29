@@ -9,6 +9,11 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Fixed
+'''''
+- Use the webpage shared data to find the CSRF token instead of response
+  cookies.
+
 v2.0.2_ - 2018-05-17
 --------------------
 

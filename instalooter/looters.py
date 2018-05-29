@@ -135,14 +135,14 @@ class InstaLooter(object):
             })
 
             with session.get(homepage) as res:
-                token = res.cookies['csrftoken']
+                token = get_shared_data(res.text)['config']['csrf_token']
                 session.headers.update({'X-CSRFToken': token})
-            time.sleep(5 * random.random()) # nosec
+            time.sleep(5 * random.random())  # nosec
 
             with session.post(login_url, data, allow_redirects=True) as login:
-                token = login.cookies['csrftoken']
+                token = get_shared_data(login.text)['config']['csrf_token']
                 session.headers.update({'X-CSRFToken': token})
-                time.sleep(5 * random.random()) # nosec
+                time.sleep(5 * random.random())  # nosec
                 if not login.status_code == 200:
                     raise SystemError("Login error: check your connection")
 
@@ -271,9 +271,9 @@ class InstaLooter(object):
 
         # Get CSRFToken and RHX
         with self.session.get('https://www.instagram.com/') as res:
-            self.session.headers['X-CSRFToken'] = res.cookies['csrftoken']
+            token = get_shared_data(res.text)['config']['csrf_token']
+            self.session.headers['X-CSRFToken'] = token
             self.rhx = get_shared_data(res.text)['rhx_gis']
-
 
     @abc.abstractmethod
     def pages(self):
@@ -555,7 +555,7 @@ class InstaLooter(object):
                           queue,            # type: Queue
                           destination,      # type: fs.base.FS
                           medias_iter,      # type: Iterable[Any]
-                          media_count=None, # type: Optional[int]
+                          media_count=None,  # type: Optional[int]
                           new_only=False,   # type: bool
                           condition=None,   # type: Optional[Callable[[dict], bool]]
                           ):
@@ -675,7 +675,7 @@ class ProfileLooter(InstaLooter):
     """A looter targeting medias on a user profile.
     """
 
-    def __init__(self, username,  **kwargs):
+    def __init__(self, username, **kwargs):
         # type: (str, **Any) -> None
         """Create a new profile looter.
 
