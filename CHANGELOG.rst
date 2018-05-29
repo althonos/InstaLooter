@@ -9,6 +9,9 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.0.3_ - 2018-05-29
+--------------------
+
 Fixed
 '''''
 - Use the webpage shared data to find the CSRF token instead of response
@@ -83,7 +86,8 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.0.2...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.0.3...HEAD
+.. _v2.0.3: https://github.com/althonos/InstaLooter/compare/v2.0.2...v2.0.3
 .. _v2.0.2: https://github.com/althonos/InstaLooter/compare/v2.0.1...v2.0.2
 .. _v2.0.1: https://github.com/althonos/InstaLooter/compare/v2.0.0...v2.0.1
 .. _v2.0.0: https://github.com/althonos/InstaLooter/compare/v1.0.0...v2.0.0
