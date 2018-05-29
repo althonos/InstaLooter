@@ -24,6 +24,8 @@ from .utils import mock
 from .utils.ig_mock import MockPages
 
 # @mock.patch('instalooter.looter.requests.Session', lambda: TestResolvedIssues.session)
+
+
 class TestResolvedIssues(unittest.TestCase):
 
     if six.PY2:
@@ -61,7 +63,7 @@ class TestResolvedIssues(unittest.TestCase):
             looter.download(self.destfs, media_count=10)
         for f in self.destfs.listdir("/"):
             exif = piexif.load(self.destfs.getbytes(f))
-            self.assertTrue(exif['Exif']) # Date & Caption
+            self.assertTrue(exif['Exif'])  # Date & Caption
             self.assertTrue(exif['0th'])  # Image creator
 
     def test_issue_012(self):
@@ -107,13 +109,16 @@ class TestResolvedIssues(unittest.TestCase):
         for f in self.destfs.scandir("/"):
             self.assertTrue(f.name.startswith('nintendo.'))
 
+    @unittest.skipIf(os.getenv("CI") is None, "need private user account")
     def test_issue_006(self):
         """
         Checks that instalooter does not iterate forever on a private
         profile.
         """
         with self.assertRaises(RuntimeError):
-            looter = ProfileLooter("tldr", session=self.session)
+            username = os.getenv("IG_USERNAME")
+            looter = ProfileLooter(username, session=self.session)
+            looter.logout()
             next(looter.medias())
 
     def test_issue_015(self):
@@ -331,7 +336,7 @@ class TestResolvedIssues(unittest.TestCase):
         from a post code and written to the metadata.
         """
         looter = PostLooter("BY77tSfBnRm",
-            add_metadata=True, template='{code}', session=self.session)
+                            add_metadata=True, template='{code}', session=self.session)
         looter.download(self.destfs)
         metadata = piexif.load(self.destfs.getbytes("BY77tSfBnRm.jpg"), True)
         self.assertTrue(metadata['Exif']['UserComment'])
@@ -425,9 +430,9 @@ class TestPullRequests(unittest.TestCase):
         self.assertEqual(stat.raw["details"]["modified"], vid['taken_at_timestamp'])
 
 
-
 def setUpModule():
    warnings.simplefilter('ignore')
+
 
 def tearDownModule():
    warnings.simplefilter(warnings.defaultaction)
