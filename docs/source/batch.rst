@@ -20,6 +20,7 @@ the ``=`` sign:
 
 Specifying targets
 ------------------
+
 Users can be specified in the *users* parameter of each section, and hashtags
 in the *hashtags* parameter. Those sections take a ``key: value`` pair per line,
 where *key* is the name of the user, and *value* the path to the directory where
@@ -41,6 +42,7 @@ the medias will be downloaded. For instance:
 
 Logging in
 ----------
+
 Each section can be provided with a ``username`` and a ``password`` parameter:
 
 * if none are given, the scraping is done anonymously or using the last session
@@ -54,6 +56,7 @@ Each section can be provided with a ``username`` and a ``password`` parameter:
 
 Passing parameters
 ------------------
+
 Each section can be given the same parameters as the command line:
 
 ``add-metadata``
@@ -72,7 +75,7 @@ Each section can be given the same parameters as the command line:
   set to *True* to only download new medias
 ``num-to-dl``
   the number of images to download
-``dump-jon``
+``dump-json``
   set to *True* to dump metadata in JSON format
 ``dump-only``
   set to *True* to only dump metadata, not downloading anything.
@@ -94,12 +97,12 @@ For instance, to download 3 new videos from ``#funny`` and ``#nsfw``:
 
 Running the program
 -------------------
+
 Simply run the following command
 
 .. code-block:: console
 
   instaLooter batch /path/to/your/batch.ini
-
 
 
 Bugs
@@ -112,4 +115,4 @@ Bugs
 
 Please report any bugs caused by this feature to the `Github
 issue tracker <https://github.com/althonos/InstaLooter/issues>`_, adding the
-configuration file as an attachment !
+configuration file as an attachment!
