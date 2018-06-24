@@ -40,7 +40,7 @@ with open(os.path.join(project_dir, "CHANGELOG.rst"), 'rb') as src:
 
 project = 'InstaLooter'
 author = instalooter.__author__
-copyright = '2016-{}, {}'.format(author, datetime.date.today().year)
+copyright = '2016-{}, {}'.format(datetime.date.today().year, author)
 
 # The full version, including alpha/beta/rc tags
 release = instalooter.__version__
