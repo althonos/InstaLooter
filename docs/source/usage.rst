@@ -21,7 +21,7 @@ Download pictures/videos from the profile of a single user:
 
 .. code-block:: console
 
-   $ instaLooter <username> [<directory>] [options]
+   $ instaLooter user <username> [<directory>] [options]
 
 
 Download pictures/videos tagged with a given *#hashtag*:
