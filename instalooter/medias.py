@@ -92,8 +92,8 @@ class TimedMediasIterator(MediasIterator):
         if timeframe is None:
             timeframe = (None, None)
         try:
-            start_time = timeframe[0] or datetime.date.today()
-            end_time = timeframe[1] or datetime.date.fromtimestamp(0)
+            start_time = timeframe[0] or datetime.datetime.now()
+            end_time = timeframe[1] or datetime.datetime.fromtimestamp(0)
         except (IndexError, AttributeError):
             raise TypeError("'timeframe' must be a couple of dates!")
         return start_time, end_time
@@ -106,7 +106,7 @@ class TimedMediasIterator(MediasIterator):
         while True:
             media = super(TimedMediasIterator, self).__next__()
             timestamp = media.get('taken_at_timestamp') or media['date']
-            media_date = datetime.date.fromtimestamp(timestamp)
+            media_date = datetime.datetime.fromtimestamp(timestamp)
 
             if self.start_time >= media_date >= self.end_time:
                 return media
