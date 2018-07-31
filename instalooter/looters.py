@@ -140,10 +140,9 @@ class InstaLooter(object):
             time.sleep(5 * random.random())  # nosec
 
             with session.post(login_url, data, allow_redirects=True) as login:
-                token = get_shared_data(login.text)['config']['csrf_token']
-                session.headers.update({'X-CSRFToken': token})
+                status = get_shared_data(login.text)['status']
                 time.sleep(5 * random.random())  # nosec
-                if not login.status_code == 200:
+                if not status == 'ok':
                     raise SystemError("Login error: check your connection")
 
             with session.get(homepage) as res:
