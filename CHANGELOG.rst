@@ -9,6 +9,10 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+
+v2.1.0_ - 2018-07-31
+--------------------
+
 Added
 '''''
 - Posts can now be downloaded by giving directly the post URL (implement #184).
@@ -107,7 +111,8 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.0.3...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.1.0...HEAD
+.. _v2.1.0: https://github.com/althonos/InstaLooter/compare/v2.0.3...v2.1.0
 .. _v2.0.3: https://github.com/althonos/InstaLooter/compare/v2.0.2...v2.0.3
 .. _v2.0.2: https://github.com/althonos/InstaLooter/compare/v2.0.1...v2.0.2
 .. _v2.0.1: https://github.com/althonos/InstaLooter/compare/v2.0.0...v2.0.1
