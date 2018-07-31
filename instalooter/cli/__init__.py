@@ -39,7 +39,6 @@ __all__ = ["main", "logger"]
 
 #: A `~logging.Logger` instance used within the `.cli` module.
 logger = verboselogs.VerboseLogger(__name__)
-logger.addHandler(logging.StreamHandler())
 
 
 @logutils.wrap_warnings(logger)

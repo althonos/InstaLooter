@@ -23,7 +23,6 @@ if typing.TYPE_CHECKING:
 
 #: The module logger
 logger = verboselogs.VerboseLogger(__name__)
-logger.addHandler(logging.StreamHandler())
 
 
 class BatchRunner(object):

@@ -11,7 +11,6 @@ from ..looters import InstaLooter
 
 
 logger = verboselogs.VerboseLogger(__name__)
-logger.addHandler(logging.StreamHandler())
 
 
 def login(args):
