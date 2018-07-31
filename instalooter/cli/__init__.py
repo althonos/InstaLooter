@@ -26,7 +26,7 @@ import verboselogs
 from .. import __version__
 from ..looters import InstaLooter, HashtagLooter, ProfileLooter, PostLooter
 from ..pbar import TqdmProgressBar
-from ..batch import BatchRunner
+from ..batch import BatchRunner, logger as batch_logger
 
 from . import logutils
 from .constants import HELP, USAGE, WARNING_ACTIONS
@@ -91,8 +91,15 @@ def main(argv=None, stream=None):
         try:
             # Run in batch mode
             if args['batch']:
+                # Setup the batch logger
+                coloredlogs.install(
+                    level=int(level) if level.isdigit() else level,
+                    stream=stream,
+                    logger=batch_logger)
+                # Load the batch configuration from the given file
                 with open(args['<batch_file>']) as batch_file:
                     batch_runner = BatchRunner(batch_file, args)
+                # Run the batch
                 batch_runner.run_all()
                 return 0
 
