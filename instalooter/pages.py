@@ -162,6 +162,8 @@ class ProfileIterator(PageIterator):
     @classmethod
     def from_username(cls, username, session):
         user_data = cls._user_data(username, session)
+        if 'ProfilePage' not in user_data['entry_data']:
+            raise ValueError("user not found: '{}'".format(username))
         data = user_data['entry_data']['ProfilePage'][0]['graphql']['user']
         if data['is_private'] and not data['followed_by_viewer']:
             con_id = next((c.value for c in session.cookies if c.name == "ds_user_id"), None)

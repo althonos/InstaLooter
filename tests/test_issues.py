@@ -361,6 +361,18 @@ class TestResolvedIssues(unittest.TestCase):
              'therock': 'D:\\Instagram\\Profiles\\therock'}
         )
 
+    def test_issue_194(self):
+        """Feature request by @raphaelbernardino
+
+        When trying to download from an non-existing user, try to display a
+        meaningful message instead of a cryptic error.
+        """
+        username = "jdhfdjkhdlqdhfdhqfqjqlhfhdsdjquryerhdjfhqlkdfhkqhfqkure"
+        looter = ProfileLooter(username)
+        with self.assertRaises(ValueError) as ctx:
+            media = next(looter.medias())
+        self.assertEqual(str(ctx.exception), "user not found: '{}'".format(username))
+
 
 # @mock.patch('instalooter.looter.requests.Session', lambda: TestPullRequests.session)
 class TestPullRequests(unittest.TestCase):

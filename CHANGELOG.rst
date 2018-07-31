@@ -9,6 +9,12 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Changed
+'''''''
+- Trying to download media from an non-existing user will display a nicer
+  message: ``user not found: '...'`` (fix #194).
+
+
 v2.0.3_ - 2018-05-29
 --------------------
 
