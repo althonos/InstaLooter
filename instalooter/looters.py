@@ -137,15 +137,18 @@ class InstaLooter(object):
             with session.get(homepage) as res:
                 token = get_shared_data(res.text)['config']['csrf_token']
                 session.headers.update({'X-CSRFToken': token})
+
             time.sleep(5 * random.random())  # nosec
-
             with session.post(login_url, data, allow_redirects=True) as login:
-                token = get_shared_data(login.text)['config']['csrf_token']
+                token = next(c.value for c in login.cookies if c.name == 'csrftoken')
                 session.headers.update({'X-CSRFToken': token})
-                time.sleep(5 * random.random())  # nosec
-                if not login.status_code == 200:
+                if not login.ok:
                     raise SystemError("Login error: check your connection")
+                data = json.loads(login.text)
+                if not data.get('authenticated', False):
+                    raise ValueError('Login error: check your login data')
 
+            time.sleep(5 * random.random())  # nosec
             with session.get(homepage) as res:
                 if res.text.find(username) == -1:
                     raise ValueError('Login error: check your login data')
@@ -153,6 +156,7 @@ class InstaLooter(object):
                     typing.cast(FileCookieJar, session.cookies).save()
                 except IOError:
                     pass
+
         finally:
             session.headers = headers
 
@@ -212,8 +216,8 @@ class InstaLooter(object):
         _session = cls._init_session(session)
         _cookies = typing.cast(FileCookieJar, _session.cookies)
         return next((ck.value for ck in _cookies
-                     if ck.domain == "www.instagram.com"
-                     and ck.name == "sessionid"
+                     if ck.domain == ".instagram.com"
+                     and ck.name == "ds_user_id"
                      and ck.path == "/"), None)
 
     def __init__(self,

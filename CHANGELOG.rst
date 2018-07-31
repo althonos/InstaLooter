@@ -20,6 +20,7 @@ Fixed
 - CLI login will now properly display logger messages.
 - Library loggers do not have a `logging.StreamHandler` set by default
   anymore.
+- Attempt fixing login procedure in ``InstaLooter._login``.
 
 Changed
 '''''''
