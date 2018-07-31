@@ -1,5 +1,5 @@
 <!-- Below you'll find a template to create an issue, with information you're
-expected to provide to help debugging. Failure to do so will most likely 
+expected to provide to help debugging. Failure to do so will most likely
 end up in your issue being ignored. Let's try being adults here, an issue
 named IT DOESN'T WORK without a description is not helping anybody. -->
 
@@ -24,8 +24,10 @@ instalooter vX.Y.Z
 ## Error description - installation
 
 *If you have an issue with installation, make sure you use a recent `setuptools` version
-before filing a bug ! If the error is still there, describe the command you used to 
-install, and make sure you reported your environment in details.*
+before filing a bug ! If the error is still there, describe the command you used to
+install, and make sure you reported your environment in details. In particular,
+if you encounter a critical error with the CLI, please post the program output when
+running with the `--traceback` flag.*
 
 
 ## Error description - runtime
@@ -34,7 +36,7 @@ install, and make sure you reported your environment in details.*
 
 ### Reproducible test case
 
-*Are you using the CLI ? If so, include a command that can be used to re-raise the 
+*Are you using the CLI ? If so, include a command that can be used to re-raise the
 error, with actual arguments anybody can try:*
 
 ```
@@ -56,5 +58,3 @@ from instalooter.looters import ...
 ### Actual behaviour
 
 *What's actually happening ? Leave empty if asking for a new feature*
-
-
