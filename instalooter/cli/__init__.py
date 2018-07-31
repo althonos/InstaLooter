@@ -31,7 +31,7 @@ from ..batch import BatchRunner, logger as batch_logger
 from . import logutils
 from .constants import HELP, USAGE, WARNING_ACTIONS
 from .time import get_times_from_cli
-from .login import login
+from .login import login, logger as login_logger
 
 
 __all__ = ["main", "logger"]
@@ -71,12 +71,13 @@ def main(argv=None, stream=None):
         _print(USAGE)
         return 0
 
-    # Set the logger up with the requested logging level
+    # Set the loggers up with the requested logging level
     level = "ERROR" if args['--quiet'] else args.get("--loglevel", "INFO")
-    coloredlogs.install(
-        level=int(level) if level.isdigit() else level,
-        stream=stream,
-        logger=logger)
+    for logger_ in (logger, login_logger, batch_logger):
+        coloredlogs.install(
+            level=int(level) if level.isdigit() else level,
+            stream=stream,
+            logger=logger_)
 
     # Check the requested logging level
     if args['-W'] not in WARNING_ACTIONS:
@@ -90,11 +91,6 @@ def main(argv=None, stream=None):
         try:
             # Run in batch mode
             if args['batch']:
-                # Setup the batch logger
-                coloredlogs.install(
-                    level=int(level) if level.isdigit() else level,
-                    stream=stream,
-                    logger=batch_logger)
                 # Load the batch configuration from the given file
                 with open(args['<batch_file>']) as batch_file:
                     batch_runner = BatchRunner(batch_file, args)

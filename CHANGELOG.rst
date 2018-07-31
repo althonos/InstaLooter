@@ -9,6 +9,14 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Fixed
+'''''
+- Batch will now log the name of the current account as well as occuring
+  errors (fix #185)
+- CLI login will now properly display logger messages.
+- Library loggers do not have a `logging.StreamHandler` set by default
+  anymore.
+
 Changed
 '''''''
 - Trying to download media from an non-existing user will display a nicer
