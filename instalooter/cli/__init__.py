@@ -147,13 +147,13 @@ def main(argv=None, stream=None):
             )
 
             # Attempt to login and extract the timeframe
+            if args['--username']:
+                login(args)
+            if args['--num-to-dl']:
+                args['--num-to-dl'] = int(args['--num-to-dl'])
             try:
-                if args['--username']:
-                    login(args)
-                if args['--time']:
+                if args['--time'] is not None:
                     args['--time'] = get_times_from_cli(args['--time'])
-                if args['--num-to-dl']:
-                    args['--num-to-dl'] = int(args['--num-to-dl'])
             except ValueError as ve:
                 _print("invalid format for --time parameter:", args["--time"])
                 _print("    (format is [D]:[D] where D is an ISO 8601 date)")
