@@ -738,6 +738,14 @@ class PostLooter(InstaLooter):
     """A looter targeting a specific post.
     """
 
+    _RX_URL = re.compile(
+        r'(?:https?://)?(?:www\.instagram\.com|instagr\.am)/p/([0-9a-zA-Z_\-]{11})'
+    )
+
+    _RX_CODE = re.compile(
+        r'^[0-9a-zA-Z_\-]{11}$'
+    )
+
     def __init__(self, code, **kwargs):
         # type: (str, **Any) -> None
         """Create a new hashtag looter.
@@ -750,8 +758,16 @@ class PostLooter(InstaLooter):
 
         """
         super(PostLooter, self).__init__(**kwargs)
-        self.code = code
+
         self._info = None   # type: Optional[dict]
+
+        match = self._RX_URL.match(code)
+        if match is not None:
+            self.code = match.group(1)
+        elif self._RX_CODE.match(code) is None:
+            raise ValueError("invalid post code: '{}'".format(code))
+        else:
+            self.code = code
 
     @property
     def info(self):

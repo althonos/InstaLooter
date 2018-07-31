@@ -361,6 +361,15 @@ class TestResolvedIssues(unittest.TestCase):
              'therock': 'D:\\Instagram\\Profiles\\therock'}
         )
 
+    @mock.patch('instalooter.looters.InstaLooter.__init__')
+    def test_issue_184(self):
+        """Feature request by @ghost.
+
+        Allow downloading a post directly from its URL.
+        """
+        looter = PostLooter("https://www.instagram.com/p/BJlIB9WhdRn/?taken-by=2k")
+        self.assertEqual(looter.code, "BJlIB9WhdRn")
+
     def test_issue_185(self):
         """Feature request by @JPNYC81.
 
