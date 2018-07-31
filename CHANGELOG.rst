@@ -13,6 +13,8 @@ Changed
 '''''''
 - Trying to download media from an non-existing user will display a nicer
   message: ``user not found: '...'`` (fix #194).
+- Batch mode will now continue to the next job if any error occurs, showing
+  an error message instead of crashing (fix #185).
 
 
 v2.0.3_ - 2018-05-29

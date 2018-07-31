@@ -143,44 +143,47 @@ class BatchRunner(object):
 
         for name, looter_cls in six.iteritems(self._CLS_MAP):
 
-            targets = self.get_targets(self._get(section_id, name))
-            quiet = self._getboolean(
-                section_id, "quiet", self.args.get("--quiet", False))
+                targets = self.get_targets(self._get(section_id, name))
+                quiet = self._getboolean(
+                    section_id, "quiet", self.args.get("--quiet", False))
 
-            if targets:
-                logger.info("Launching {} job for section {}".format(name, section_id))
+                if targets:
+                    logger.info("Launching {} job for section {}".format(name, section_id))
 
-            for target, directory in six.iteritems(targets):
+                for target, directory in six.iteritems(targets):
+                    try:
+                        logger.info("Downloading {} to {}".format(target, directory))
+                        looter = looter_cls(
+                            target,
+                            add_metadata=self._getboolean(section_id, 'add-metadata', False),
+                            get_videos=self._getboolean(section_id, 'get-videos', False),
+                            videos_only=self._getboolean(section_id, 'videos-only', False),
+                            jobs=self._getint(section_id, 'jobs', 16),
+                            template=self._get(section_id, 'template', '{id}'),
+                            dump_json=self._getboolean(section_id, 'dump-json', False),
+                            dump_only=self._getboolean(section_id, 'dump-only', False),
+                            extended_dump=self._getboolean(section_id, 'extended-dump', False),
+                            session=session)
 
-                logger.info("Downloading {} to {}".format(target, directory))
-                looter = looter_cls(
-                    target,
-                    add_metadata=self._getboolean(section_id, 'add-metadata', False),
-                    get_videos=self._getboolean(section_id, 'get-videos', False),
-                    videos_only=self._getboolean(section_id, 'videos-only', False),
-                    jobs=self._getint(section_id, 'jobs', 16),
-                    template=self._get(section_id, 'template', '{id}'),
-                    dump_json=self._getboolean(section_id, 'dump-json', False),
-                    dump_only=self._getboolean(section_id, 'dump-only', False),
-                    extended_dump=self._getboolean(section_id, 'extended-dump', False),
-                    session=session)
+                        if self.parser.has_option(section_id, 'username'):
+                            looter.logout()
+                            username = self._get(section_id, 'username')
+                            password = self._get(section_id, 'password') or \
+                                getpass.getpass('Password for "{}": '.format(username))
+                            looter.login(username, password)
 
-                if self.parser.has_option(section_id, 'username'):
-                    looter.logout()
-                    username = self._get(section_id, 'username')
-                    password = self._get(section_id, 'password') or \
-                        getpass.getpass('Password for "{}": '.format(username))
-                    looter.login(username, password)
+                        n = looter.download(
+                            directory,
+                            media_count=self._getint(section_id, 'num-to-dl'),
+                            # FIXME: timeframe=self._get(section_id, 'timeframe'),
+                            new_only=self._getboolean(section_id, 'new', False),
+                            pgpbar_cls=None if quiet else TqdmProgressBar,
+                            dlpbar_cls=None if quiet else TqdmProgressBar)
 
-                n = looter.download(
-                    directory,
-                    media_count=self._getint(section_id, 'num-to-dl'),
-                    # FIXME: timeframe=self._get(section_id, 'timeframe'),
-                    new_only=self._getboolean(section_id, 'new', False),
-                    pgpbar_cls=None if quiet else TqdmProgressBar,
-                    dlpbar_cls=None if quiet else TqdmProgressBar)
+                        logger.success("Downloaded %i medias !", n)
 
-                logger.success("Downloaded %i medias !", n)
+                    except Exception as exception:
+                        logger.error(six.text_type(exception))
 
     def get_targets(self, raw_string):
         # type: (Optional[Text]) -> Dict[Text, Text]

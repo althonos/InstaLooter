@@ -16,7 +16,7 @@ import requests
 import six
 
 from instalooter._impl import length_hint, piexif, PIL
-from instalooter.batch import BatchRunner
+from instalooter.batch import BatchRunner, logger as batch_logger
 from instalooter.cli import main
 from instalooter.looters import HashtagLooter, ProfileLooter, PostLooter
 
@@ -360,6 +360,27 @@ class TestResolvedIssues(unittest.TestCase):
             {'instagram': 'D:\\Instagram\\Profiles\\instagram',
              'therock': 'D:\\Instagram\\Profiles\\therock'}
         )
+
+    def test_issue_185(self):
+        """Feature request by @JPNYC81.
+
+        Make sure an ``instalooter`` batch keeps even if it encounters errors
+        on a specific job. This test tries with an non-existing profile.
+        """
+        configfile = six.StringIO(textwrap.dedent(
+            """
+            [Family]
+            num-to-dl = 3
+            users =
+                jdskjhjkfhkdshfkjdhsfjsfdkjhfksdjhf: {tmp}
+            	instagram: {tmp}
+            	therock: {tmp}
+            """
+        ).format(tmp=self.tmpdir))
+        runner = BatchRunner(configfile)
+        with mock.patch('instalooter.batch.logger'):
+            runner.run_all()
+        self.assertGreaterEqual(len(self.destfs.listdir('/')), 6)
 
     def test_issue_194(self):
         """Feature request by @raphaelbernardino
