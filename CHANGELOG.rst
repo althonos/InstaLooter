@@ -9,6 +9,10 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Added
+'''''
+- Posts can now be downloaded by giving directly the post URL (implement #184).
+
 Fixed
 '''''
 - Batch will now log the name of the current account as well as occuring

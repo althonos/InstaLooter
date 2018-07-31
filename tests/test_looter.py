@@ -10,8 +10,9 @@ import parameterized
 import requests
 import six
 
-from instalooter.looters import ProfileLooter, HashtagLooter
+from instalooter.looters import ProfileLooter, HashtagLooter, PostLooter
 
+from .utils import mock
 from .utils.method_names import signature
 
 
@@ -52,6 +53,28 @@ class TestInstaLooter(unittest.TestCase):
         looter.download(self.destfs, media_count=self.MEDIA_COUNT)
         self.assertGreaterEqual(len(self.destfs.listdir("/")), self.MEDIA_COUNT)
 
+
+
+class TestPostLooter(unittest.TestCase):
+
+    @mock.patch('instalooter.looters.InstaLooter.__init__')
+    def test_post_url(self, _):
+        urls = (
+            "http://www.instagram.com/p/BJlIB9WhdRn/?taken-by=2k",
+            "https://www.instagram.com/p/BJlIB9WhdRn/?taken-by=2k",
+            "www.instagram.com/p/BJlIB9WhdRn/?taken-by=2k",
+            "http://instagr.am/p/BJlIB9WhdRn/?taken-by=2k",
+            "https://instagr.am/p/BJlIB9WhdRn/?taken-by=2k",
+            "instagr.am/p/BJlIB9WhdRn/?taken-by=2k",
+        )
+        for url in urls:
+            looter = PostLooter(url)
+            self.assertEqual(looter.code, "BJlIB9WhdRn")
+
+    @mock.patch('instalooter.looters.InstaLooter.__init__')
+    def test_invalid_post_code(self, _):
+        with self.assertRaises(ValueError):
+            looter = PostLooter("instagram")  # invalid code
 
 
 # class TestTemplate(_TempTestCase):
