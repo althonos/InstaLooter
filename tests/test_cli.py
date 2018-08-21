@@ -86,7 +86,6 @@ class TestCLI(unittest.TestCase):
         main(["--usage"], stream=handle)
         self.assertEqual(handle.getvalue().strip(), USAGE.strip())
 
-    @unittest.expectedFailure
     def test_single_post_from_url(self):
         url = "https://www.instagram.com/p/BFB6znLg5s1/"
         main(["post", url, self.tmpdir, "-q"])
