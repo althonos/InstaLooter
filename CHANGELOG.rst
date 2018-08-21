@@ -9,6 +9,10 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Changed
+'''''''
+- Bumped required ``tenacity`` version to ``5.0``.
+
 v2.2.0_ - 2018-08-19
 --------------------
 
