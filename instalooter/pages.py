@@ -157,7 +157,7 @@ class ProfileIterator(PageIterator):
             with session.get(url) as res:
                 return get_shared_data(res.text)
         except (ValueError, AttributeError):
-            raise ValueError("account not found: {}".format(username))
+            raise ValueError("user not found: '{}'".format(username))
 
     @classmethod
     def from_username(cls, username, session):
