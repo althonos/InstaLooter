@@ -9,6 +9,9 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.3.0_ - 2018-09-05
+--------------------
+
 Changed
 '''''''
 - Bumped required ``tenacity`` version to ``5.0``.
@@ -122,7 +125,8 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.2.0...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.3.0...HEAD
+.. _v2.3.0: https://github.com/althonos/InstaLooter/compare/v2.2.0...v2.3.0
 .. _v2.2.0: https://github.com/althonos/InstaLooter/compare/v2.1.0...v2.2.0
 .. _v2.1.0: https://github.com/althonos/InstaLooter/compare/v2.0.3...v2.1.0
 .. _v2.0.3: https://github.com/althonos/InstaLooter/compare/v2.0.2...v2.0.3
