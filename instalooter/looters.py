@@ -743,7 +743,7 @@ class PostLooter(InstaLooter):
     """
 
     _RX_URL = re.compile(
-        r'(?:https?://)?(?:www\.instagram\.com|instagr\.am)/p/([0-9a-zA-Z_\-]{11})'
+        r'(?:https?://)?(?:www\.instagram\.com|instagr\.am)/p/([0-9a-zA-Z_\-]{10,11})'
     )
 
     _RX_CODE = re.compile(
