@@ -747,7 +747,7 @@ class PostLooter(InstaLooter):
     )
 
     _RX_CODE = re.compile(
-        r'^[0-9a-zA-Z_\-]{11}$'
+        r'^[0-9a-zA-Z_\-]{10,11}$'
     )
 
     def __init__(self, code, **kwargs):
