@@ -109,7 +109,7 @@ class TestResolvedIssues(unittest.TestCase):
         for f in self.destfs.scandir("/"):
             self.assertTrue(f.name.startswith('nintendo.'))
 
-    @unittest.skipIf(os.getenv("CI") is None, "need private user account")
+    @unittest.skipIf(os.getenv("IG_USERNAME") is None, "need private user account")
     def test_issue_006(self):
         """
         Checks that instalooter does not iterate forever on a private
