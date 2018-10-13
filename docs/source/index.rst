@@ -63,6 +63,7 @@ Special thanks to the following contributors:
   * `Geoff <https://github.com/gffde3>`_
   * `Lev Velykoivanenko <https://github.com/AbysmalBiscuit>`_
   * `Maksymilian Ratajczyk <https://github.com/mratajczyk>`_
+  * `Henning Kowalk <https://github.com/Henning-K>`_
 
 Indices and tables
 ------------------
