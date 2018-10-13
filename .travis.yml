@@ -7,6 +7,7 @@ python:
 #- '3.4'
 #- '3.5'
 - '3.6'
+- '3.7'
 #- pypy
 #- pypy-5.4.1
 #matrix:
@@ -33,7 +34,7 @@ deploy:
   provider: pypi
   distributions: sdist bdist_wheel
   on:
-    python: '3.6'
+    python: '3.7'
     tags: true
     repo: althonos/InstaLooter
   server: https://upload.pypi.org/legacy/
