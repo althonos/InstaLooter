@@ -42,8 +42,8 @@ class NameGenerator(object):
         timestamp = media.get('date') or media.get('taken_at_timestamp')
         if timestamp is not None:
             dt = datetime.datetime.fromtimestamp(timestamp)
-            info['datetime'] = ("{0.year}-{0.month}-{0.day} {0.hour}"
-                "h{0.minute}m{0.second}s{0.microsecond}").format(dt)
+            info['datetime'] = ("{0.year}-{0.month:02d}-{0.day:02d} {0.hour:02d}"
+                "h{0.minute:02d}m{0.second:02d}s{0.microsecond}").format(dt)
             info['date'] = datetime.date.fromtimestamp(timestamp)
 
         return dict(six.moves.filter(
