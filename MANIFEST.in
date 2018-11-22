@@ -1,3 +1,4 @@
 include COPYING
 include CHANGELOG.rst
 include setup.cfg
+graft tests
