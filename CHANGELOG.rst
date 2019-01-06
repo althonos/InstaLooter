@@ -9,6 +9,13 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Changed
+'''''''
+- Add `tests` to source distribution (pr #228).
+- Add zero padding for date and time in filenames (pr #224)
+- Bumped required ``fs`` version to ``2.2.0``.
+
+
 v2.3.0_ - 2018-09-05
 --------------------
 

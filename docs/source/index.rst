@@ -65,6 +65,7 @@ Special thanks to the following contributors:
   * `Maksymilian Ratajczyk <https://github.com/mratajczyk>`_
   * `Henning Kowalk <https://github.com/Henning-K>`_
   * `Daniel M. Capella <https://github.com/polyzen>`_
+  * `tgandor <https://github.com/tgandor>`_
 
 Indices and tables
 ------------------
