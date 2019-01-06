@@ -64,6 +64,7 @@ Special thanks to the following contributors:
   * `Lev Velykoivanenko <https://github.com/AbysmalBiscuit>`_
   * `Maksymilian Ratajczyk <https://github.com/mratajczyk>`_
   * `Henning Kowalk <https://github.com/Henning-K>`_
+  * `Daniel M. Capella <https://github.com/polyzen>`_
 
 Indices and tables
 ------------------
