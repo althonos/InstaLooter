@@ -9,11 +9,24 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.3.2 _ - 2019-01-06
+---------------------
+
+Added
+'''''
+- Add zero padding for date and time in filenames (pr #224)
+
 Changed
 '''''''
 - Add `tests` to source distribution (pr #228).
-- Add zero padding for date and time in filenames (pr #224)
 - Bumped required ``fs`` version to ``2.2.0``.
+
+v2.3.1_ - 2018-10-13
+--------------------
+
+Fixed
+'''''
+- Allow extracting post codes of length 10 from URLs.
 
 
 v2.3.0_ - 2018-09-05
@@ -132,7 +145,9 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.3.0...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.3.2...HEAD
+.. _v2.3.2: https://github.com/althonos/InstaLooter/compare/v2.3.1...v2.3.2
+.. _v2.3.1: https://github.com/althonos/InstaLooter/compare/v2.3.0...v2.3.1
 .. _v2.3.0: https://github.com/althonos/InstaLooter/compare/v2.2.0...v2.3.0
 .. _v2.2.0: https://github.com/althonos/InstaLooter/compare/v2.1.0...v2.2.0
 .. _v2.1.0: https://github.com/althonos/InstaLooter/compare/v2.0.3...v2.1.0
