@@ -1,4 +1,6 @@
 include COPYING
 include CHANGELOG.rst
 include setup.cfg
+
 graft tests
+global-exclude __pycache__ *.pyc
