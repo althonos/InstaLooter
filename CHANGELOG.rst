@@ -9,7 +9,14 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
-v2.3.2 _ - 2019-01-06
+v2.3.3_ - 2019-02-11
+--------------------
+
+Fixed
+'''''
+- Bumped supported ``fs`` version to ``2.3.0``.
+
+v2.3.2_ - 2019-01-06
 ---------------------
 
 Added
@@ -19,7 +26,7 @@ Added
 Changed
 '''''''
 - Add `tests` to source distribution (pr #228).
-- Bumped required ``fs`` version to ``2.2.0``.
+- Bumped supported ``fs`` version to ``2.2.0``.
 
 v2.3.1_ - 2018-10-13
 --------------------
@@ -145,7 +152,8 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.3.2...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.3.3...HEAD
+.. _v2.3.3: https://github.com/althonos/InstaLooter/compare/v2.3.2...v2.3.3
 .. _v2.3.2: https://github.com/althonos/InstaLooter/compare/v2.3.1...v2.3.2
 .. _v2.3.1: https://github.com/althonos/InstaLooter/compare/v2.3.0...v2.3.1
 .. _v2.3.0: https://github.com/althonos/InstaLooter/compare/v2.2.0...v2.3.0
