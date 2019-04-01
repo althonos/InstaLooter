@@ -33,8 +33,8 @@ class NameGenerator(object):
             'ownerid': media['owner']['id'],
             'username': media['owner'].get('username'),
             'fullname': media['owner'].get('full_name'),
-            'commentscount': media['edge_media_to_comment']['count'],
-            'likescount': media['edge_media_preview_like']['count'],
+            'commentscount': media.get('edge_media_to_comment', {}).get('count'),
+            'likescount': media.get('edge_media_preview_like', {}).get('count'),
             'width': media.get('dimensions', {}).get('width'),
             'height': media.get('dimensions', {}).get('height'),
         }  # type: Dict[Text, Any]
