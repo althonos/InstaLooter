@@ -13,6 +13,9 @@ before_install:
 install:
 - pip install -e .[dev]
 
+before_script:
+- ci/travis/before_script.sh
+
 script:
 - green -t
 
