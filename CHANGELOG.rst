@@ -9,6 +9,12 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+Changed
+'''''''
+- Removed ``fake-useragent`` dependency.
+- Use a custom HTTP server to detect the user agent of the default web browser.
+
+
 v2.3.4_ - 2019-02-22
 --------------------
 

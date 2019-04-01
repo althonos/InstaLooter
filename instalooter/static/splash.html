@@ -1,0 +1,45 @@
+<html lang="en">
+
+<head>
+    <!-- meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Martin Larralde">
+    <!-- styling -->
+    <!-- <link href="/static/EBI-Icon-fonts/fonts.css" rel="stylesheet" crossorigin="anonymous"> -->
+    <link href="/static/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- icon -->
+    <link rel="icon" type="image/png" href="https://assets.gitlab-static.net/uploads/-/system/project/avatar/2101509/instaLooter-small.png?width=64"/>
+    <title>InstaLooter - UserAgent catcher</title>
+</head>
+
+<body>
+  <main>
+    <div style="padding-bottom: 20%; background: url('/static/img/splash.jpg'); background-size: cover; background-repeat: fixed;" class="jumbotron bg-secondary text-white text-center mb-0">
+      <div class="container-fluid">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/480px-Instagram_logo_2016.svg.png" alt="">
+        <div class="display-1">Don't Panic</div>
+        <hr class="bg-white">
+        <p>
+            Hi ! You recently installed and updated InstaLooter, and this page opened
+            because it needs to detect your User Agent. This way, we can trick Instagram
+            into thinking that you are using your usual web browser !
+            <i>You will not see this page on the next run.</i>
+        </p>
+        <hr class="bg-white">
+        <p>Your User Agent is: {}</p>
+        <p>It has been cached in: {}</p>
+      </div>
+    </div>
+  </main>
+  <footer class="footer mt-auto py-3">
+    <div class="container">
+      <div class="row">
+        <span class="text-muted">© 2016-2019, Martin Larralde (GPLv3)</span>
+      </div>
+    </div>
+  </footer>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

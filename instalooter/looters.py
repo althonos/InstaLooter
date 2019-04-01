@@ -15,7 +15,6 @@ import time
 import typing
 import warnings
 
-import fake_useragent
 import fs
 import six
 from requests import Session
@@ -24,6 +23,7 @@ from six.moves.http_cookiejar import FileCookieJar, LWPCookieJar
 
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint, json
+from ._uadetect import get_user_agent
 from ._utils import NameGenerator, CachedClassProperty, get_shared_data
 from .medias import TimedMediasIterator, MediasIterator
 from .pages import ProfileIterator, HashtagIterator
@@ -64,13 +64,21 @@ class InstaLooter(object):
 
     @CachedClassProperty
     @classmethod
-    def _user_agents(cls):
-        """~fake_useragent.UserAgent: a collection of fake user-agents.
+    def _user_agent(cls):
+        """str: the user agent of the default web browser.
         """
-        filename = 'fake_useragent_{}.json'.format(fake_useragent.VERSION)
-        return fake_useragent.UserAgent(
-            path=cls._cachefs.getsyspath(filename),
-            safe_attrs=['__name__', '__objclass__'])
+        if not cls._cachefs.isfile(cls._USERAGENT_FILE):
+            ua = get_user_agent(cache=cls._cachefs.getsyspath(cls._USERAGENT_FILE))
+            if ua is None:
+                warnings.warn("Could not detect user agent, using default")
+                ua = "Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+            with cls._cachefs.open("user-agent.txt", "w") as f:
+                f.write(ua)
+        with cls._cachefs.open(cls._USERAGENT_FILE) as f:
+            return f.read()
+
+    # str: The name of the user agent file in the cache filesystem
+    _USERAGENT_FILE = "user-agent.txt"
 
     # str: The name of the cookie file in the cache filesystem
     _COOKIE_FILE = "cookies.txt"
@@ -129,7 +137,7 @@ class InstaLooter(object):
                 'Host': 'www.instagram.com',
                 'Origin': 'https://www.instagram.com',
                 'Referer': 'https://www.instagram.com',
-                'User-Agent': cls._user_agents.firefox,
+                'User-Agent': cls._user_agent,
                 'X-Instagram-AJAX': '1',
                 'X-Requested-With': 'XMLHttpRequest'
             })
@@ -269,9 +277,9 @@ class InstaLooter(object):
         self.session = self._init_session(session)
         atexit.register(self.session.close)
 
-        # Set a fake User-Agent
+        # Set the default webbrowser user agent
         if self.session.headers['User-Agent'].startswith('python-requests'):
-            self.session.headers['User-Agent'] = self._user_agents.firefox
+            self.session.headers['User-Agent'] = self._user_agent
 
         # Get CSRFToken and RHX
         with self.session.get('https://www.instagram.com/') as res:
