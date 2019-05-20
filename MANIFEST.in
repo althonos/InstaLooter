@@ -1,3 +1,8 @@
 include COPYING
 include CHANGELOG.rst
 include setup.cfg
+
+recursive-include instalooter/static *.html
+
+graft tests
+global-exclude __pycache__ *.pyc
