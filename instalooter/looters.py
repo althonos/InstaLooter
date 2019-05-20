@@ -285,7 +285,7 @@ class InstaLooter(object):
         with self.session.get('https://www.instagram.com/') as res:
             token = get_shared_data(res.text)['config']['csrf_token']
             self.session.headers['X-CSRFToken'] = token
-            self.rhx = get_shared_data(res.text)['rhx_gis']
+            self.rhx = get_shared_data(res.text).get('rhx_gis', '')
 
     @abc.abstractmethod
     def pages(self):
