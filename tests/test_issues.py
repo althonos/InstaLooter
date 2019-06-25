@@ -153,6 +153,7 @@ class TestResolvedIssues(unittest.TestCase):
         for f in self.destfs.scandir("/"):
             self.assertFalse(FORBIDDEN.intersection(f.name))
 
+    @unittest.skipUnless(PIL, "PIL required for this test")
     def test_issue_026(self):
         """
         Feature request by @verafide.
