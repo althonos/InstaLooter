@@ -169,7 +169,7 @@ class ProfileIterator(PageIterator):
             con_id = next((c.value for c in session.cookies if c.name == "ds_user_id"), None)
             if con_id != data['id']:
                 raise RuntimeError("user '{}' is private".format(username))
-        return cls(data['id'], session, user_data['rhx_gis'])
+        return cls(data['id'], session, user_data.get('rhx_gis', ''))
 
     def __init__(self, owner_id, session, rhx):
         super(ProfileIterator, self).__init__(session, rhx)
