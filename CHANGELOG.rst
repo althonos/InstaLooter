@@ -9,11 +9,18 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.4.0_ - 2019-02-22
+--------------------
+
+Fixed
+'''''
+- Attempt fix for `rhx_gis` issue (#247) (pr #248)
+- Fix crashes when downloading hashtag medias
+
 Changed
 '''''''
 - Removed ``fake-useragent`` dependency.
 - Use a custom HTTP server to detect the user agent of the default web browser.
-
 
 v2.3.4_ - 2019-02-22
 --------------------
@@ -165,7 +172,8 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.3.4...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.4.0...HEAD
+.. _v2.4.0: https://github.com/althonos/InstaLooter/compare/v2.3.4...v2.4.0
 .. _v2.3.4: https://github.com/althonos/InstaLooter/compare/v2.3.3...v2.3.4
 .. _v2.3.3: https://github.com/althonos/InstaLooter/compare/v2.3.2...v2.3.3
 .. _v2.3.2: https://github.com/althonos/InstaLooter/compare/v2.3.1...v2.3.2
