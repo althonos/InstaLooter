@@ -148,6 +148,9 @@ class HashtagIterator(PageIterator):
             )
         return item
 
+    if six.PY2:
+        next = __next__
+
 
 class ProfileIterator(PageIterator):
     """An iterator over the pages of a user profile.
