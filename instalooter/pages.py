@@ -139,6 +139,15 @@ class HashtagIterator(PageIterator):
             "after": cursor
         }
 
+    def __next__(self):
+        item = super(HashtagIterator, self).__next__()
+        for media in item[self._section_media].get("edges", []):
+            media["node"].setdefault(
+                "__typename",
+                "GraphVideo" if media["node"].get("is_video", False) else "GraphImage"
+            )
+        return item
+
 
 class ProfileIterator(PageIterator):
     """An iterator over the pages of a user profile.
