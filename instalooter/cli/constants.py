@@ -62,8 +62,6 @@ HELP = textwrap.dedent(
                                      downloaded videos/pictures.
         -D, --dump-only              Save only the metadata and no video/picture.
                                      Implies `--dump-json`.
-        -e, --extended-dump          Always dump the maximum amount of extracted
-                                     information, at the cost of more time.
 
     Options - Miscellaneous:
         -l LEVEL, --loglevel LEVEL   The level of log to produce, as an

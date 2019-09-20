@@ -117,10 +117,6 @@ Options - Metadata
 ``-D, --dump-only``
   Save only the metadata and no video / picture.
 
-``-e, --extended-dump``
-  Always dump the maximum amount of extractable information, at the cost
-  of more time.
-
 
 Options - Miscellaneous
 -----------------------
