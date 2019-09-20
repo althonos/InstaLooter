@@ -157,33 +157,6 @@ class TestPostLooter(unittest.TestCase):
 #                 dump = json.load(f)
 #             self.assertMediaEqual(media, dump)
 #
-#     def test_extended_dump(self):
-#         looter = instaLooter.InstaLooter(
-#             self.tmpdir,
-#             profile="instagram",
-#             dump_only=True,
-#             extended_dump=True,
-#         )
-#         test_medias = list(itertools.islice(
-#             (m for m in looter.medias() if not m['is_video']), 3))
-#         looter.download(media_count=3)
-#
-#         # Check all files were downloaded as expected
-#         self.assertEqual(
-#             sorted(os.listdir(self.tmpdir)),
-#             sorted(str("{}.json").format(media['id']) for media in test_medias)
-#         )
-#
-#         # Check the metadata are OK
-#         for media in test_medias:
-#             with open(os.path.join(self.tmpdir, "{}.json").format(media['id'])) as f:
-#                 dump = json.load(f)
-#             self.assertMediaEqual(media, dump)
-#
-#             # Check the dump was "extended"
-#             self.assertIn('edge_media_to_comment', dump)
-#             self.assertIn('edge_media_to_caption', dump)
-#
 #
 # class TestUtils(_TempTestCase):
 #
