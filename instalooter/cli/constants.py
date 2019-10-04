@@ -10,7 +10,7 @@ WARNING_ACTIONS = {'error', 'ignore', 'always', 'default', 'module', 'once'}
 
 HELP = textwrap.dedent(
     """
-    instalooter - Another API-less Instagram pictures and videos downloader
+    instalooter - Another API-less Instagram media downloader
 
     Usage:
         instalooter (-h | --help | --version | --usage)
@@ -23,9 +23,9 @@ HELP = textwrap.dedent(
 
     Arguments:
         <profile>                    The username of the profile to download
-                                     videos and pictures from.
+                                     pictures and optionally videos from.
         <hashtag>                    A hashtag to download pictures and
-                                     videos from.
+                                     optionally videos from.
         <post_token>                 Either the url or the code of a post to
                                      download the picture or video from.
         <directory>                  The directory in which to download files.
