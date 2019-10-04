@@ -216,13 +216,13 @@ subcommand.
 Examples
 --------
 
-Download all pictures from the *instagram* profile in the current directory::
+Download all **pictures** from the *instagram* profile in the current directory::
 
     $ instalooter user instagram
 
 Download the latest 20 pictures or videos tagged with *python* to */tmp*::
 
-    $ instalooter hashtag python /tmp -n 20 -v -c MYLOGIN
+    $ instalooter hashtag python /tmp -n 20 --get-videos -c MYLOGIN
 
 Download a single post from an url in the `~/Pictures` directory::
 
