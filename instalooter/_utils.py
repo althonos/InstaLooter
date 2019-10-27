@@ -43,7 +43,7 @@ class NameGenerator(object):
         if timestamp is not None:
             dt = datetime.datetime.fromtimestamp(timestamp)
             info['datetime'] = ("{0.year}-{0.month:02d}-{0.day:02d} {0.hour:02d}"
-                "h{0.minute:02d}m{0.second:02d}s{0.microsecond}").format(dt)
+                                "h{0.minute:02d}m{0.second:02d}s{0.microsecond}").format(dt)
             info['date'] = datetime.date.fromtimestamp(timestamp)
 
         return dict(six.moves.filter(
@@ -91,4 +91,9 @@ class CachedClassProperty(object):
 
 def get_shared_data(html):
     match = re.search(r'window._sharedData = ({[^\n]*});', html)
-    return json.loads(match.group(1))
+    # append in 2019.7.15 in order to fix random 'NoneType' error
+    # return json.loads(match.group(1))
+    if match:
+        return json.loads(match.group(1))
+    else:
+        return None

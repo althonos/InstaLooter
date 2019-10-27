@@ -143,7 +143,12 @@ class InstaLooter(object):
             })
 
             with session.get(homepage) as res:
-                token = get_shared_data(res.text)['config']['csrf_token']
+                # to fix 'NoneType' error 2019.7.15
+                # token = get_shared_data(res.text)['config']['csrf_token']
+                token = None
+                while token is None:
+                    token = get_shared_data(res.text)['config']['csrf_token'] if not None else None
+
                 session.headers.update({'X-CSRFToken': token})
 
             time.sleep(5 * random.random())  # nosec
@@ -283,9 +288,17 @@ class InstaLooter(object):
 
         # Get CSRFToken and RHX
         with self.session.get('https://www.instagram.com/') as res:
-            token = get_shared_data(res.text)['config']['csrf_token']
+            # to fix 'NoneType' error 2019.7.15
+            # token = get_shared_data(res.text)['config']['csrf_token']
+            token = None
+            while token is None:
+                token = get_shared_data(res.text)['config']['csrf_token'] if not None else None
             self.session.headers['X-CSRFToken'] = token
-            self.rhx = get_shared_data(res.text).get('rhx_gis', '')
+            # self.rhx = get_shared_data(res.text).get('rhx_gis', '')
+            self.rhx = None
+            while self.rhx is None:
+                self.rhx = get_shared_data(res.text).get('rhx_gis', '') if not None else None
+
 
     @abc.abstractmethod
     def pages(self):
@@ -345,7 +358,11 @@ class InstaLooter(object):
         """
         url = "https://www.instagram.com/p/{}/".format(code)
         with self.session.get(url) as res:
-            data = get_shared_data(res.text)
+            # to fix 'NoneType' error 2019.7.15
+            # data = get_shared_data(res.text)
+            data = None
+            while data is None:
+                data = get_shared_data(res.text) if not None else None
             return data['entry_data']['PostPage'][0]['graphql']['shortcode_media']
 
     def download_pictures(self,
