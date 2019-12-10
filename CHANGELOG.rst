@@ -9,6 +9,14 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.4.1_ - 2019-12-10
+--------------------
+
+Fixed
+'''''
+- Issue with additional data not being loaded from certain pages (#271) (pr #273)
+
+
 v2.4.0_ - 2019-06-29
 --------------------
 
