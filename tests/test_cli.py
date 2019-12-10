@@ -96,8 +96,8 @@ class TestTimeUtils(unittest.TestCase):
 
     @parameterized.parameterized.expand([
         (":", (None, None)),
-        ("2017-03-12:", (datetime.date(2017, 3, 12), None)),
-        (":2016-08-04", (None, datetime.date(2016, 8, 4))),
+        ("2017-03-12:", (None, datetime.date(2017, 3, 12))),
+        (":2016-08-04", (datetime.date(2016, 8, 4), None)),
         ("2017-03-01:2017-02-01", (datetime.date(2017, 3, 1), datetime.date(2017, 2, 1))),
     ], testcase_func_name=firstparam)
     def test_get_times_from_cli(self, token, expected):

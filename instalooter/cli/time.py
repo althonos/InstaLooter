@@ -74,4 +74,7 @@ def get_times_from_cli(cli_token):
             stop_date = date_from_isoformat(stop_date) if stop_date else None
         except ValueError:
             raise ValueError("--time parameter was not provided ISO formatted dates")
-        return start_date, stop_date
+        if start_date is not None and stop_date is not None:
+            return max(start_date, stop_date), min(start_date, stop_date)
+        else:
+            return stop_date, start_date
