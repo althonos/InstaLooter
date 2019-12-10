@@ -24,7 +24,7 @@ from six.moves.http_cookiejar import FileCookieJar, LWPCookieJar
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint, json
 from ._uadetect import get_user_agent
-from ._utils import NameGenerator, CachedClassProperty, get_shared_data
+from ._utils import NameGenerator, CachedClassProperty, get_shared_data, get_additional_data
 from .medias import TimedMediasIterator, MediasIterator
 from .pages import ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
@@ -346,7 +346,10 @@ class InstaLooter(object):
         url = "https://www.instagram.com/p/{}/".format(code)
         with self.session.get(url) as res:
             data = get_shared_data(res.text)
-            return data['entry_data']['PostPage'][0]['graphql']['shortcode_media']
+            if 'graphql' in data['entry_data']['PostPage'][0]:
+                return data['entry_data']['PostPage'][0]['graphql']['shortcode_media']
+            data = get_additional_data(res.text)
+            return data['graphql']['shortcode_media']
 
     def download_pictures(self,
                           destination,       # type: Union[str, fs.base.FS]

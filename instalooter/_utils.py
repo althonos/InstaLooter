@@ -92,3 +92,8 @@ class CachedClassProperty(object):
 def get_shared_data(html):
     match = re.search(r'window._sharedData = ({[^\n]*});', html)
     return json.loads(match.group(1))
+
+
+def get_additional_data(html):
+    match = re.search(r"window.__additionalDataLoaded\('/p/.*/',({[^\n]*})\);", html)
+    return json.loads(match.group(1))
