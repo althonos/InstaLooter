@@ -66,6 +66,7 @@ Special thanks to the following contributors:
   * `Henning Kowalk <https://github.com/Henning-K>`_
   * `Daniel M. Capella <https://github.com/polyzen>`_
   * `tgandor <https://github.com/tgandor>`_
+  * `St2mZ <https://github.com/St2mZ>`_
 
 Indices and tables
 ------------------
