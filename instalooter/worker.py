@@ -103,6 +103,7 @@ class InstaDownloader(threading.Thread):
         mode = "w" if six.PY3 else "wb"
         with self.destination.open(filename, mode) as dest:
             json.dump(media, dest, indent=4, sort_keys=True)
+        self._set_time(media, filename)
 
     def run(self):
         while not self._killed:
