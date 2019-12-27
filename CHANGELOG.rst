@@ -9,6 +9,19 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.4.2_ - 2019-12-27
+--------------------
+
+Changed
+'''''''
+- CLI `--time` option will now always use higher and lower time given as the 
+  timeframe, independently of the order they are given.
+
+Fixed
+'''''
+- JSON files also get a proper timestamp set (pr #275).
+
+
 v2.4.1_ - 2019-12-10
 --------------------
 
