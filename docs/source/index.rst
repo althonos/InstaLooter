@@ -60,13 +60,14 @@ Special thanks to the following contributors:
   * `Bryan Massoth <https://github.com/bmass02>`_
   * `AndCycle <https://github.com/AndCycle>`_
   * `Pauli Salmenrinne <https://github.com/susundberg>`_
-  * `Geoff <https://github.com/gffde3>`_
+  * `Georp <https://github.com/gffde3>`_
   * `Lev Velykoivanenko <https://github.com/AbysmalBiscuit>`_
   * `Maksymilian Ratajczyk <https://github.com/mratajczyk>`_
   * `Henning Kowalk <https://github.com/Henning-K>`_
   * `Daniel M. Capella <https://github.com/polyzen>`_
   * `tgandor <https://github.com/tgandor>`_
-  * `St2mZ <https://github.com/St2mZ>`_
+  * `Denis Emelyanov <https://github.com/St2mZ>`_
+  * `Pavel Sutyrin <https://github.com/pavel64-sutyrin>`_
 
 Indices and tables
 ------------------
