@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
 import unittest
 import warnings
 
@@ -52,6 +53,16 @@ class TestInstaLooter(unittest.TestCase):
         looter = HashtagLooter(hashtag, session=self.session, **kwargs)
         looter.download(self.destfs, media_count=self.MEDIA_COUNT)
         self.assertGreaterEqual(len(self.destfs.listdir("/")), self.MEDIA_COUNT)
+
+    def test_timeframe_datetime(self):
+        looter = HashtagLooter("protein")
+        timeframe = datetime.datetime(2019, 12, 27), datetime.datetime(2019, 11, 27)
+        media = next(looter.medias(timeframe=timeframe))
+
+    def test_timeframe_date(self):
+        looter = HashtagLooter("protein")
+        timeframe = datetime.date(2019, 12, 27), datetime.date(2019, 12, 20)
+        media = next(looter.medias(timeframe=timeframe))
 
 
 

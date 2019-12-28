@@ -12,6 +12,8 @@ import typing
 
 import six
 
+from .pages import PageIterator
+
 if typing.TYPE_CHECKING:
     from typing import Any, Dict, List, Optional, Iterable, Set, Text
 
@@ -103,16 +105,19 @@ class TimedMediasIterator(MediasIterator):
         self.start_time, self.end_time = self.get_times(timeframe)
 
     def __next__(self):
+        number_old = 0
         while True:
             media = super(TimedMediasIterator, self).__next__()
             timestamp = media.get('taken_at_timestamp') or media['date']
-            media_date = datetime.date.fromtimestamp(timestamp)
+            media_date = type(self.start_time).fromtimestamp(timestamp)
 
             if self.start_time >= media_date >= self.end_time:
                 return media
             elif media_date < self.end_time:
-                self._finished = True
-                raise StopIteration
+                number_old += 1
+                if number_old >= PageIterator.PAGE_SIZE:
+                    self._finished = True
+                    raise StopIteration
 
     if six.PY2:
         next = __next__
