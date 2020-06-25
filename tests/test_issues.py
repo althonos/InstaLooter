@@ -53,6 +53,8 @@ class TestResolvedIssues(unittest.TestCase):
     def tearDown(self):
         self.destfs.close()
         warnings.showwarning = warnings._showwarning
+        if os.getenv("CI") == "true":
+            time.sleep(1)
 
     @unittest.expectedFailure
     @unittest.skipUnless(piexif, "piexif required for this test")
@@ -447,6 +449,8 @@ class TestPullRequests(unittest.TestCase):
 
     def tearDown(self):
         self.destfs.close()
+        if os.getenv("CI") == "true":
+            time.sleep(1)
 
     def _pr_122_looter(self):
         return ProfileLooter('nintendo', template='{code}', session=self.session)

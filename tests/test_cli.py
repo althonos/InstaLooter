@@ -6,6 +6,7 @@ import datetime
 import unittest
 import json
 import os
+import time
 
 import contexter
 import fs
@@ -50,6 +51,8 @@ class TestCLI(unittest.TestCase):
 
     def tearDown(self):
         self.destfs.close()
+        if os.getenv("CI") == "true":
+            time.sleep(1)
 
     @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_user(self):

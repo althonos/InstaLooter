@@ -3,6 +3,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
+import os
+import time
 import unittest
 import warnings
 
@@ -42,6 +44,8 @@ class TestInstaLooter(unittest.TestCase):
 
     def tearDown(self):
         self.destfs.close()
+        if os.getenv("CI") == "true":
+            time.sleep(1)
 
     @parameterized.parameterized.expand([
         parameterized.param("instagram",),
@@ -88,6 +92,10 @@ class TestInstaLooter(unittest.TestCase):
 
 
 class TestPostLooter(unittest.TestCase):
+
+    def tearDown(self):
+        if os.getenv("CI") == "true":
+            time.sleep(1)
 
     @mock.patch('instalooter.looters.InstaLooter.__init__')
     def test_post_url(self, _):
