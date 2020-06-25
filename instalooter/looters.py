@@ -126,7 +126,8 @@ class InstaLooter(object):
         headers = copy.deepcopy(session.headers)
         homepage = "https://www.instagram.com/"
         login_url = "https://www.instagram.com/accounts/login/ajax/"
-        data = {'username': username, 'password': password}
+        enc_password = "#PWD_INSTAGRAM_BROWSER:0:{}:{}".format(time.time(), password)
+        data = {'username': username, 'enc_password': enc_password}
 
         try:
             session.headers.update({
