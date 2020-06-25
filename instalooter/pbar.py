@@ -92,10 +92,5 @@ class TqdmProgressBar(tqdm.tqdm, ProgressBar):
     def set_maximum(self, maximum):  # noqa: D102
         self.total = maximum
 
-    def update(self):
-        """Update the progress bar by one step.
-        """
-        super(TqdmProgressBar, self).update()
-
     def finish(self):  # noqa: D102
         self.close()

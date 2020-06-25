@@ -193,7 +193,9 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.4.0...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.4.2...HEAD
+.. _v2.4.2: https://github.com/althonos/InstaLooter/compare/v2.4.1...v2.4.2
+.. _v2.4.1: https://github.com/althonos/InstaLooter/compare/v2.4.0...v2.4.1
 .. _v2.4.0: https://github.com/althonos/InstaLooter/compare/v2.3.4...v2.4.0
 .. _v2.3.4: https://github.com/althonos/InstaLooter/compare/v2.3.3...v2.3.4
 .. _v2.3.3: https://github.com/althonos/InstaLooter/compare/v2.3.2...v2.3.3

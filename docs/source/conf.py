@@ -234,7 +234,7 @@ autoclass_content = "both"
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'fs': ('https://docs.pyfilesystem.org/en/latest/', None),
-    'requests': ('http://requests.readthedocs.io/en/master/', None),
+    'requests': ('https://requests.readthedocs.io/en/master/', None),
     'coloredlogs': ('https://coloredlogs.readthedocs.io/en/latest/', None),
 }
 
