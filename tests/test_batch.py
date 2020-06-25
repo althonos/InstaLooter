@@ -7,9 +7,16 @@ import unittest
 import warnings
 
 import fs
+import requests
 
 from instalooter.cli import main
 from instalooter.batch import BatchRunner
+
+
+try:
+    CONNECTION_FAILURE = not requests.get("https://instagr.am/instagram").ok
+except requests.exceptions.ConnectionError:
+    CONNECTION_FAILURE = True
 
 
 class TestBatchRunner(unittest.TestCase):
@@ -21,6 +28,7 @@ class TestBatchRunner(unittest.TestCase):
     def tearDown(self):
         self.destfs.close()
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_cli(self):
 
         cfg = textwrap.dedent(

@@ -26,6 +26,12 @@ from .utils.method_names import firstparam
 from .utils.ig_mock import MockPages
 
 
+try:
+    CONNECTION_FAILURE = not requests.get("https://instagr.am/instagram").ok
+except requests.exceptions.ConnectionError:
+    CONNECTION_FAILURE = True
+
+
 class TestCLI(unittest.TestCase):
 
     @classmethod
@@ -43,6 +49,7 @@ class TestCLI(unittest.TestCase):
     def tearDown(self):
         self.destfs.close()
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_user(self):
         with contexter.Contexter() as ctx:
             ctx << mock.patch('instalooter.cli.ProfileLooter.pages', MockPages('nintendo'))
@@ -50,11 +57,13 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(r, 0)
         self.assertEqual(len(self.destfs.listdir('/')), 10)
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_single_post(self):
         r = main(["post", "BFB6znLg5s1", self.tmpdir, "-q"])
         self.assertEqual(r, 0)
         self.assertTrue(self.destfs.exists("1243533605591030581.jpg"))
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_dump_json(self):
         r = main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '-d'])
         self.assertEqual(r, 0)
@@ -68,6 +77,7 @@ class TestCLI(unittest.TestCase):
         self.assertEqual("1308972728853756295", json_metadata["id"])
         self.assertEqual("BIqZ8L8AHmH", json_metadata["shortcode"])
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_dump_only(self):
         r = main(["post", "BIqZ8L8AHmH", self.tmpdir, '-q', '-D'])
         self.assertEqual(r, 0)
@@ -81,11 +91,13 @@ class TestCLI(unittest.TestCase):
         self.assertEqual("1308972728853756295", json_metadata["id"])
         self.assertEqual("BIqZ8L8AHmH", json_metadata["shortcode"])
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_usage(self):
         handle = six.moves.StringIO()
         main(["--usage"], stream=handle)
         self.assertEqual(handle.getvalue().strip(), USAGE.strip())
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_single_post_from_url(self):
         url = "https://www.instagram.com/p/BFB6znLg5s1/"
         main(["post", url, self.tmpdir, "-q"])

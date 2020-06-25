@@ -17,6 +17,12 @@ from .utils import mock
 from .utils.method_names import signature
 
 
+try:
+    CONNECTION_FAILURE = not requests.get("https://instagr.am/instagram").ok
+except requests.exceptions.ConnectionError:
+    CONNECTION_FAILURE = True
+
+
 class TestInstaLooter(unittest.TestCase):
 
     MEDIA_COUNT = 5
@@ -40,6 +46,7 @@ class TestInstaLooter(unittest.TestCase):
         parameterized.param("instagram", get_videos=True),
         # parameterized.param("serotonine",),
     ], testcase_func_name=signature)
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_profile(self, profile, **kwargs):
         looter = ProfileLooter(profile, session=self.session, **kwargs)
         looter.download(self.destfs, media_count=self.MEDIA_COUNT)
@@ -49,11 +56,13 @@ class TestInstaLooter(unittest.TestCase):
         parameterized.param("eggs"),
         parameterized.param("python", videos_only=True),
     ], testcase_func_name=signature)
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_hashtag(self, hashtag, **kwargs):
         looter = HashtagLooter(hashtag, session=self.session, **kwargs)
         looter.download(self.destfs, media_count=self.MEDIA_COUNT)
         self.assertGreaterEqual(len(self.destfs.listdir("/")), self.MEDIA_COUNT)
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_timeframe_datetime(self):
         looter = HashtagLooter("protein")
         now = datetime.datetime.now()
@@ -64,6 +73,7 @@ class TestInstaLooter(unittest.TestCase):
         self.assertLessEqual(taken_at, max(timeframe))
         self.assertGreaterEqual(taken_at, min(timeframe))
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_timeframe_date(self):
         looter = HashtagLooter("protein")
         today = datetime.date.today()

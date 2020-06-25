@@ -23,7 +23,11 @@ from instalooter.looters import HashtagLooter, ProfileLooter, PostLooter
 from .utils import mock
 from .utils.ig_mock import MockPages
 
-# @mock.patch('instalooter.looter.requests.Session', lambda: TestResolvedIssues.session)
+
+try:
+    CONNECTION_FAILURE = not requests.get("https://instagr.am/instagram").ok
+except requests.exceptions.ConnectionError:
+    CONNECTION_FAILURE = True
 
 
 class TestResolvedIssues(unittest.TestCase):
@@ -66,6 +70,7 @@ class TestResolvedIssues(unittest.TestCase):
             self.assertTrue(exif['Exif'])  # Date & Caption
             self.assertTrue(exif['0th'])  # Image creator
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_012(self):
         """Feature request by @paramjitrohit.
 
@@ -78,6 +83,7 @@ class TestResolvedIssues(unittest.TestCase):
             medias_in_timeframe = list(looter.medias(timeframe=[day, day]))
         self.assertEqual(len(medias_in_timeframe), 2)
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_019(self):
         """
         Thanks to @emijawdo for reporting this bug.
@@ -96,6 +102,7 @@ class TestResolvedIssues(unittest.TestCase):
         finally:
             os.chdir(initial_dir)
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_014(self):
         """Feature request by @JFLarsen.
 
@@ -109,6 +116,7 @@ class TestResolvedIssues(unittest.TestCase):
         for f in self.destfs.scandir("/"):
             self.assertTrue(f.name.startswith('nintendo.'))
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     @unittest.skipIf(os.getenv("IG_USERNAME") is None, "need private user account")
     def test_issue_006(self):
         """
@@ -121,6 +129,7 @@ class TestResolvedIssues(unittest.TestCase):
             looter.logout()
             next(looter.medias())
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_015(self):
         """
         Feature request by @MohamedIM.
@@ -138,6 +147,7 @@ class TestResolvedIssues(unittest.TestCase):
             looter.download_videos(self.destfs, media_count=1)
             self.assertEqual(mtime, self.destfs.getdetails(video_file.name).accessed)
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_022(self):
         """
         Thanks to @kuchenmitsahne for reporting this bug.
@@ -153,6 +163,7 @@ class TestResolvedIssues(unittest.TestCase):
         for f in self.destfs.scandir("/"):
             self.assertFalse(FORBIDDEN.intersection(f.name))
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     @unittest.skipUnless(PIL, "PIL required for this test")
     def test_issue_026(self):
         """
@@ -165,6 +176,7 @@ class TestResolvedIssues(unittest.TestCase):
         pic = PIL.Image.open(self.destfs.getsyspath("1419863760138791137.jpg"))
         self.assertEqual(pic.size, (525, 612))
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_039(self):
         """
         Feature request by @verafide
@@ -185,6 +197,7 @@ class TestResolvedIssues(unittest.TestCase):
             }
         )
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_042(self):
         """
         Thanks to @MohamedIM for reporting this bug.
@@ -223,6 +236,7 @@ class TestResolvedIssues(unittest.TestCase):
     #     except Exception:
     #         self.fail()
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_041(self):
         """Feature request by @liorlior
 
@@ -235,6 +249,7 @@ class TestResolvedIssues(unittest.TestCase):
             looter.download(self.destfs, timeframe=[day, day])
         self.assertEqual(self.destfs.listdir("/"), ["1467639884243493431.mp4"])
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_052(self):
         """Thanks to @cyrusclarke for reporting this bug.
 
@@ -265,6 +280,7 @@ class TestResolvedIssues(unittest.TestCase):
     #         self.assertIn(key, media)
     #         self.assertIsNotNone(media[key])
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_066(self):
         """Thanks to @douglasrizzo for reporting this bug.
 
@@ -282,6 +298,7 @@ class TestResolvedIssues(unittest.TestCase):
         for image in self.destfs.listdir("/"):
             self.assertRegex(image, '[a-zA-Z0-9]*-[0-9]*-[0-9]*.(jpg|mp4)')
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_076(self):
         """Thanks to @zeshuaro for reporting this bug.
 
@@ -319,6 +336,7 @@ class TestResolvedIssues(unittest.TestCase):
     #     with open(os.path.join(self.tmpdir, 'BWOYSYQDCo5.jpg'), 'rb') as f:
     #         self.assertNotIn(b'5xx Server Error', f.read())
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_084(self):
         """Thanks to @raphaelbernardino for reporting this bug.
 
@@ -329,6 +347,7 @@ class TestResolvedIssues(unittest.TestCase):
         self.assertRaises(RuntimeError, looter.medias)
 
     @unittest.expectedFailure
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     @unittest.skipUnless(piexif, "piexif required for this test")
     def test_issue_094(self):
         """Thanks to @jeanmarctst for raising this issue.
@@ -371,6 +390,7 @@ class TestResolvedIssues(unittest.TestCase):
         looter = PostLooter("https://www.instagram.com/p/BJlIB9WhdRn/?taken-by=2k")
         self.assertEqual(looter.code, "BJlIB9WhdRn")
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_185(self):
         """Feature request by @JPNYC81.
 
@@ -392,6 +412,7 @@ class TestResolvedIssues(unittest.TestCase):
             runner.run_all()
         self.assertGreaterEqual(len(self.destfs.listdir('/')), 6)
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_issue_194(self):
         """Feature request by @raphaelbernardino
 
@@ -426,6 +447,7 @@ class TestPullRequests(unittest.TestCase):
     def _pr_122_looter(self):
         return ProfileLooter('nintendo', template='{code}', session=self.session)
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_pr_122_download_post(self):
         """Feature implemented by @susundberg.
 
@@ -440,6 +462,7 @@ class TestPullRequests(unittest.TestCase):
         self.assertEqual(stat.raw["details"]["accessed"], info['taken_at_timestamp'])
         self.assertEqual(stat.raw["details"]["modified"], info['taken_at_timestamp'])
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_pr_122_download_pictures(self):
         """Feature implemented by @susundberg.
 
@@ -456,6 +479,7 @@ class TestPullRequests(unittest.TestCase):
         self.assertEqual(stat.raw["details"]["accessed"], pic['taken_at_timestamp'])
         self.assertEqual(stat.raw["details"]["modified"], pic['taken_at_timestamp'])
 
+    @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_pr_122_download_videos(self):
         """Feature implemented by @susundberg.
 

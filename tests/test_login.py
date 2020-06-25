@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import os
 import unittest
 
+import requests
 import fs.memoryfs
 
 from instalooter.looters import ProfileLooter
@@ -13,8 +14,13 @@ from instalooter.looters import ProfileLooter
 USERNAME = os.getenv("IG_USERNAME")
 PASSWORD = os.getenv("IG_PASSWORD")
 
+try:
+    CONNECTION_FAILURE = not requests.get("https://instagr.am/instagram").ok
+except requests.exceptions.ConnectionError:
+    CONNECTION_FAILURE = True
 
-@unittest.skipIf(os.getenv("CI") == "true", "not working in CI")
+
+@unittest.skipIf(os.getenv("CI") == "true", "not supported in CI")
 @unittest.skipUnless(USERNAME and PASSWORD, "credentials required")
 class TestLogin(unittest.TestCase):
 
@@ -40,9 +46,7 @@ class TestLogin(unittest.TestCase):
             self.looter.logout()
             self.assertFalse(self.looter._cachefs.exists(self.looter._COOKIE_FILE))
 
-
     def test_download(self):
-
         try:
             self.looter.login(USERNAME, PASSWORD)
             self.looter.download(self.destfs)

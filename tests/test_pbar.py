@@ -11,7 +11,6 @@ import six
 from instalooter.pbar import ProgressBar, TqdmProgressBar
 
 
-
 class TestProgressBar(unittest.TestCase):
 
     def test_derived_progress_bar(self):
