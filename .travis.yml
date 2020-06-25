@@ -17,7 +17,7 @@ before_script:
 - ci/travis/before_script.sh
 
 script:
-- green -t
+- python -m coverage run -m unittest discover -v
 
 after_success:
 - python -m codecov
