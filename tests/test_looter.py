@@ -11,7 +11,7 @@ import parameterized
 import requests
 import six
 
-from instalooter.looters import ProfileLooter, HashtagLooter, PostLooter
+from instalooter.looters import InstaLooter, ProfileLooter, HashtagLooter, PostLooter
 
 from .utils import mock
 from .utils.method_names import signature
@@ -30,10 +30,12 @@ class TestInstaLooter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
+        InstaLooter._user_agent = cls.session.headers["User-Agent"]
 
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
+        del InstaLooter._user_agent
 
     def setUp(self):
         self.destfs = fs.memoryfs.MemoryFS()

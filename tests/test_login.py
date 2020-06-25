@@ -8,7 +8,7 @@ import unittest
 import requests
 import fs.memoryfs
 
-from instalooter.looters import ProfileLooter
+from instalooter.looters import InstaLooter, ProfileLooter
 
 
 USERNAME = os.getenv("IG_USERNAME")
@@ -23,6 +23,16 @@ except requests.exceptions.ConnectionError:
 @unittest.skipIf(os.getenv("CI") == "true", "not supported in CI")
 @unittest.skipUnless(USERNAME and PASSWORD, "credentials required")
 class TestLogin(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.session = requests.Session()
+        InstaLooter._user_agent = cls.session.headers["User-Agent"]
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.session.close()
+        del InstaLooter._user_agent
 
     def setUp(self):
         self.looter = ProfileLooter(USERNAME, template="test")

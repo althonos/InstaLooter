@@ -18,7 +18,7 @@ import six
 from instalooter._impl import length_hint, piexif, PIL
 from instalooter.batch import BatchRunner, logger as batch_logger
 from instalooter.cli import main
-from instalooter.looters import HashtagLooter, ProfileLooter, PostLooter
+from instalooter.looters import InstaLooter, HashtagLooter, ProfileLooter, PostLooter
 
 from .utils import mock
 from .utils.ig_mock import MockPages
@@ -38,10 +38,12 @@ class TestResolvedIssues(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
+        InstaLooter._user_agent = cls.session.headers["User-Agent"]
 
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
+        del InstaLooter._user_agent
 
     def setUp(self):
         self.destfs = fs.open_fs("temp://")
@@ -432,10 +434,12 @@ class TestPullRequests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
+        InstaLooter._user_agent = cls.session.headers["User-Agent"]
 
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
+        del InstaLooter._user_agent
 
     def setUp(self):
         self.destfs = fs.open_fs("temp://")

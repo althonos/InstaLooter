@@ -11,6 +11,7 @@ import requests
 
 from instalooter.cli import main
 from instalooter.batch import BatchRunner
+from instalooter.looters import InstaLooter
 
 
 try:
@@ -21,6 +22,16 @@ except requests.exceptions.ConnectionError:
 
 class TestBatchRunner(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.session = requests.Session()
+        InstaLooter._user_agent = cls.session.headers["User-Agent"]
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.session.close()
+        del InstaLooter._user_agent
+
     def setUp(self):
         self.destfs = fs.open_fs("temp://")
         self.tmpdir = self.destfs.getsyspath("/")
@@ -30,7 +41,6 @@ class TestBatchRunner(unittest.TestCase):
 
     @unittest.skipIf(CONNECTION_FAILURE, "cannot connect to Instagram")
     def test_cli(self):
-
         cfg = textwrap.dedent(
             """
             [my job]
