@@ -56,14 +56,23 @@ class TestInstaLooter(unittest.TestCase):
 
     def test_timeframe_datetime(self):
         looter = HashtagLooter("protein")
-        timeframe = datetime.datetime(2019, 12, 27), datetime.datetime(2019, 11, 27)
+        now = datetime.datetime.now()
+        timeframe = now - datetime.timedelta(5), now - datetime.timedelta(7)
         media = next(looter.medias(timeframe=timeframe))
+
+        taken_at = datetime.datetime.fromtimestamp(media["taken_at_timestamp"])
+        self.assertLessEqual(taken_at, max(timeframe))
+        self.assertGreaterEqual(taken_at, min(timeframe))
 
     def test_timeframe_date(self):
         looter = HashtagLooter("protein")
-        timeframe = datetime.date(2019, 12, 27), datetime.date(2019, 12, 20)
+        today = datetime.date.today()
+        timeframe = today - datetime.timedelta(5), today - datetime.timedelta(7)
         media = next(looter.medias(timeframe=timeframe))
 
+        taken_at = datetime.datetime.fromtimestamp(media["taken_at_timestamp"])
+        self.assertLessEqual(taken_at.date(), max(timeframe))
+        self.assertGreaterEqual(taken_at.date(), min(timeframe))
 
 
 class TestPostLooter(unittest.TestCase):
