@@ -9,6 +9,19 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.4.3_ - 2020-06-25
+--------------------
+
+Changed
+'''''''
+- Bumped ``tenacity`` to ``v6`` in requirements.
+
+Fixed
+'''''
+- Change in Instagram login policy causing plaintext password to stop 
+  working.
+
+
 v2.4.2_ - 2019-12-27
 --------------------
 
@@ -193,7 +206,8 @@ Removed
 - ``hues`` dependency, replaced by ``coloredlogs``
 - ``BeautifulSoup4`` dependency
 
-.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.4.2...HEAD
+.. _Unreleased: https://github.com/althonos/InstaLooter/compare/v2.4.3...HEAD
+.. _v2.4.3: https://github.com/althonos/InstaLooter/compare/v2.4.2...v2.4.3
 .. _v2.4.2: https://github.com/althonos/InstaLooter/compare/v2.4.1...v2.4.2
 .. _v2.4.1: https://github.com/althonos/InstaLooter/compare/v2.4.0...v2.4.1
 .. _v2.4.0: https://github.com/althonos/InstaLooter/compare/v2.3.4...v2.4.0
