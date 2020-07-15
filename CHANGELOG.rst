@@ -9,6 +9,14 @@ project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 Unreleased_
 -----------
 
+v2.4.4_ - 2020-07-15
+--------------------
+
+Changed
+'''''''
+- Bumped ``verboselogs`` to ``v14`` in requirements.
+
+
 v2.4.3_ - 2020-06-25
 --------------------
 
