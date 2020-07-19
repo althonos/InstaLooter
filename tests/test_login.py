@@ -27,12 +27,10 @@ class TestLogin(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
-        InstaLooter._user_agent = cls.session.headers["User-Agent"]
 
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
-        del InstaLooter._user_agent
 
     def setUp(self):
         self.looter = ProfileLooter(USERNAME, template="test")
@@ -45,16 +43,16 @@ class TestLogin(unittest.TestCase):
 
         self.assertFalse(self.looter.logged_in())
         self.assertRaises(RuntimeError, self.looter.medias)
-        self.assertFalse(self.looter._cachefs.exists(self.looter._COOKIE_FILE))
+        self.assertFalse(self.looter._cachefs().exists(self.looter._COOKIE_FILE))
 
         try:
             self.looter.login(USERNAME, PASSWORD)
             self.assertTrue(self.looter.logged_in())
-            self.assertTrue(self.looter._cachefs.exists(self.looter._COOKIE_FILE))
+            self.assertTrue(self.looter._cachefs().exists(self.looter._COOKIE_FILE))
             self.assertTrue(next(self.looter.medias()))
         finally:
             self.looter.logout()
-            self.assertFalse(self.looter._cachefs.exists(self.looter._COOKIE_FILE))
+            self.assertFalse(self.looter._cachefs().exists(self.looter._COOKIE_FILE))
 
     def test_download(self):
         try:

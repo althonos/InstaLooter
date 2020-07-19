@@ -38,12 +38,14 @@ class TestResolvedIssues(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
-        InstaLooter._user_agent = cls.session.headers["User-Agent"]
+        _user_agent = mock.Mock(return_value=cls.session.headers["User-Agent"])
+        cls.patch = mock.patch.object(InstaLooter, "_user_agent", new=_user_agent)
+        cls.patch.__enter__()
 
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
-        del InstaLooter._user_agent
+        cls.patch.__exit__(None, None, None)
 
     def setUp(self):
         self.destfs = fs.open_fs("temp://")
@@ -436,12 +438,10 @@ class TestPullRequests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
-        InstaLooter._user_agent = cls.session.headers["User-Agent"]
 
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
-        del InstaLooter._user_agent
 
     def setUp(self):
         self.destfs = fs.open_fs("temp://")

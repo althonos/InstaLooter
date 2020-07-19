@@ -100,7 +100,7 @@ class InstaLooter(object):
         session = session or Session()
         # Load cookies
         path = cls._cachefs().getsyspath(cls._COOKIE_FILE)
-        session.cookies = FileCookieJar, LWPCookieJar(path)  # type: ignore
+        session.cookies = LWPCookieJar(path)  # type: ignore
         try:
             typing.cast(FileCookieJar, session.cookies).load()
         except IOError:
