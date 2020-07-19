@@ -21,7 +21,7 @@ except ImportError:
 try:
     from operator import length_hint
 except ImportError:
-    def length_hint(obj, default=0):
+    def length_hint(obj, default=0):  # type: ignore
         # type: (typing.Any, int) -> int
         """Return an estimate of the number of items in obj.
 

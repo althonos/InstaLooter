@@ -72,22 +72,6 @@ class NameGenerator(object):
             return True
 
 
-class CachedClassProperty(object):
-
-    def __init__(self, factory):
-        if not isinstance(factory, (classmethod, staticmethod)):
-            factory = classmethod(factory)
-        self.factory = factory
-        self.value = self.sentinel = object()
-
-    def __get__(self, obj, klass=None):
-        if self.value is self.sentinel:
-            self.value = self.factory.__get__(obj, klass)()
-        return self.value
-
-    def __set__(self, obj, value):
-        raise AttributeError("can't set attribute")
-
 
 def get_shared_data(html):
     match = re.search(r'window._sharedData = ({[^\n]*});', html)

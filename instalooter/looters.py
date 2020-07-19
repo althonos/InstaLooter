@@ -54,27 +54,28 @@ class InstaLooter(object):
     """A brutal Instagram looter that raids without API tokens.
     """
 
-    @CachedClassProperty
     @classmethod
     def _cachefs(cls):
-        """~fs.base.FS: the cache filesystem.
+        # type: () -> FS
+        """Get the a persistent filesystem to store the program cache.
         """
         url = "usercache://{}:{}:{}".format(__appname__, __author__, __version__)
         return fs.open_fs(url, create=True)
 
-    @CachedClassProperty
     @classmethod
     def _user_agent(cls):
-        """str: the user agent of the default web browser.
+        # type: () -> Text
+        """Get the user agent of the default web browser on the local machine.
         """
-        if not cls._cachefs.isfile(cls._USERAGENT_FILE):
-            ua = get_user_agent(cache=cls._cachefs.getsyspath(cls._USERAGENT_FILE))
+        cache = cls._cachefs()
+        if not cache.isfile(cls._USERAGENT_FILE):
+            ua = get_user_agent(cache=cache.getsyspath(cls._USERAGENT_FILE))
             if ua is None:
                 warnings.warn("Could not detect user agent, using default")
                 ua = "Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
-            with cls._cachefs.open("user-agent.txt", "w") as f:
+            with cache.open("user-agent.txt", "w") as f:
                 f.write(ua)
-        with cls._cachefs.open(cls._USERAGENT_FILE) as f:
+        with cache.open(cls._USERAGENT_FILE) as f:
             return f.read()
 
     # str: The name of the user agent file in the cache filesystem
@@ -98,13 +99,13 @@ class InstaLooter(object):
         """
         session = session or Session()
         # Load cookies
-        session.cookies = LWPCookieJar(
-            cls._cachefs.getsyspath(cls._COOKIE_FILE))
+        path = cls._cachefs().getsyspath(cls._COOKIE_FILE)
+        session.cookies = FileCookieJar, LWPCookieJar(path)  # type: ignore
         try:
             typing.cast(FileCookieJar, session.cookies).load()
         except IOError:
             pass
-        typing.cast(FileCookieJar, session.cookies).clear_expired_cookies()
+        session.cookies.clear_expired_cookies()  # type: ignore
         return session
 
     @classmethod
@@ -138,7 +139,7 @@ class InstaLooter(object):
                 'Host': 'www.instagram.com',
                 'Origin': 'https://www.instagram.com',
                 'Referer': 'https://www.instagram.com',
-                'User-Agent': cls._user_agent,
+                'User-Agent': cls._user_agent(),
                 'X-Instagram-AJAX': '1',
                 'X-Requested-With': 'XMLHttpRequest'
             })
@@ -191,8 +192,9 @@ class InstaLooter(object):
             url = "https://www.instagram.com/accounts/logout/"
             session.post(url, data={"csrfmiddlewaretoken": sessionid})
 
-        if cls._cachefs.exists(cls._COOKIE_FILE):
-            cls._cachefs.remove(cls._COOKIE_FILE)
+        cache = cls._cachefs()
+        if cache.exists(cls._COOKIE_FILE):
+            cache.remove(cls._COOKIE_FILE)
 
     @classmethod
     def _logged_in(cls, session=None):
@@ -280,7 +282,7 @@ class InstaLooter(object):
 
         # Set the default webbrowser user agent
         if self.session.headers['User-Agent'].startswith('python-requests'):
-            self.session.headers['User-Agent'] = self._user_agent
+            self.session.headers['User-Agent'] = self._user_agent()
 
         # Get CSRFToken and RHX
         with self.session.get('https://www.instagram.com/') as res:
@@ -854,7 +856,7 @@ class PostLooter(InstaLooter):
         """
         destination, close_destination = self._init_destfs(destination)
 
-        queue = Queue()                           # type: Queue[Dict]
+        queue = Queue()  # type: Queue[Optional[Dict]]
         medias_queued = self._fill_media_queue(
             queue, destination, iter(self.medias()), media_count,
             new_only, condition)

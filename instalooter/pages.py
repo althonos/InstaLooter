@@ -39,9 +39,10 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
     _BASE_URL = "https://www.instagram.com/graphql/query/"
     _section_generic = NotImplemented    # type: Text
     _section_media = NotImplemented      # type: Text
+    _URL = NotImplemented                # type: Text
 
     def __init__(self, session, rhx):
-        # type: (Session) -> None
+        # type: (Session, Text) -> None
         self._finished = False
         self._cursor = None     # type: Optional[Text]
         self._current_page = 0
@@ -53,7 +54,7 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
         return NotImplemented
 
     def _page_loader(self, session, rhx):
-        # type: (Session) -> Iterable[Dict[Text, Dict[Text, Any]]]
+        # type: (Session, Text) -> Iterable[Dict[Text, Dict[Text, Any]]]
         while True:
             # Cache cursor for later
             cursor = self._cursor
