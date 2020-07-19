@@ -29,7 +29,7 @@ InstaLooter |starme|
    :target: https://codecov.io/gh/althonos/InstaLooter
 
 .. |doc| image:: https://img.shields.io/readthedocs/instalooter.svg?style=flat-square
-   :target: http://instalooter.readthedocs.io/en/latest/?badge=latest
+   :target: http://instalooter.readthedocs.io/en/stable/?badge=stable
 
 .. .. |requirements| image:: https://img.shields.io/requires/github/althonos/InstaLooter/master.svg?style=flat-square
 ..    :target: https://requires.io/github/althonos/InstaLooter/requirements/?branch=master
