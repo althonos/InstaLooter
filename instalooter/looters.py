@@ -24,7 +24,7 @@ from six.moves.http_cookiejar import FileCookieJar, LWPCookieJar
 from . import __author__, __name__ as __appname__, __version__
 from ._impl import length_hint, json
 from ._uadetect import get_user_agent
-from ._utils import NameGenerator, CachedClassProperty, get_shared_data, get_additional_data
+from ._utils import NameGenerator, get_shared_data, get_additional_data
 from .medias import TimedMediasIterator, MediasIterator
 from .pages import ProfileIterator, HashtagIterator
 from .pbar import ProgressBar
