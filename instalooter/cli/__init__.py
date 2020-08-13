@@ -143,7 +143,6 @@ def main(argv=None, stream=None):
                 template=args['--template'],
                 dump_json=args['--dump-json'],
                 dump_only=args['--dump-only'],
-                extended_dump=args['--extended-dump']
             )
 
             # Attempt to login and extract the timeframe
