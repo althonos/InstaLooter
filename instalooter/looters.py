@@ -18,7 +18,7 @@ import warnings
 import fs
 import six
 from requests import Session
-from six.moves.queue import Queue
+from six.moves.queue import Queue, Empty
 from six.moves.http_cookiejar import FileCookieJar, LWPCookieJar
 
 from . import __author__, __name__ as __appname__, __version__
@@ -69,10 +69,14 @@ class InstaLooter(object):
         """
         cache = cls._cachefs()
         if not cache.isfile(cls._USERAGENT_FILE):
-            ua = get_user_agent(cache=cache.getsyspath(cls._USERAGENT_FILE))
+            try:
+                ua = get_user_agent(cache=cache.getsyspath(cls._USERAGENT_FILE))
+            except Empty:
+                ua = None
             if ua is None:
-                warnings.warn("Could not detect user agent, using default")
                 ua = "Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+                warnings.warn("Could not detect user agent, using default: " + ua)
+                warnings.warn("User agent will be stored in file " + cache.getsyspath(cls._USERAGENT_FILE))
             with cache.open("user-agent.txt", "w") as f:
                 f.write(ua)
         with cache.open(cls._USERAGENT_FILE) as f:
