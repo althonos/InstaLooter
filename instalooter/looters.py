@@ -708,7 +708,7 @@ class ProfileLooter(InstaLooter):
         self._username = username
         self._owner_id = None
 
-    def pages(self):
+    def pages(self, cursor=None):
         # type: () -> ProfileIterator
         """Obtain an iterator over Instagram post pages.
 
@@ -723,10 +723,10 @@ class ProfileLooter(InstaLooter):
 
         """
         if self._owner_id is None:
-            it = ProfileIterator.from_username(self._username, self.session)
+            it = ProfileIterator.from_username(self._username, self.session, cursor=cursor)
             self._owner_id = it.owner_id
             return it
-        return ProfileIterator(self._owner_id, self.session, self.rhx)
+        return ProfileIterator(self._owner_id, self.session, self.rhx, cursor=cursor)
 
 
 class HashtagLooter(InstaLooter):
