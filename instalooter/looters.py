@@ -320,7 +320,7 @@ class InstaLooter(object):
             return TimedMediasIterator(pages_iterator, timeframe)
         return MediasIterator(pages_iterator)
 
-    def medias(self, timeframe=None):
+    def medias(self, timeframe=None, cursor=None):
         # type: (Optional[_Timeframe]) -> Iterator[Dict[Text, Any]]
         """Obtain an iterator over the Instagram medias.
 
@@ -331,7 +331,7 @@ class InstaLooter(object):
             MediasIterator: an iterator over the medias in every pages.
 
         """
-        return self._medias(self.pages(), timeframe)
+        return self._medias(self.pages(cursor=cursor), timeframe)
 
     def get_post_info(self, code):
         # type: (str) -> dict
@@ -409,6 +409,7 @@ class InstaLooter(object):
                  condition=None,        # type: Optional[Callable[[dict], bool]]
                  media_count=None,      # type: Optional[int]
                  timeframe=None,        # type: Optional[_Timeframe]
+                 cursor=None,           # type: Optional[str]
                  new_only=False,        # type: bool
                  pgpbar_cls=None,       # type: Optional[Type[ProgressBar]]
                  dlpbar_cls=None,       # type: Optional[Type[ProgressBar]]
@@ -432,6 +433,7 @@ class InstaLooter(object):
             timeframe (tuple or None): a tuple of two `~datetime.datetime`
                 objects to enforce a time frame (the first item must be
                 more recent). Leave to `None` to ignore times.
+            cursor (str or none): a cursor used to resume looting
             new_only (bool): stop media discovery when already
                 downloaded medias are encountered.
             pgpbar_cls (type or None): an optional `~.pbar.ProgressBar`
@@ -450,7 +452,7 @@ class InstaLooter(object):
         destination, close_destination = self._init_destfs(destination)
 
         # Create an iterator over the pages with an optional progress bar
-        pages_iterator = self.pages()   # type: Iterable[Dict[Text, Any]]
+        pages_iterator = self.pages(cursor=cursor)   # type: Iterable[Dict[Text, Any]]
         pages_iterator = pgpbar = self._init_pbar(pages_iterator, pgpbar_cls)
 
         # Create an iterator over the medias

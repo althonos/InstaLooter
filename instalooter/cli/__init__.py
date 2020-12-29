@@ -168,6 +168,7 @@ def main(argv=None, stream=None):
                 destination=dest_fs,
                 media_count=args['--num-to-dl'],
                 timeframe=args['--time'],
+                cursor=args['--cursor'],
                 new_only=args['--new'],
                 pgpbar_cls=None if args['--quiet'] else TqdmProgressBar,
                 dlpbar_cls=None if args['--quiet'] else TqdmProgressBar)
