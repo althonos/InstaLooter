@@ -41,10 +41,11 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
     _section_media = NotImplemented      # type: Text
     _URL = NotImplemented                # type: Text
 
-    def __init__(self, session, rhx):
+    def __init__(self, session, rhx, cursor=None):
         # type: (Session, Text) -> None
         self._finished = False
-        self._cursor = None     # type: Optional[Text]
+        self._cursor = cursor     # type: Optional[Text]
+
         self._current_page = 0
         self._data_it = iter(self._page_loader(session, rhx))
 
@@ -62,6 +63,7 @@ class PageIterator(typing.Iterator[typing.Dict[typing.Text, typing.Any]]):
             try:
                 # Prepare the query
                 params = self._getparams(cursor)
+
                 json_params = json.dumps(params, separators=(',', ':'))
                 magic = "{}:{}".format(rhx, json_params)
                 session.headers['x-instagram-gis'] = hashlib.md5(magic.encode('utf-8')).hexdigest()
@@ -173,7 +175,7 @@ class ProfileIterator(PageIterator):
             raise ValueError("user not found: '{}'".format(username))
 
     @classmethod
-    def from_username(cls, username, session):
+    def from_username(cls, username, session, cursor=None):
         user_data = cls._user_data(username, session)
         if 'ProfilePage' not in user_data['entry_data']:
             raise ValueError("user not found: '{}'".format(username))
@@ -182,10 +184,10 @@ class ProfileIterator(PageIterator):
             con_id = next((c.value for c in session.cookies if c.name == "ds_user_id"), None)
             if con_id != data['id']:
                 raise RuntimeError("user '{}' is private".format(username))
-        return cls(data['id'], session, user_data.get('rhx_gis', ''))
+        return cls(data['id'], session, user_data.get('rhx_gis', ''), cursor=cursor)
 
-    def __init__(self, owner_id, session, rhx):
-        super(ProfileIterator, self).__init__(session, rhx)
+    def __init__(self, owner_id, session, rhx, cursor=None):
+        super(ProfileIterator, self).__init__(session, rhx, cursor=cursor)
         self.owner_id = owner_id
 
     def _getparams(self, cursor):
