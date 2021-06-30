@@ -9,12 +9,12 @@ python:
 
 before_install:
 - pip install -U pip wheel setuptools
-
+ 
 install:
 - pip install -e .[dev]
 
 before_script:
-- ci/travis/before_script.sh
+- sh ci/travis/before_script.sh
 
 script:
 - python -m coverage run -m unittest discover -v
