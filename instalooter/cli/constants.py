@@ -54,6 +54,7 @@ HELP = textwrap.dedent(
                                      in the destination directory (faster).
         -t TIME, --time TIME         The time limit within which to download
                                      pictures and video (see *Time*).
+        -c CURSOR, --cursor CURSOR   Use saved cursor to resume looting
 
     Options - Metadata:
         -m, --add-metadata           Add date and caption metadata to downloaded
