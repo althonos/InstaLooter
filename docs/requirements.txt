@@ -1,4 +1,4 @@
 setuptools >=30.3
 Sphinx ~=3.1
-sphinx-bootstrap-theme ~=0.7
+sphinx-bootstrap-theme ~=0.8
 semantic-version ~=2.8
