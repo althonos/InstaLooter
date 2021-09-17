@@ -55,7 +55,10 @@ def get_user_agent(port=None, cache=None):
     # Use webbrowser to connect to the server with the default browser
     webbrowser.open("http://localhost:{}/".format(port))
     # Wait for the request handler to get the request from the browser
-    user_agent = UserAgentRequestHandler.queue.get()
+    try:
+        user_agent = UserAgentRequestHandler.queue.get(timeout=5)
+    except queue.Empty:
+        user_agent = None
     # Close the server
     server.shutdown()
     server.server_close()
