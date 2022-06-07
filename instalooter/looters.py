@@ -126,7 +126,7 @@ class InstaLooter(object):
         session = cls._init_session(session)
         headers = copy.deepcopy(session.headers)
         homepage = "https://www.instagram.com/"
-        login_url = "https://www.instagram.com/accounts/login/ajax/"
+        login_url = "https://www.instagram.com/accounts/login/"
         enc_password = "#PWD_INSTAGRAM_BROWSER:0:{}:{}".format(time.time(), password)
         data = {'username': username, 'enc_password': enc_password}
 
@@ -144,13 +144,45 @@ class InstaLooter(object):
                 'X-Requested-With': 'XMLHttpRequest'
             })
 
-            with session.get(homepage) as res:
-                token = get_shared_data(res.text)['config']['csrf_token']
-                session.headers.update({'X-CSRFToken': token})
+            for cookie in session.cookies:
+                if (cookie.name == 'sessionid'):
+                    cookie.value = ''
+                elif (cookie.name == 'mid'):
+                    cookie.value = ''
+                elif (cookie.name == 'ig_pr'):
+                    cookie.value = '1'
+                elif (cookie.name == 'ig_vw'):
+                    cookie.value = '1920'
+                elif (cookie.name == 'ig_cb'):
+                    cookie.value = '1'
+                elif (cookie.name == 'csrftoken'):
+                    cookie.value = ''
+                elif (cookie.name == 's_network'):
+                    cookie.value = ''
+                elif (cookie.name == 'ds_user_id'):
+                    cookie.value = ''
+
+            with session.get(login_url, params={}, allow_redirects=False) as res:
+                if res.status_code == 400:
+                    raise ValueError('400 Bad Request')
+                if res.status_code == 404:
+                    raise ValueError('404 Not Found')
+                if res.status_code == 429:
+                    raise ValueError('429 Too Many Requests')
+                if res.status_code != 200:
+                    raise ValueError('HTTP error code {}.'.format(res.status_code))
+
+                sData = get_shared_data(res.text)
+                if (sData and ('config' in sData)):
+                    token = sData['config']['csrf_token']
+                    session.headers.update({'X-CSRFToken': token})
+                else:
+                    raise SystemError('Login error: Token not found')
 
             time.sleep(5 * random.random())  # nosec
-            with session.post(login_url, data, allow_redirects=True) as login:
-                token = next(c.value for c in login.cookies if c.name == 'csrftoken')
+            with session.post('https://www.instagram.com/accounts/login/ajax/', data, allow_redirects=True) as login:
+                tokens = list(c.value for c in login.cookies if c.name == 'csrftoken')
+                token = None if not tokens else tokens[0]
                 session.headers.update({'X-CSRFToken': token})
                 if not login.ok:
                     raise SystemError("Login error: check your connection")
@@ -278,6 +310,7 @@ class InstaLooter(object):
         self.dump_json = dump_json or dump_only
         self.extended_dump = extended_dump
         self.session = self._init_session(session)
+        self.rhx = ''
         atexit.register(self.session.close)
 
         # Set the default webbrowser user agent
@@ -286,9 +319,14 @@ class InstaLooter(object):
 
         # Get CSRFToken and RHX
         with self.session.get('https://www.instagram.com/') as res:
-            token = get_shared_data(res.text)['config']['csrf_token']
-            self.session.headers['X-CSRFToken'] = token
-            self.rhx = get_shared_data(res.text).get('rhx_gis', '')
+            sData = get_shared_data(res.text)
+            if sData:
+                token = None
+                if 'config' in sData:
+                    token = sData['config']['csrf_token']
+
+                self.session.headers['X-CSRFToken'] = token
+                self.rhx = sData.get('rhx_gis', '')
 
     @abc.abstractmethod
     def pages(self):
